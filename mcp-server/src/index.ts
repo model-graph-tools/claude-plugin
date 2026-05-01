@@ -15,7 +15,7 @@ import { runCypher } from "./tools/run-cypher.js";
 
 const server = new McpServer({
   name: "wildfly-model-graph",
-  version: "0.3.0",
+  version: "0.3.1",
 });
 
 function textResult(data: unknown) {
