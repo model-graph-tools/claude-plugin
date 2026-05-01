@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { closeAll } from "./neo4j.js";
@@ -17,7 +15,7 @@ import { runCypher } from "./tools/run-cypher.js";
 
 const server = new McpServer({
   name: "wildfly-model-graph",
-  version: "0.2.0",
+  version: "0.3.0",
 });
 
 function textResult(data: unknown) {
