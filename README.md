@@ -60,6 +60,7 @@ Use `/mgt:model` followed by your question:
 /mgt:model Tell me more about credential stores.
 /mgt:model Compare WildFly 38 and 39.
 /mgt:model What resources does the AI feature pack provide?
+/mgt:model Compare the first with the latest versions of the AI feature pack.
 ```
 
 ### Natural Language
