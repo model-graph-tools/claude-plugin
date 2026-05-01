@@ -19,7 +19,7 @@ export async function stopSource(
   }
   untrackStarted(identifier);
   return {
-    identifier: result.identifier,
+    identifier,
     status: "stopped",
   };
 }

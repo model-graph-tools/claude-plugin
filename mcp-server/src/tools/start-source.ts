@@ -26,7 +26,7 @@ export async function startSource(
   registerConnection(identifier, result.bolt);
   trackStarted(identifier);
   return {
-    identifier: result.identifier,
+    identifier,
     status: "running",
     bolt: result.bolt,
     http: result.http,

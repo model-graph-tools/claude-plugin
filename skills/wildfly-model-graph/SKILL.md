@@ -57,10 +57,12 @@ The model graph covers two types of sources:
 
 - **Feature packs**: Additional WildFly subsystems distributed as Galleon feature packs
   (e.g., `ai`, `graphql`). These provide focused management model extensions without the
-  full WildFly server. Identified by their shortcut name.
+  full WildFly server. Identified by `shortcut:version` (e.g., `ai:0.9.1`, `graphql:2.7.0`)
+  for a specific version, or just the shortcut (e.g., `ai`) for the latest version.
 
 Both source types produce the same graph schema — the same query tools work for both.
-When the user asks about a feature pack, use its shortcut as the identifier.
+When the user asks about a feature pack without specifying a version, use just the shortcut
+(e.g., `"ai"`). When a specific version is needed, use `shortcut:version` (e.g., `"ai:0.9.1"`).
 
 ### Resource address format
 
@@ -96,7 +98,7 @@ Users often ask about these areas:
 | "what versions are available?"                      | `list_sources`         | (none)                                       |
 | "what feature packs are there?"                     | `list_sources`         | (none)                                       |
 | "start the model DB for WildFly 39"                 | `start_source`         | identifier="39"                              |
-| "start the model DB for the AI feature pack"        | `start_source`         | identifier="ai"                              |
+| "start the model DB for the AI feature pack"        | `start_source`         | identifier="ai" (latest) or "ai:0.9.1"       |
 | "stop the model DB for WildFly 38"                  | `stop_source`          | identifier="38"                              |
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
@@ -106,7 +108,7 @@ Users often ask about these areas:
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
 | "what's new in WildFly 39?"                         | `compare_versions`     | identifier1="38", identifier2="39"           |
 | "show all deprecated stuff since WildFly 30"        | `find_deprecated`      | since_version="30.0.0"                       |
-| "what resources does the AI feature pack add?"      | `search_resources`     | identifier="ai", query=""                    |
+| "what resources does the AI feature pack add?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
 specifying a base version, infer the previous version: call `list_sources` to get
@@ -151,7 +153,8 @@ a representative resource at the wildcard level.
 - If the user asks **"what model am I using?"**, **"what's the current source?"**, or similar,
   call `list_sources` and report the `activeSource`. If none is active, say so.
 - If the user **specifies a version or feature pack**, map it to an identifier
-  (e.g., "WildFly 39" → `"39"`, "the AI feature pack" → `"ai"`).
+  (e.g., "WildFly 39" → `"39"`, "the AI feature pack" → `"ai"`,
+  "AI feature pack 0.9.1" → `"ai:0.9.1"`).
 - If the user **does not specify a source**, pick one using this priority:
   1. If there is an active source (from a previous query in this session), keep using it.
   2. If exactly one source is already running, use it.
@@ -161,7 +164,8 @@ a representative resource at the wildcard level.
      feature pack source over a WildFly version.
 - When comparing versions, the user might say "WildFly 39" — map this to identifier "39"
   for the tool parameter.
-- Feature pack identifiers are their shortcut names: "ai", "graphql", etc.
+- Feature pack identifiers use the format `shortcut:version` (e.g., `"ai:0.9.1"`,
+  `"graphql:2.7.0"`). Use just the shortcut (e.g., `"ai"`) to target the latest version.
 
 ### Response formatting
 

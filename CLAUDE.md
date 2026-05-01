@@ -87,7 +87,7 @@ The WildFly management model is a tree of **resources** (e.g., `/subsystem=datas
 
 Two source types:
 - **WildFly versions** — identified by version number (e.g., `34`, `39`), image tag like `model:34.0.0.Final`
-- **Feature packs** — identified by shortcut (e.g., `ai`, `graphql`), image tag like `model:ai-1.0.0`
+- **Feature packs** — identified by `shortcut:version` (e.g., `ai:0.9.1`, `graphql:2.7.0`), image tag like `model:ai-1.0.0`
 
 ## Graph Schema
 

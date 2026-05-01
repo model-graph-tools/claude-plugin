@@ -47,11 +47,10 @@ export async function listSources(): Promise<ListSourcesResult> {
 
   const seen = new Set<string>();
   for (const fp of featurePacks) {
-    const key = `${fp.shortcut}-${fp.version}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
+    const id = `${fp.shortcut}:${fp.version}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
 
-    const id = `${fp.shortcut}-${fp.version}`;
     const container = runningByIdentifier.get(id);
     sources.push({
       identifier: id,

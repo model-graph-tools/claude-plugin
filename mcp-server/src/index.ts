@@ -57,7 +57,7 @@ server.registerTool("start_source", {
   inputSchema: z.object({
     identifier: z
       .string()
-      .describe('Source identifier, e.g. "39", "26.1", "ai-0.9.1"'),
+      .describe('Source identifier, e.g. "39", "26.1", "ai:0.9.1"'),
   }),
 }, async ({ identifier }) => {
   try {
@@ -72,7 +72,7 @@ server.registerTool("stop_source", {
   inputSchema: z.object({
     identifier: z
       .string()
-      .describe('Source identifier, e.g. "39", "ai-0.9.1"'),
+      .describe('Source identifier, e.g. "39", "ai:0.9.1"'),
   }),
 }, async ({ identifier }) => {
   try {
