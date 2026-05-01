@@ -1,14 +1,17 @@
 ---
 name: wildfly-model-graph
 description: >
-  Search, browse, and analyze the WildFly management model across versions
-  and feature packs using a Neo4j-backed graph database. Handles natural
-  language queries about resources, attributes, operations, capabilities,
-  deprecations, and version diffs.
+  This skill should be used when the user asks about the WildFly management
+  model, WildFly subsystems, JBoss configuration, management resources,
+  attributes, operations, or capabilities. Covers queries like "what versions
+  of WildFly are available", "show me the datasources subsystem", "what
+  operations can I do on a datasource", "what changed between WildFly 38
+  and 39", "find deprecated attributes", "what capabilities does elytron
+  provide", "start WildFly 39", or "search for logging resources". Also
+  triggered by mentions of specific WildFly subsystems such as undertow,
+  elytron, datasources, messaging, infinispan, or logging in a management
+  model context.
 ---
-
-You are helping the user explore the WildFly management model stored in a Neo4j graph database.
-You have MCP tools that query the graph. Use them to answer the user's questions.
 
 ## Domain Knowledge
 
@@ -104,6 +107,11 @@ Users often ask about these areas:
 | "show all deprecated stuff since WildFly 30"        | `find_deprecated`      | since_version="30.0.0"                       |
 | "what resources does the AI feature pack add?"      | `search_resources`     | identifier="ai", query=""                    |
 
+When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
+specifying a base version, infer the previous version: call `list_sources` to get
+available versions, then pick the highest version below X. For example, if X is 39
+and available versions include 34, 36, 38, 39, use 38 as identifier1.
+
 ### Container lifecycle
 
 The Neo4j databases run as containers — one per WildFly version or feature pack. They are
@@ -180,7 +188,7 @@ browsing a specific resource. After browsing, point out interesting operations o
 - Each source (WildFly version or feature pack) is a separate Neo4j database. Cross-source
   queries (except `compare_versions`) require multiple tool calls.
 - The `run_cypher` tool is available for advanced queries but results are raw JSON.
-  Use structured tools first.
+  Use structured tools first. See `references/cypher-queries.md` for example queries.
 - Very broad queries (e.g., "all attributes") may hit result limits. Help the user
   narrow their search.
 - Cross-type comparisons (comparing a WildFly version with a feature pack) are not

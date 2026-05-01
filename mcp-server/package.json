@@ -10,7 +10,7 @@
     "dev": "tsx src/index.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "latest",
+    "@modelcontextprotocol/server": "^2.0.0-alpha.2",
     "neo4j-driver": "^5.28.0",
     "zod": "^4.0.0"
   },
