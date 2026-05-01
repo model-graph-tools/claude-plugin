@@ -75,7 +75,7 @@ Use `/mgt:model` followed by your question:
 
 ```
 /mgt:model How does capabilities work?
-/mgt:model What capabilities does elytron declare?
+/mgt:model What capabilities does elytron provide?
 /mgt:model What operations have been deprecated recently?
 ```
 
