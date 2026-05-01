@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    {
+      "name": "mgt",
+      "description": "Search and browse the WildFly management model across versions and feature packs",
+      "source": {
+        "source": "github",
+        "repo": "model-graph-tools/claude-plugin",
+        "path": "./",
+        "branch": "main"
+      }
+    }
+  ]
+}
