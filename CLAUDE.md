@@ -58,7 +58,7 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 
 ## MCP Tools
 
-11 tools registered in `src/index.ts`:
+13 tools registered in `src/index.ts`:
 
 | Tool | Purpose |
 |------|---------|
@@ -66,12 +66,14 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 | `start_source` | Starts a Neo4j container for a source (auto-pulls image) |
 | `stop_source` | Stops a running Neo4j container |
 | `search_resources` | Searches resources by name or address pattern |
-| `browse_resource` | Returns a resource with children, attributes, operations, capabilities |
+| `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
 | `search_operations` | Searches operations across all resources |
-| `search_attributes` | Searches attributes, with optional deprecated-only filter |
+| `search_attributes` | Searches attributes, with optional deprecated-only and stability level filters |
 | `find_capabilities` | Searches capabilities and their declaring/referencing resources |
 | `find_deprecated` | Finds deprecated elements, filterable by version and type |
-| `compare_versions` | Diffs two sources for added/removed/deprecated elements |
+| `find_by_stability` | Finds elements by stability level (experimental, preview, community, default) |
+| `get_statistics` | Overview of a source's model: counts, stability breakdown, relationships |
+| `compare_versions` | Diffs two sources for added/removed/deprecated elements, including attribute and operation changes within shared resources |
 | `run_cypher` | Escape hatch: runs arbitrary read-only Cypher (100 row limit, 10s timeout) |
 
 ## Key Architecture

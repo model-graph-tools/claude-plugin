@@ -13,7 +13,9 @@ import { searchOperations } from "./tools/search-operations.js";
 import { searchAttributes } from "./tools/search-attributes.js";
 import { findCapabilities } from "./tools/find-capabilities.js";
 import { findDeprecated } from "./tools/find-deprecated.js";
+import { findByStability } from "./tools/find-by-stability.js";
 import { compareVersions } from "./tools/compare-versions.js";
+import { getStatistics } from "./tools/get-statistics.js";
 import { runCypher } from "./tools/run-cypher.js";
 
 const require = createRequire(import.meta.url);
@@ -102,7 +104,7 @@ server.registerTool("search_resources", {
 
 server.registerTool("browse_resource", {
   description:
-    "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool.",
+    "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata, operation stability, and parameter relationships (requires/alternatives).",
   inputSchema: z.object({
     address: z
       .string()
@@ -137,7 +139,7 @@ server.registerTool("search_operations", {
 
 server.registerTool("search_attributes", {
   description:
-    "Searches attributes across all resources. Can filter to only deprecated attributes.",
+    "Searches attributes across all resources. Can filter to only deprecated attributes or by stability level.",
   inputSchema: z.object({
     query: z
       .string()
@@ -147,12 +149,16 @@ server.registerTool("search_attributes", {
       .boolean()
       .optional()
       .describe("If true, only return deprecated attributes"),
+    stability: z
+      .string()
+      .optional()
+      .describe('Filter by stability level: "experimental", "preview", "community", or "default"'),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, async ({ query, identifier, deprecated, limit }) => {
+}, async ({ query, identifier, deprecated, stability, limit }) => {
   try {
     return textResult(
-      await searchAttributes(identifier, query, deprecated, limit)
+      await searchAttributes(identifier, query, deprecated, stability, limit)
     );
   } catch (e) {
     return errorResult(e);
@@ -199,9 +205,47 @@ server.registerTool("find_deprecated", {
   }
 });
 
+server.registerTool("find_by_stability", {
+  description:
+    "Finds all elements (resources, attributes, operations) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
+  inputSchema: z.object({
+    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    stability: z
+      .string()
+      .describe('Stability level: "experimental", "preview", "community", or "default"'),
+    element_type: z
+      .string()
+      .optional()
+      .describe('Filter by type: "resource", "attribute", or "operation"'),
+    limit: z.number().optional().describe("Max results (default 50)"),
+  }),
+}, async ({ identifier, stability, element_type, limit }) => {
+  try {
+    return textResult(
+      await findByStability(identifier, stability, element_type, limit)
+    );
+  } catch (e) {
+    return errorResult(e);
+  }
+});
+
+server.registerTool("get_statistics", {
+  description:
+    "Overview of a source's management model: node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
+  inputSchema: z.object({
+    identifier: z.string().describe('Source identifier, e.g. "39"'),
+  }),
+}, async ({ identifier }) => {
+  try {
+    return textResult(await getStatistics(identifier));
+  } catch (e) {
+    return errorResult(e);
+  }
+});
+
 server.registerTool("compare_versions", {
   description:
-    "Compares two sources to find added, removed, and newly deprecated resources/attributes/operations.",
+    "Compares two sources to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute and operation changes within resources that exist in both versions.",
   inputSchema: z.object({
     identifier1: z.string().describe('Older source identifier, e.g. "38"'),
     identifier2: z.string().describe('Newer source identifier, e.g. "39"'),

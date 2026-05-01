@@ -21,55 +21,36 @@ export async function searchAttributes(
   identifier: string,
   query: string,
   deprecated?: boolean,
+  stability?: string,
   limit: number = DEFAULT_LIMIT
 ): Promise<SearchAttributesResult> {
   const session = getSession(identifier);
   try {
     const regex = `(?i).*${escapeRegex(query)}.*`;
+    const params: Record<string, unknown> = { regex, limit: neo4j.int(limit) };
 
-    if (deprecated) {
-      const countResult = await session.run(
-        `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
-         WHERE (a.name =~ $regex OR a.description =~ $regex)
-         MATCH (a)-[d:DEPRECATED_SINCE]->(v:Version)
-         RETURN count(a) AS total`,
-        { regex }
-      );
-      const totalCount = toNumber(countResult.records[0]?.get("total"));
-
-      const result = await session.run(
-        `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
-         WHERE (a.name =~ $regex OR a.description =~ $regex)
-         MATCH (a)-[d:DEPRECATED_SINCE]->(v:Version)
-         RETURN r.address AS resource,
-                a.name AS name,
-                a.type AS type,
-                a.description AS description,
-                v.name AS deprecatedSince,
-                d.reason AS deprecationReason
-         ORDER BY a.name, r.address
-         LIMIT $limit`,
-        { regex, limit: neo4j.int(limit) }
-      );
-
-      return {
-        results: result.records.map(mapRecord),
-        totalCount,
-      };
+    let whereClause = `WHERE (a.name =~ $regex OR a.description =~ $regex)`;
+    if (stability) {
+      whereClause += `\nAND a.stability = $stability`;
+      params.stability = stability;
     }
 
+    const deprecatedJoin = deprecated
+      ? `MATCH (a)-[d:DEPRECATED_SINCE]->(v:Version)`
+      : `OPTIONAL MATCH (a)-[d:DEPRECATED_SINCE]->(v:Version)`;
+
+    const baseQuery = `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+       ${whereClause}
+       ${deprecatedJoin}`;
+
     const countResult = await session.run(
-      `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
-       WHERE a.name =~ $regex OR a.description =~ $regex
-       RETURN count(a) AS total`,
-      { regex }
+      `${baseQuery}\nRETURN count(a) AS total`,
+      params
     );
     const totalCount = toNumber(countResult.records[0]?.get("total"));
 
     const result = await session.run(
-      `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
-       WHERE a.name =~ $regex OR a.description =~ $regex
-       OPTIONAL MATCH (a)-[d:DEPRECATED_SINCE]->(v:Version)
+      `${baseQuery}
        RETURN r.address AS resource,
               a.name AS name,
               a.type AS type,
@@ -78,7 +59,7 @@ export async function searchAttributes(
               d.reason AS deprecationReason
        ORDER BY a.name, r.address
        LIMIT $limit`,
-      { regex, limit: neo4j.int(limit) }
+      params
     );
 
     return {

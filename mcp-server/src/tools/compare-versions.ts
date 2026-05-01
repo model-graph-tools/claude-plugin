@@ -7,6 +7,8 @@ interface CompareResult {
   added: string[];
   removed: string[];
   newlyDeprecated: DeprecatedInfo[];
+  changedAttributes: ChangedElements[];
+  changedOperations: ChangedElements[];
 }
 
 interface DeprecatedInfo {
@@ -15,6 +17,12 @@ interface DeprecatedInfo {
   resource?: string;
   deprecatedSince: string;
   reason?: string;
+}
+
+interface ChangedElements {
+  resource: string;
+  added: string[];
+  removed: string[];
 }
 
 export async function compareVersions(
@@ -27,11 +35,20 @@ export async function compareVersions(
     }
   }
 
-  const [addresses1, addresses2, deprecated1, deprecated2] = await Promise.all([
+  const [
+    addresses1, addresses2,
+    deprecated1, deprecated2,
+    attrs1, attrs2,
+    ops1, ops2,
+  ] = await Promise.all([
     getResourceAddresses(identifier1),
     getResourceAddresses(identifier2),
     getDeprecatedKeys(identifier1),
     getDeprecatedKeys(identifier2),
+    getElementsByResource(identifier1, "attribute"),
+    getElementsByResource(identifier2, "attribute"),
+    getElementsByResource(identifier1, "operation"),
+    getElementsByResource(identifier2, "operation"),
   ]);
 
   const set1 = new Set(addresses1);
@@ -45,7 +62,38 @@ export async function compareVersions(
     (d) => !depKeys1.has(`${d.elementType}:${d.name}`)
   );
 
-  return { identifier1, identifier2, added, removed, newlyDeprecated };
+  const commonAddresses = addresses2.filter((a) => set1.has(a));
+
+  const changedAttributes = computeChanges(commonAddresses, attrs1, attrs2);
+  const changedOperations = computeChanges(commonAddresses, ops1, ops2);
+
+  return {
+    identifier1,
+    identifier2,
+    added,
+    removed,
+    newlyDeprecated,
+    changedAttributes,
+    changedOperations,
+  };
+}
+
+function computeChanges(
+  commonAddresses: string[],
+  map1: Map<string, Set<string>>,
+  map2: Map<string, Set<string>>
+): ChangedElements[] {
+  const results: ChangedElements[] = [];
+  for (const addr of commonAddresses) {
+    const s1 = map1.get(addr) ?? new Set<string>();
+    const s2 = map2.get(addr) ?? new Set<string>();
+    const addedElems = [...s2].filter((n) => !s1.has(n)).sort();
+    const removedElems = [...s1].filter((n) => !s2.has(n)).sort();
+    if (addedElems.length > 0 || removedElems.length > 0) {
+      results.push({ resource: addr, added: addedElems, removed: removedElems });
+    }
+  }
+  return results.sort((a, b) => a.resource.localeCompare(b.resource));
 }
 
 async function getResourceAddresses(identifier: string): Promise<string[]> {
@@ -55,6 +103,33 @@ async function getResourceAddresses(identifier: string): Promise<string[]> {
       "MATCH (r:Resource) RETURN r.address AS address ORDER BY address"
     );
     return result.records.map((r) => r.get("address") as string);
+  } finally {
+    await session.close();
+  }
+}
+
+async function getElementsByResource(
+  identifier: string,
+  elementType: "attribute" | "operation"
+): Promise<Map<string, Set<string>>> {
+  const session = getSession(identifier);
+  try {
+    const query =
+      elementType === "attribute"
+        ? `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+           RETURN r.address AS resource, collect(a.name) AS names`
+        : `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)
+           RETURN r.address AS resource, collect(o.name) AS names`;
+
+    const result = await session.run(query);
+    const map = new Map<string, Set<string>>();
+    for (const r of result.records) {
+      map.set(
+        r.get("resource") as string,
+        new Set(r.get("names") as string[])
+      );
+    }
+    return map;
   } finally {
     await session.close();
   }

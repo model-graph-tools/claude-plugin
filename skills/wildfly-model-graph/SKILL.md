@@ -45,6 +45,13 @@ messaging, clustering — is represented as a tree of **resources**, each with *
   capability and references a `org.wildfly.data-sources.driver` capability. Capabilities
   enable WildFly's dependency management between subsystems.
 
+- **Stability**: Resources, attributes, and operations have a stability level indicating
+  their maturity: `default` (stable, recommended), `community` (community-contributed,
+  less tested), `preview` (early access, may change), or `experimental` (highly unstable,
+  for testing only). Most elements are `default`. Non-default stability levels signal that
+  the feature may change or be removed in future versions. Use `find_by_stability` to
+  discover non-default elements, or `get_statistics` for a stability breakdown.
+
 - **Deprecation**: Resources, attributes, and operations can be deprecated starting from a
   specific WildFly version, with a reason explaining why and what to use instead.
 
@@ -108,6 +115,12 @@ Users often ask about these areas:
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
 | "what's new in WildFly 39?"                         | `compare_versions`     | identifier1="38", identifier2="39"           |
 | "show all deprecated stuff since WildFly 30"        | `find_deprecated`      | since_version="30.0.0"                       |
+| "what experimental features are in WildFly 39?"     | `find_by_stability`    | stability="experimental"                     |
+| "show preview attributes"                           | `find_by_stability`    | stability="preview", element_type="attribute"|
+| "find community stability attributes for logging"   | `search_attributes`    | query="logging", stability="community"       |
+| "give me an overview of the model"                  | `get_statistics`       | (identifier only)                            |
+| "how many resources does WildFly 39 have?"          | `get_statistics`       | identifier="39"                              |
+| "what attributes changed between WildFly 38 and 39?"| `compare_versions`     | identifier1="38", identifier2="39"           |
 | "what resources does the AI feature pack add?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without

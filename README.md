@@ -9,7 +9,9 @@ WildFly exposes its entire configuration and runtime state through a management 
 - **Search** resources, attributes, and operations by name or pattern
 - **Browse** the resource tree with full attribute, operation, and capability details
 - **Find** deprecated elements and track when they were deprecated
-- **Compare** two WildFly versions to see what was added, removed, or deprecated
+- **Filter** by stability level to find experimental, preview, or community features
+- **Analyze** model statistics — element counts, stability breakdown, relationship counts
+- **Compare** two WildFly versions to see what was added, removed, or deprecated — including attribute and operation changes
 - **Explore** feature pack extensions (AI, GraphQL, etc.) using the same tools
 - **Run** arbitrary read-only Cypher queries for advanced use cases
 
@@ -52,19 +54,52 @@ claude --plugin-dir /path/to/claude-plugin
 
 Use `/mgt:model` followed by your question:
 
+**Model overview**
+
+```
+/mgt:model Give me an overview of the WildFly 39 management model.
+/mgt:model How many resources and attributes does WildFly 39 have?
+```
+
+**Browse and search**
+
 ```
 /mgt:model How do I add a new datasource?
 /mgt:model How does the logging subsystem work?
-/mgt:model How does capabilities work?
-/mgt:model What capabilities does elytron declare?
 /mgt:model How is TLS configured?
 /mgt:model What is an authentication context?
 /mgt:model Tell me more about credential stores.
+```
+
+**Capabilities and deprecation**
+
+```
+/mgt:model How does capabilities work?
+/mgt:model What capabilities does elytron declare?
 /mgt:model What operations have been deprecated recently?
+```
+
+**Stability levels**
+
+```
+/mgt:model Are there any experimental features in WildFly 39?
+/mgt:model Show me all preview resources.
+/mgt:model What community stability attributes exist?
+```
+
+**Compare versions**
+
+```
 /mgt:model Compare WildFly 38 and 39.
+/mgt:model What attributes changed between WildFly 38 and 39?
+/mgt:model Compare the IO subsystem between WildFly 23 and the latest version.
+```
+
+**Feature packs**
+
+```
 /mgt:model What resources does the AI feature pack provide?
 /mgt:model Compare the first and the latest version of the AI feature pack.
-/mgt:model Compare the IO subsystem between WildFly 23 and the latest version.
 ```
 
 ### Natural Language
@@ -132,7 +167,7 @@ claude-plugin/
 │   │   ├── neo4j.ts             # Neo4j connection management
 │   │   ├── mgt.ts               # mgt CLI wrapper
 │   │   ├── session.ts           # Session state management
-│   │   └── tools/               # One file per MCP tool (11 tools)
+│   │   └── tools/               # One file per MCP tool (13 tools)
 │   ├── build.mjs                # Custom build script
 │   ├── package.json
 │   └── tsconfig.json
