@@ -75,6 +75,7 @@ The skill also activates automatically when Claude detects WildFly management mo
 
 Each WildFly version or feature pack runs as a separate Neo4j container. The plugin manages these through `mgt`:
 
+- Images are pulled if not present locally
 - Containers are started on demand when you query a source
 - If a source isn't running, the plugin will suggest starting it
 - Containers started during a session are automatically stopped when the MCP server shuts down
@@ -115,19 +116,27 @@ npm run dev    # runs with tsx, no compile step needed
 ```
 claude-plugin/
 ├── .claude-plugin/
-│   ├── plugin.json              # Plugin manifest
+│   ├── plugin.json              # Plugin manifest (skills, mcpServers)
 │   └── marketplace.json         # Marketplace manifest
 ├── skills/
 │   └── wildfly-model-graph/
-│       └── SKILL.md             # Skill prompt with domain knowledge
+│       ├── SKILL.md             # Skill prompt with domain knowledge
+│       └── references/
+│           ├── cypher-queries.md # Cypher query reference
+│           └── graph-schema.md  # Neo4j graph schema reference
 ├── commands/
 │   └── model.md                 # /mgt:model slash command
 ├── mcp-server/
-│   └── src/
-│       ├── index.ts             # Server entry point, tool registration
-│       ├── neo4j.ts             # Neo4j connection management
-│       ├── mgt.ts               # mgt CLI wrapper
-│       └── tools/               # One file per MCP tool (11 tools)
+│   ├── src/
+│   │   ├── index.ts             # Server entry point, tool registration
+│   │   ├── neo4j.ts             # Neo4j connection management
+│   │   ├── mgt.ts               # mgt CLI wrapper
+│   │   ├── session.ts           # Session state management
+│   │   └── tools/               # One file per MCP tool (11 tools)
+│   ├── build.mjs                # Custom build script
+│   ├── package.json
+│   └── tsconfig.json
+├── CLAUDE.md                    # Claude Code project instructions
 └── README.md
 ```
 
