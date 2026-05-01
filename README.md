@@ -1,4 +1,4 @@
-# mgt Claude Code Plugin
+# Model Graph Tools Claude Code Plugin
 
 A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin for exploring the [WildFly](https://wildfly.org) management model via natural language.
 
