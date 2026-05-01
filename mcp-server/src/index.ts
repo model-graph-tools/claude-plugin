@@ -1,3 +1,4 @@
+import { createRequire } from "node:module";
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { closeAll } from "./neo4j.js";
@@ -13,9 +14,12 @@ import { findDeprecated } from "./tools/find-deprecated.js";
 import { compareVersions } from "./tools/compare-versions.js";
 import { runCypher } from "./tools/run-cypher.js";
 
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json");
+
 const server = new McpServer({
   name: "wildfly-model-graph",
-  version: "0.3.1",
+  version,
 });
 
 function textResult(data: unknown) {
