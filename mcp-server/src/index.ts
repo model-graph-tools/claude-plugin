@@ -1,7 +1,9 @@
 import { createRequire } from "node:module";
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
+import { mgtStop } from "./mgt.js";
 import { closeAll } from "./neo4j.js";
+import { getStartedBySession } from "./session.js";
 import { listSources } from "./tools/list-sources.js";
 import { startSource } from "./tools/start-source.js";
 import { stopSource } from "./tools/stop-source.js";
@@ -229,13 +231,21 @@ server.registerTool("run_cypher", {
 
 // --- Server startup ---
 
+async function shutdown(): Promise<void> {
+  await closeAll();
+  const stopPromises = Array.from(getStartedBySession()).map((id) =>
+    mgtStop(id).catch(() => {})
+  );
+  await Promise.all(stopPromises);
+}
+
 async function main() {
   process.on("SIGINT", async () => {
-    await closeAll();
+    await shutdown();
     process.exit(0);
   });
   process.on("SIGTERM", async () => {
-    await closeAll();
+    await shutdown();
     process.exit(0);
   });
 

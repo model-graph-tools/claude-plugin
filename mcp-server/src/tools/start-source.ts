@@ -1,5 +1,6 @@
 import { mgtStart } from "../mgt.js";
 import { registerConnection } from "../neo4j.js";
+import { trackStarted } from "../session.js";
 
 interface StartSourceResult {
   identifier: string;
@@ -23,6 +24,7 @@ export async function startSource(
     );
   }
   registerConnection(identifier, result.bolt);
+  trackStarted(identifier);
   return {
     identifier: result.identifier,
     status: "running",
