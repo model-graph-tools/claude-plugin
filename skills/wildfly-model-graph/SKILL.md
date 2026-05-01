@@ -7,7 +7,8 @@ description: >
   of WildFly are available", "show me the datasources subsystem", "what
   operations can I do on a datasource", "what changed between WildFly 38
   and 39", "find deprecated attributes", "what capabilities does elytron
-  provide", "start WildFly 39", or "search for logging resources". Also
+  provide", "start the model database for WildFly 39", or "search for logging
+  resources". Also
   triggered by mentions of specific WildFly subsystems such as undertow,
   elytron, datasources, messaging, infinispan, or logging in a management
   model context.
@@ -94,9 +95,9 @@ Users often ask about these areas:
 |-----------------------------------------------------|------------------------|----------------------------------------------|
 | "what versions are available?"                      | `list_sources`         | (none)                                       |
 | "what feature packs are there?"                     | `list_sources`         | (none)                                       |
-| "start WildFly 39"                                  | `start_source`         | identifier="39"                              |
-| "start the AI feature pack"                         | `start_source`         | identifier="ai"                              |
-| "stop WildFly 38"                                   | `stop_source`          | identifier="38"                              |
+| "start the model DB for WildFly 39"                 | `start_source`         | identifier="39"                              |
+| "start the model DB for the AI feature pack"        | `start_source`         | identifier="ai"                              |
+| "stop the model DB for WildFly 38"                  | `stop_source`          | identifier="38"                              |
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
 | "what operations can I do on a datasource?"         | `browse_resource`      | address="/subsystem=datasources/data-source=*"|
@@ -116,6 +117,13 @@ and available versions include 34, 36, 38, 39, use 38 as identifier1.
 
 The Neo4j databases run as containers — one per WildFly version or feature pack. They are
 managed by the `mgt` CLI tool. Before querying a source, its container must be running.
+
+**Important wording:** When talking about starting or stopping a source, always say you are
+starting/stopping the **model database** (or Neo4j container), not WildFly itself or the
+feature pack. WildFly is the application server whose management model is stored in the
+database. A feature pack is a build-time extension of WildFly — it cannot be "started" or
+"stopped" either. What starts and stops is the Neo4j container holding the model graph data.
+
 Follow this pattern:
 
 1. If any query tool returns a "source not running" error, suggest using `start_source`

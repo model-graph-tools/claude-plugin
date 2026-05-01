@@ -53,11 +53,13 @@ claude --plugin-dir /path/to/claude-plugin
 Use `/mgt:model` followed by your question:
 
 ```
-/mgt:model what resources does the datasources subsystem have?
-/mgt:model compare WildFly 38 and 39
-/mgt:model show deprecated attributes in the logging subsystem
-/mgt:model what capabilities does elytron declare?
-/mgt:model what resources does the AI feature pack provide?
+/mgt:model How do I add a new datasource?
+/mgt:model How does the logging subsystem work?
+/mgt:model What capabilities does elytron declare?
+/mgt:model What is an authentication context?
+/mgt:model Tell me more about credential stores.
+/mgt:model Compare WildFly 38 and 39.
+/mgt:model What resources does the AI feature pack provide?
 ```
 
 ### Natural Language

@@ -47,7 +47,7 @@ server.registerTool("list_sources", {
 
 server.registerTool("start_source", {
   description:
-    "Starts the Neo4j container for a WildFly version or feature pack. Pulls the image automatically if needed.",
+    "Starts the Neo4j model database container for a WildFly version or feature pack. Pulls the image automatically if needed. Note: this starts the model database, not WildFly itself.",
   inputSchema: z.object({
     identifier: z
       .string()
@@ -62,7 +62,7 @@ server.registerTool("start_source", {
 });
 
 server.registerTool("stop_source", {
-  description: "Stops the Neo4j container for a WildFly version or feature pack.",
+  description: "Stops the Neo4j model database container for a WildFly version or feature pack.",
   inputSchema: z.object({
     identifier: z
       .string()
