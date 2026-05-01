@@ -1,4 +1,8 @@
 {
+  "name": "model-graph-tools",
+  "owner": {
+    "name": "Model Graph Tools"
+  },
   "plugins": [
     {
       "name": "mgt",
