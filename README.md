@@ -60,6 +60,7 @@ Use `/mgt:model` followed by your question:
 /mgt:model How is TLS configured?
 /mgt:model What is an authentication context?
 /mgt:model Tell me more about credential stores.
+/mgt:model What operations have been deprecated recently?
 /mgt:model Compare WildFly 38 and 39.
 /mgt:model What resources does the AI feature pack provide?
 /mgt:model Compare the first and the latest version of the AI feature pack.
