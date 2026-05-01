@@ -57,11 +57,13 @@ Use `/mgt:model` followed by your question:
 /mgt:model How does the logging subsystem work?
 /mgt:model How does capabilities work?
 /mgt:model What capabilities does elytron declare?
+/mgt:model How is TLS configured?
 /mgt:model What is an authentication context?
 /mgt:model Tell me more about credential stores.
 /mgt:model Compare WildFly 38 and 39.
 /mgt:model What resources does the AI feature pack provide?
 /mgt:model Compare the first and the latest version of the AI feature pack.
+/mgt:model Compare the IO subsystem between WildFly 23 and the latest version.
 ```
 
 ### Natural Language

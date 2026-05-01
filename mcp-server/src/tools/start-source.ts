@@ -23,10 +23,11 @@ export async function startSource(
       `mgt start succeeded but did not return port information for "${identifier}"`
     );
   }
-  registerConnection(identifier, result.bolt);
-  trackStarted(identifier);
+  const canonicalId = result.identifier ?? identifier;
+  registerConnection(canonicalId, result.bolt);
+  trackStarted(canonicalId);
   return {
-    identifier,
+    identifier: canonicalId,
     status: "running",
     bolt: result.bolt,
     http: result.http,

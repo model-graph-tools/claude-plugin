@@ -10,16 +10,17 @@ interface StopSourceResult {
 export async function stopSource(
   identifier: string
 ): Promise<StopSourceResult> {
-  await closeConnection(identifier);
   const result = await mgtStop(identifier);
   if (!result.success) {
     throw new Error(
       result.error ?? `Failed to stop source "${identifier}"`
     );
   }
-  untrackStarted(identifier);
+  const canonicalId = result.identifier ?? identifier;
+  await closeConnection(canonicalId);
+  untrackStarted(canonicalId);
   return {
-    identifier,
+    identifier: canonicalId,
     status: "stopped",
   };
 }
