@@ -52,7 +52,9 @@ class MgtNotFoundError extends Error {
 
 async function runMgt(args: string[]): Promise<string> {
   try {
-    const { stdout } = await execFileAsync(MGT_COMMAND, [...args, "--json"]);
+    const { stdout } = await execFileAsync(MGT_COMMAND, [...args, "--json"], {
+      shell: true,
+    });
     return stdout;
   } catch (error: unknown) {
     if (
