@@ -108,7 +108,8 @@ claude-plugin/
 │   ├── plugin.json              # Plugin manifest
 │   └── marketplace.json         # Marketplace manifest
 ├── skills/
-│   └── wildfly-model-graph.md   # Skill prompt with domain knowledge
+│   └── wildfly-model-graph/
+│       └── SKILL.md             # Skill prompt with domain knowledge
 ├── commands/
 │   └── model.md                 # /mgt:model slash command
 ├── mcp-server/
@@ -125,7 +126,7 @@ claude-plugin/
 1. Create a new file in `mcp-server/src/tools/`
 2. Implement the query function with a Neo4j session
 3. Register the tool in `mcp-server/src/index.ts` with a Zod input schema
-4. Update the skill prompt in `skills/wildfly-model-graph.md` with usage guidance
+4. Update the skill prompt in `skills/wildfly-model-graph/SKILL.md` with usage guidance
 
 ## License
 

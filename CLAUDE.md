@@ -14,7 +14,8 @@ skill/                           # Plugin root
 │   ├── plugin.json              # Plugin manifest (skills, mcpServers)
 │   └── marketplace.json         # Marketplace manifest
 ├── skills/
-│   └── wildfly-model-graph.md   # Skill prompt (domain knowledge, tool usage)
+│   └── wildfly-model-graph/
+│       └── SKILL.md             # Skill prompt (domain knowledge, tool usage)
 ├── mcp-server/                  # MCP server (TypeScript, Node.js)
 │   ├── src/
 │   │   ├── index.ts             # Server entry point, tool registration

@@ -2,13 +2,6 @@
   "name": "mgt",
   "version": "0.1.0",
   "description": "Search and browse the WildFly management model across versions and feature packs",
-  "skills": [
-    {
-      "name": "wildfly-model-graph",
-      "description": "Search, browse, and analyze the WildFly management model across versions and feature packs using a Neo4j graph database.",
-      "path": "skills/wildfly-model-graph.md"
-    }
-  ],
   "mcpServers": {
     "wildfly-model-graph": {
       "command": "node",
