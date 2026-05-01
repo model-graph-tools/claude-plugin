@@ -31,12 +31,15 @@ skill/                           # Plugin root
 ## Installation
 
 ```bash
-# Local development/testing
-claude --plugin-dir /path/to/skill
+# From marketplace
+claude plugin marketplace add https://github.com/model-graph-tools/claude-plugin
+claude plugin install mgt@model-graph-tools
 
-# From GitHub (once published)
-claude plugin install mgt@github:model-graph-tools/skill
+# Local development/testing
+claude --plugin-dir /path/to/claude-plugin
 ```
+
+The MCP server is published to npm as [`@model-graph-tools/mcp-server`](https://www.npmjs.com/package/@model-graph-tools/mcp-server) and fetched via `npx` at runtime.
 
 ## Build & Run
 

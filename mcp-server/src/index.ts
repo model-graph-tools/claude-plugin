@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { closeAll } from "./neo4j.js";

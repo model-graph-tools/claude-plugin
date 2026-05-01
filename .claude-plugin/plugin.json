@@ -4,8 +4,8 @@
   "description": "Search and browse the WildFly management model across versions and feature packs",
   "mcpServers": {
     "wildfly-model-graph": {
-      "command": "node",
-      "args": ["./mcp-server/dist/index.js"]
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server@latest"]
     }
   }
 }

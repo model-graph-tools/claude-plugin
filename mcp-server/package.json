@@ -1,13 +1,35 @@
 {
-  "name": "wildfly-model-graph-mcp",
+  "name": "@model-graph-tools/mcp-server",
   "version": "0.1.0",
   "description": "MCP server for querying the WildFly management model graph",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "model-graph-mcp-server": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "wildfly",
+    "jboss",
+    "management-model",
+    "mcp",
+    "neo4j",
+    "claude-code"
+  ],
+  "author": "Harald Pehl",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/model-graph-tools/claude-plugin.git",
+    "directory": "mcp-server"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0-alpha.2",

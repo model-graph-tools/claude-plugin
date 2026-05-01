@@ -29,6 +29,8 @@ claude plugin marketplace add https://github.com/model-graph-tools/claude-plugin
 claude plugin install mgt@model-graph-tools
 ```
 
+The MCP server is fetched automatically from [npm](https://www.npmjs.com/package/@model-graph-tools/mcp-server) via `npx` — no build step required.
+
 ### From Source
 
 ```bash
