@@ -65,7 +65,7 @@ Use `/mgt:model` followed by your question:
 
 ### Natural Language
 
-The skill also activates automatically when Claude detects WildFly management model context in your conversation — just ask about subsystems, resources, attributes, or operations naturally.
+The skill also activates automatically when Claude detects WildFly management model context in your conversation — just ask about subsystems, resources, attributes, or operations naturally. So most of the questions above should also work without using the slash command.
 
 ### Container Lifecycle
 
@@ -73,8 +73,9 @@ Each WildFly version or feature pack runs as a separate Neo4j container. The plu
 
 - Containers are started on demand when you query a source
 - If a source isn't running, the plugin will suggest starting it
-- Containers persist across sessions and are cheap to keep running
-- Stop containers explicitly when you're done: `/mgt:model stop WildFly 39`
+- Containers started during a session are automatically stopped when the MCP server shuts down
+- Containers started outside the session (e.g., via `mgt start`) persist and are not affected
+- Stop containers explicitly at any time: `/mgt:model stop WildFly 39`
 
 ## Related Projects
 

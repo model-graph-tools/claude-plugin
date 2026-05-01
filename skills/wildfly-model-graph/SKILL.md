@@ -7,11 +7,11 @@ description: >
   of WildFly are available", "show me the datasources subsystem", "what
   operations can I do on a datasource", "what changed between WildFly 38
   and 39", "find deprecated attributes", "what capabilities does elytron
-  provide", "start the model database for WildFly 39", or "search for logging
-  resources". Also
-  triggered by mentions of specific WildFly subsystems such as undertow,
-  elytron, datasources, messaging, infinispan, or logging in a management
-  model context.
+  provide", "start the model database for WildFly 39", "search for logging
+  resources", "compare feature packs", or "explore WildFly configuration".
+  Also applies when the user mentions specific WildFly subsystems such as
+  undertow, elytron, datasources, messaging, infinispan, or logging in a
+  management model context.
 ---
 
 ## Domain Knowledge
@@ -102,7 +102,7 @@ Users often ask about these areas:
 | "stop the model DB for WildFly 38"                  | `stop_source`          | identifier="38"                              |
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
-| "what operations can I do on a datasource?"         | `browse_resource`      | address="/subsystem=datasources/data-source=*"|
+| "what operations can I do on a datasource?"         | `search_resources` then `browse_resource` | query="data-source", then browse a concrete result |
 | "is there an operation to test my DB connection?"   | `search_operations`    | query="test connection"                      |
 | "what attributes are deprecated in logging?"        | `search_attributes`    | query="logging", deprecated=true             |
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
