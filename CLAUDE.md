@@ -11,7 +11,8 @@ This repository is a **Claude Code plugin** for exploring the WildFly management
 ```
 skill/                           # Plugin root
 ├── .claude-plugin/
-│   └── plugin.json              # Plugin manifest (skills, mcpServers)
+│   ├── plugin.json              # Plugin manifest (skills, mcpServers)
+│   └── marketplace.json         # Marketplace manifest
 ├── skills/
 │   └── wildfly-model-graph.md   # Skill prompt (domain knowledge, tool usage)
 ├── mcp-server/                  # MCP server (TypeScript, Node.js)

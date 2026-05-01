@@ -55,7 +55,7 @@ Use `/mgt:model` followed by your question:
 /mgt:model compare WildFly 38 and 39
 /mgt:model show deprecated attributes in the logging subsystem
 /mgt:model what capabilities does elytron declare?
-/mgt:model start the AI feature pack
+/mgt:model what resources does the AI feature pack provide?
 ```
 
 ### Natural Language
@@ -105,7 +105,8 @@ npm run dev    # runs with tsx, no compile step needed
 ```
 claude-plugin/
 ├── .claude-plugin/
-│   └── plugin.json              # Plugin manifest
+│   ├── plugin.json              # Plugin manifest
+│   └── marketplace.json         # Marketplace manifest
 ├── skills/
 │   └── wildfly-model-graph.md   # Skill prompt with domain knowledge
 ├── commands/
@@ -116,7 +117,6 @@ claude-plugin/
 │       ├── neo4j.ts             # Neo4j connection management
 │       ├── mgt.ts               # mgt CLI wrapper
 │       └── tools/               # One file per MCP tool (11 tools)
-├── marketplace.json             # Plugin marketplace manifest
 └── README.md
 ```
 
