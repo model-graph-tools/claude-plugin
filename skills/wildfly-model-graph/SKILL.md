@@ -3,12 +3,14 @@ name: wildfly-model-graph
 description: >
   This skill should be used when the user asks about the WildFly management
   model, WildFly subsystems, JBoss configuration, management resources,
-  attributes, operations, or capabilities. Covers queries like "what versions
-  of WildFly are available", "show me the datasources subsystem", "what
-  operations can I do on a datasource", "what changed between WildFly 38
-  and 39", "find deprecated attributes", "what capabilities does elytron
-  provide", "start the model database for WildFly 39", "search for logging
-  resources", "compare feature packs", or "explore WildFly configuration".
+  attributes, operations, capabilities, or stability levels. Covers queries
+  like "what versions of WildFly are available", "show me the datasources
+  subsystem", "what operations can I do on a datasource", "what changed
+  between WildFly 38 and 39", "find deprecated attributes", "what
+  capabilities does elytron provide", "start the model database for WildFly
+  39", "search for logging resources", "compare feature packs", "show model
+  statistics", "what experimental features exist", "explore WildFly
+  configuration", or "run a Cypher query".
   Also applies when the user mentions specific WildFly subsystems such as
   undertow, elytron, datasources, messaging, infinispan, or logging in a
   management model context.
@@ -122,6 +124,7 @@ Users often ask about these areas:
 | "how many resources does WildFly 39 have?"          | `get_statistics`       | identifier="39"                              |
 | "what attributes changed between WildFly 38 and 39?"| `compare_versions`     | identifier1="38", identifier2="39"           |
 | "what resources does the AI feature pack add?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
+| "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39"           |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
 specifying a base version, infer the previous version: call `list_sources` to get
