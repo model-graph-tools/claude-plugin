@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-05-02
+
 ### Changed
 - Add skill guidance for "how do I add/configure X" questions to avoid unnecessary JSON post-processing
 - Add targeted Cypher query examples for add operation parameters and required attributes
@@ -61,7 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.2...HEAD
+[0.6.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.5.0...v0.5.3
