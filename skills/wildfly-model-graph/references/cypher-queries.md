@@ -57,3 +57,20 @@ WHERE parameters > 2
 RETURN r.address, o.name, parameters
 ORDER BY parameters DESC
 ```
+
+Get the add operation parameters for a specific resource (useful for "how do I add X?" questions):
+
+```cypher
+MATCH (r:Resource {address: "/subsystem=datasources/data-source=*"})-[:PROVIDES]->(o:Operation {name: "add"})-[:ACCEPTS]->(p:Parameter)
+RETURN p.name AS name, p.type AS type, p.required AS required, p.description AS description
+ORDER BY p.required DESC, p.name
+```
+
+Get required attributes for a specific resource:
+
+```cypher
+MATCH (r:Resource {address: "/subsystem=datasources/data-source=*"})-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE a.required = true
+RETURN a.name AS name, a.type AS type, a.description AS description, a.`default-value` AS defaultValue
+ORDER BY a.name
+```

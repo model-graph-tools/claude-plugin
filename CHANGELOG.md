@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Add skill guidance for "how do I add/configure X" questions to avoid unnecessary JSON post-processing
+- Add targeted Cypher query examples for add operation parameters and required attributes
+
 ## [0.6.1] - 2025-05-02
 
 ### Fixed

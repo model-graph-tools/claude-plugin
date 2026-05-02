@@ -112,6 +112,7 @@ Users often ask about these areas:
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
 | "what operations can I do on a datasource?"         | `search_resources` then `browse_resource` | query="data-source", then browse a concrete result |
+| "how do I add a datasource?"                        | `browse_resource`      | address="/subsystem=datasources/data-source=*" — see "Configuration how-to questions" below |
 | "is there an operation to test my DB connection?"   | `search_operations`    | query="test connection"                      |
 | "what attributes are deprecated in logging?"        | `search_attributes`    | query="logging", deprecated=true             |
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
@@ -160,6 +161,43 @@ hasn't specified a name, use `search_resources` first to find available instance
 `browse_resource` with a concrete address. For example, if the user asks about "datasource
 attributes", first search for datasource resources to find the address pattern, then browse
 a representative resource at the wildcard level.
+
+### Configuration how-to questions
+
+When the user asks "how do I add X?", "how do I configure X?", or "what do I need for X?",
+they want a concise, actionable answer — not a raw data dump. Follow this approach:
+
+1. Use `search_resources` to find the resource address (if not already known).
+2. Use `browse_resource` to get the full resource details.
+3. **Summarize directly from the tool response** — do NOT re-read the raw JSON from disk
+   or pipe it through shell scripts. The `browse_resource` response is already structured
+   with `attributes` (including `required`, `type`, `defaultValue`) and `operations`
+   (including `parameters` with `required` flags).
+4. Present the answer as:
+   - The `add` operation and its **required** parameters
+   - **Required attributes** (where `required: true`)
+   - **Key optional attributes** relevant to the question (e.g., for datasources:
+     `connection-url`, `driver-name`, `jndi-name`, `user-name`, `password`, pool settings)
+   - Any resource-specific operations (e.g., `test-connection-in-pool`)
+   - A brief CLI example using the JBoss CLI `/subsystem=.../resource=name:add(...)` syntax
+
+If the `browse_resource` output is too large to process comfortably, use `run_cypher` with
+a targeted query instead. For example, to get just the `add` operation parameters:
+
+```
+MATCH (r:Resource {address: $address})-[:PROVIDES]->(o:Operation {name: "add"})-[:ACCEPTS]->(p:Parameter)
+RETURN p.name, p.type, p.required, p.description
+ORDER BY p.required DESC, p.name
+```
+
+Or to get just the required attributes:
+
+```
+MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE a.required = true
+RETURN a.name, a.type, a.description, a.`default-value` AS defaultValue
+ORDER BY a.name
+```
 
 ### Source identifier handling
 
