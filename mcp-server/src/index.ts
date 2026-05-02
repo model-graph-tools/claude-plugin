@@ -1,6 +1,7 @@
 import { createRequire } from "node:module";
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
+import { resolveIdentifier, resolveIdentifiers } from "./identifiers.js";
 import { mgtStop } from "./mgt.js";
 import { closeAll } from "./neo4j.js";
 import { getStartedBySession } from "./session.js";
@@ -63,7 +64,8 @@ server.registerTool("start_source", {
   }),
 }, async ({ identifier }) => {
   try {
-    return textResult(await startSource(identifier));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await startSource(resolved));
   } catch (e) {
     return errorResult(e);
   }
@@ -78,7 +80,8 @@ server.registerTool("stop_source", {
   }),
 }, async ({ identifier }) => {
   try {
-    return textResult(await stopSource(identifier));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await stopSource(resolved));
   } catch (e) {
     return errorResult(e);
   }
@@ -96,7 +99,8 @@ server.registerTool("search_resources", {
   }),
 }, async ({ query, identifier, limit }) => {
   try {
-    return textResult(await searchResources(identifier, query, limit));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await searchResources(resolved, query, limit));
   } catch (e) {
     return errorResult(e);
   }
@@ -113,7 +117,8 @@ server.registerTool("browse_resource", {
   }),
 }, async ({ address, identifier }) => {
   try {
-    return textResult(await browseResource(identifier, address));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await browseResource(resolved, address));
   } catch (e) {
     return errorResult(e);
   }
@@ -131,7 +136,8 @@ server.registerTool("search_operations", {
   }),
 }, async ({ query, identifier, limit }) => {
   try {
-    return textResult(await searchOperations(identifier, query, limit));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await searchOperations(resolved, query, limit));
   } catch (e) {
     return errorResult(e);
   }
@@ -157,8 +163,9 @@ server.registerTool("search_attributes", {
   }),
 }, async ({ query, identifier, deprecated, stability, limit }) => {
   try {
+    const resolved = await resolveIdentifier(identifier);
     return textResult(
-      await searchAttributes(identifier, query, deprecated, stability, limit)
+      await searchAttributes(resolved, query, deprecated, stability, limit)
     );
   } catch (e) {
     return errorResult(e);
@@ -174,7 +181,8 @@ server.registerTool("find_capabilities", {
   }),
 }, async ({ query, identifier }) => {
   try {
-    return textResult(await findCapabilities(identifier, query));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await findCapabilities(resolved, query));
   } catch (e) {
     return errorResult(e);
   }
@@ -197,8 +205,9 @@ server.registerTool("find_deprecated", {
   }),
 }, async ({ identifier, since_version, element_type, limit }) => {
   try {
+    const resolved = await resolveIdentifier(identifier);
     return textResult(
-      await findDeprecated(identifier, since_version, element_type, limit)
+      await findDeprecated(resolved, since_version, element_type, limit)
     );
   } catch (e) {
     return errorResult(e);
@@ -221,8 +230,9 @@ server.registerTool("find_by_stability", {
   }),
 }, async ({ identifier, stability, element_type, limit }) => {
   try {
+    const resolved = await resolveIdentifier(identifier);
     return textResult(
-      await findByStability(identifier, stability, element_type, limit)
+      await findByStability(resolved, stability, element_type, limit)
     );
   } catch (e) {
     return errorResult(e);
@@ -237,7 +247,8 @@ server.registerTool("get_statistics", {
   }),
 }, async ({ identifier }) => {
   try {
-    return textResult(await getStatistics(identifier));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await getStatistics(resolved));
   } catch (e) {
     return errorResult(e);
   }
@@ -252,7 +263,8 @@ server.registerTool("compare_versions", {
   }),
 }, async ({ identifier1, identifier2 }) => {
   try {
-    return textResult(await compareVersions(identifier1, identifier2));
+    const [resolved1, resolved2] = await resolveIdentifiers(identifier1, identifier2);
+    return textResult(await compareVersions(resolved1, resolved2));
   } catch (e) {
     return errorResult(e);
   }
@@ -267,7 +279,8 @@ server.registerTool("run_cypher", {
   }),
 }, async ({ query, identifier }) => {
   try {
-    return textResult(await runCypher(identifier, query));
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await runCypher(resolved, query));
   } catch (e) {
     return errorResult(e);
   }

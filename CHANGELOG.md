@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Centralized identifier resolution via `mgt resolve` that normalizes user input (e.g., `"39"` → `"39.0"`, `"ai"` → `"ai:0.9.1"`) before connection lookup
+- Unit tests for identifier resolution using vitest
+
+### Fixed
+- Resolve identifier mismatch that caused connection lookup failures when abbreviated identifiers were used, leading to unnecessary container stop/remove cycles
+
 ## [0.6.2] - 2026-05-02
 
 ### Changed
