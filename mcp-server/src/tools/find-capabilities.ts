@@ -15,7 +15,7 @@ export async function findCapabilities(
   identifier: string,
   query: string
 ): Promise<CapabilityResult[]> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const regex = `(?i).*${escapeRegex(query)}.*`;
 

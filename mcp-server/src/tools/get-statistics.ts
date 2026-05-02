@@ -56,7 +56,7 @@ const REL_TYPE_MAP: Record<string, keyof StatisticsResult["relationships"]> = {
 export async function getStatistics(
   identifier: string
 ): Promise<StatisticsResult> {
-  const sessions = [getSession(identifier), getSession(identifier), getSession(identifier)];
+  const sessions = await Promise.all([getSession(identifier), getSession(identifier), getSession(identifier)]);
   try {
     const [nodeResult, deprecatedResult, relResult] = await Promise.all([
       sessions[0].run(

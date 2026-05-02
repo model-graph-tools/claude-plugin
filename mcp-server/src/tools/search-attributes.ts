@@ -24,7 +24,7 @@ export async function searchAttributes(
   stability?: string,
   limit: number = DEFAULT_LIMIT
 ): Promise<SearchAttributesResult> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const regex = `(?i).*${escapeRegex(query)}.*`;
     const params: Record<string, unknown> = { regex, limit: neo4j.int(limit) };

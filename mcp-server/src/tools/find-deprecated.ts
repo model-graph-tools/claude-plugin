@@ -22,7 +22,7 @@ export async function findDeprecated(
   elementType?: string,
   limit: number = DEFAULT_LIMIT
 ): Promise<FindDeprecatedResult> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const queries: string[] = [];
     const types = elementType

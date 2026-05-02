@@ -1,5 +1,5 @@
 import { mgtVersions, mgtFeaturePacks, mgtPs } from "../mgt.js";
-import { getActiveSource, registerConnection } from "../neo4j.js";
+import { getActiveSource, refreshConnection } from "../neo4j.js";
 
 interface SourceInfo {
   identifier: string;
@@ -34,7 +34,7 @@ export async function listSources(): Promise<ListSourcesResult> {
   for (const v of versions) {
     const container = runningByIdentifier.get(v.short_version);
     if (container) {
-      registerConnection(v.short_version, container.bolt);
+      refreshConnection(v.short_version, container.bolt);
     }
     sources.push({
       identifier: v.short_version,
@@ -56,7 +56,7 @@ export async function listSources(): Promise<ListSourcesResult> {
 
     const container = runningByIdentifier.get(id);
     if (container) {
-      registerConnection(id, container.bolt);
+      refreshConnection(id, container.bolt);
     }
     sources.push({
       identifier: id,

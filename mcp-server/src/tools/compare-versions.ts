@@ -97,7 +97,7 @@ function computeChanges(
 }
 
 async function getResourceAddresses(identifier: string): Promise<string[]> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const result = await session.run(
       "MATCH (r:Resource) RETURN r.address AS address ORDER BY address"
@@ -112,7 +112,7 @@ async function getElementsByResource(
   identifier: string,
   elementType: "attribute" | "operation"
 ): Promise<Map<string, Set<string>>> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const query =
       elementType === "attribute"
@@ -136,7 +136,7 @@ async function getElementsByResource(
 }
 
 async function getDeprecatedKeys(identifier: string): Promise<DeprecatedInfo[]> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const result = await session.run(
       `MATCH (a:Attribute)-[d:DEPRECATED_SINCE]->(v:Version)

@@ -50,13 +50,13 @@ export async function browseResource(
   identifier: string,
   address: string
 ): Promise<BrowseResult> {
-  const sessions = [
+  const sessions = await Promise.all([
     getSession(identifier),
     getSession(identifier),
     getSession(identifier),
     getSession(identifier),
     getSession(identifier),
-  ];
+  ]);
   try {
     const [resourceResult, attrResult, opResult, capResult, paramRelResult] =
       await Promise.all([

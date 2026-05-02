@@ -21,7 +21,7 @@ export async function findByStability(
   elementType?: string,
   limit: number = DEFAULT_LIMIT
 ): Promise<FindByStabilityResult> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const queries: string[] = [];
     const types = elementType

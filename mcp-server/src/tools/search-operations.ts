@@ -26,7 +26,7 @@ export async function searchOperations(
   query: string,
   limit: number = DEFAULT_LIMIT
 ): Promise<SearchOperationsResult> {
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const regex = `(?i).*${escapeRegex(query)}.*`;
 

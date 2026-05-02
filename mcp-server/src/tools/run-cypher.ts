@@ -20,7 +20,7 @@ export async function runCypher(
     );
   }
 
-  const session = getSession(identifier);
+  const session = await getSession(identifier);
   try {
     const result = await session.run(query, {}, { timeout: QUERY_TIMEOUT_MS });
     const columns = result.records.length > 0 ? result.records[0].keys : [];

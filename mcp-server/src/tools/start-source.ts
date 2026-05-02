@@ -1,5 +1,5 @@
 import { mgtStart } from "../mgt.js";
-import { registerConnection } from "../neo4j.js";
+import { refreshConnection } from "../neo4j.js";
 import { trackStarted } from "../session.js";
 
 interface StartSourceResult {
@@ -24,7 +24,7 @@ export async function startSource(
     );
   }
   const canonicalId = result.identifier ?? identifier;
-  registerConnection(canonicalId, result.bolt);
+  refreshConnection(canonicalId, result.bolt);
   trackStarted(canonicalId);
   return {
     identifier: canonicalId,
