@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-05-02
+
 ### Added
 - Centralized identifier resolution via `mgt resolve` that normalizes user input (e.g., `"39"` → `"39.0"`, `"ai"` → `"ai:0.9.1"`) before connection lookup
 - Unit tests for identifier resolution using vitest
@@ -70,7 +72,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.3...HEAD
+[0.6.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.5.3...v0.6.0
