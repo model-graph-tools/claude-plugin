@@ -137,6 +137,10 @@ msg "Bumping version to ${CYAN}${RELEASE_VERSION}${NOFORMAT}..."
 
 msg "Updating ${CYAN}CHANGELOG.md${NOFORMAT}..."
 sed -i '' "s/## \[Unreleased\]/## [Unreleased]\n\n## [${RELEASE_VERSION}] - ${TODAY}/" CHANGELOG.md
+PREV_TAG=$(grep '\.\.\.HEAD' CHANGELOG.md | sed 's|.*compare/v\(.*\)\.\.\.HEAD.*|\1|')
+sed -i '' "s|compare/v${PREV_TAG}\.\.\.HEAD|compare/${TAG}...HEAD|" CHANGELOG.md
+sed -i '' "/^\[Unreleased\]/a\\
+[${RELEASE_VERSION}]: https://github.com/model-graph-tools/claude-plugin/compare/v${PREV_TAG}...${TAG}" CHANGELOG.md
 
 msg "Committing and tagging..."
 git add .claude-plugin/plugin.json mcp-server/package.json CHANGELOG.md
