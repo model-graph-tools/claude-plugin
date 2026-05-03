@@ -9,19 +9,23 @@ This repository is a **Claude Code plugin** for exploring the WildFly management
 ## Repository Structure
 
 ```
-skill/                           # Plugin root
+claude-plugin/                   # Plugin root
 ├── .claude-plugin/
 │   ├── plugin.json              # Plugin manifest (skills, mcpServers)
 │   └── marketplace.json         # Marketplace manifest
 ├── skills/
 │   └── wildfly-model-graph/
-│       └── SKILL.md             # Skill prompt (domain knowledge, tool usage)
+│       ├── SKILL.md             # Skill prompt (domain knowledge, tool usage)
+│       └── references/          # Graph schema and Cypher query reference
+├── commands/
+│   └── model.md                 # /mgt:model slash command
 ├── mcp-server/                  # MCP server (TypeScript, Node.js)
 │   ├── src/
 │   │   ├── index.ts             # Server entry point, tool registration
 │   │   ├── neo4j.ts             # Neo4j driver/connection pool management
 │   │   ├── mgt.ts               # mgt CLI wrapper (shell out to mgt --json)
-│   │   └── tools/               # One file per MCP tool
+│   │   ├── session.ts           # Session state management
+│   │   └── tools/               # One file per MCP tool (16 tools)
 │   ├── dist/                    # Compiled JS output
 │   ├── package.json
 │   └── tsconfig.json

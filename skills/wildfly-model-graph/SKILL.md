@@ -2,7 +2,7 @@
 name: wildfly-model-graph
 description: >
   This skill should be used when the user asks about the WildFly management
-  model, WildFly subsystems, JBoss configuration, management resources,
+  model, WildFly subsystems, JBoss EAP configuration, management resources,
   attributes, operations, capabilities, or stability levels. Covers queries
   like "what versions of WildFly are available", "show me the datasources
   subsystem", "what operations can I do on a datasource", "what changed
@@ -10,7 +10,10 @@ description: >
   capabilities does elytron provide", "start the model graph for WildFly
   39", "search for logging resources", "compare feature packs", "show model
   statistics", "what experimental features exist", "explore WildFly
-  configuration", or "run a custom query against the model".
+  configuration", "run a custom query against the model", "show the
+  resource hierarchy under a subsystem", "how do I add a datasource",
+  "what attributes depend on each other", or "what parameters are required
+  together".
   Also applies when the user mentions specific WildFly subsystems such as
   undertow, elytron, datasources, messaging, infinispan, or logging in a
   management model context.
@@ -101,9 +104,10 @@ Users often ask about these areas:
 ## How to use the tools
 
 **CRITICAL RULE:** Never read cached tool-result JSON files from disk (`cat ...tool-results/*.json`),
-and never pipe MCP tool output through `python3`, `jq`, or any Bash post-processing. All MCP tool
-responses are structured — summarize directly from the tool response. If the response is too large,
-use `run_cypher` with a targeted query instead of trying to parse a large `browse_resource` result.
+and never pipe MCP tool output through `python3`, `jq`, or any Bash post-processing. Tool responses
+are already structured and parsed by Claude — post-processing adds latency and error risk. Summarize
+directly from the tool response. If the response is too large, use `run_cypher` with a targeted
+query instead of trying to parse a large `browse_resource` result.
 
 ### Translating user intent
 
@@ -132,9 +136,7 @@ use `run_cypher` with a targeted query instead of trying to parse a large `brows
 | "what resources does the AI feature pack have?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
 | "show me the resource tree under datasources"       | `get_resource_tree`    | address="/subsystem=datasources"             |
 | "what's the full resource hierarchy?"               | `get_resource_tree`    | address="/"                                  |
-| "what attributes depend on each other?"             | `find_relationships`   | address="/subsystem=datasources/data-source=*" |
-| "what attributes are mutually exclusive?"           | `find_relationships`   | address=..., scope="attributes"              |
-| "what parameters are required together?"            | `find_relationships`   | address=..., scope="parameters"              |
+| "what attributes depend on each other?" / "are mutually exclusive?" / "what parameters are required together?" | `find_relationships` | address=..., optional scope="attributes" or "parameters" |
 | "find deprecated parameters"                        | `find_deprecated`      | element_type="parameter"                     |
 | "what parameters have preview stability?"           | `find_by_stability`    | stability="preview", element_type="parameter"|
 | "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39"           |
@@ -275,3 +277,12 @@ Use `scope="attributes"` or `scope="parameters"` to narrow the results, or omit 
   narrow their search.
 - Cross-type comparisons (comparing a WildFly version with a feature pack) are not supported
   by `compare_versions`. Both entries should be of the same type.
+
+### Handling empty results
+
+When a tool returns zero results:
+- Suggest broadening the search query or trying synonyms (e.g., "db" → "datasource",
+  "security" → "elytron").
+- Verify the correct model graph is active — the user may be querying the wrong version.
+- If searching by stability or deprecation, mention that the filter may be too restrictive
+  and suggest removing it to see all matches first.

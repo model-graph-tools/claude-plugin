@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Update skill description with trigger phrases for newer tools (`get_resource_tree`, `find_relationships`, `describe_resource`) and add "JBoss EAP" as a trigger term
+- Add empty-result handling guidance to the skill for when searches return zero matches
+- Update command, README, and CLAUDE.md to reflect all 16 MCP tools
+
 ## [0.7.0] - 2026-05-03
 
 ### Added
