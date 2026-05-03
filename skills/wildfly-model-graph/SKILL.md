@@ -10,7 +10,7 @@ description: >
   capabilities does elytron provide", "start the model graph for WildFly
   39", "search for logging resources", "compare feature packs", "show model
   statistics", "what experimental features exist", "explore WildFly
-  configuration", or "run a Cypher query".
+  configuration", or "run a custom query against the model".
   Also applies when the user mentions specific WildFly subsystems such as
   undertow, elytron, datasources, messaging, infinispan, or logging in a
   management model context.
@@ -193,22 +193,8 @@ they want a concise, actionable answer — not a raw data dump. Follow this appr
    - A brief CLI example using the JBoss CLI `/subsystem=.../resource=name:add(...)` syntax
 
 If the `browse_resource` output is too large to process comfortably, use `run_cypher` with
-a targeted query instead. For example, to get just the `add` operation parameters:
-
-```
-MATCH (r:Resource {address: $address})-[:PROVIDES]->(o:Operation {name: "add"})-[:ACCEPTS]->(p:Parameter)
-RETURN p.name, p.type, p.required, p.description
-ORDER BY p.required DESC, p.name
-```
-
-Or to get just the required attributes:
-
-```
-MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
-WHERE a.required = true
-RETURN a.name, a.type, a.description, a.`default-value` AS defaultValue
-ORDER BY a.name
-```
+a targeted query instead. See `references/cypher-queries.md` for templates like "add
+operation parameters" and "required attributes for a resource."
 
 ### Selecting the right model graph
 
