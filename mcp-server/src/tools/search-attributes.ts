@@ -8,6 +8,8 @@ interface AttributeResult {
   name: string;
   type: string;
   description: string;
+  accessType?: string;
+  required?: boolean;
   deprecatedSince?: string;
   deprecationReason?: string;
 }
@@ -55,6 +57,8 @@ export async function searchAttributes(
               a.name AS name,
               a.type AS type,
               a.description AS description,
+              a.\`access-type\` AS accessType,
+              a.required AS required,
               v.name AS deprecatedSince,
               d.reason AS deprecationReason
        ORDER BY a.name, r.address
@@ -78,6 +82,10 @@ function mapRecord(r: { get(key: string): unknown }): AttributeResult {
     type: r.get("type") as string,
     description: r.get("description") as string,
   };
+  const at = r.get("accessType");
+  if (at != null) attr.accessType = at as string;
+  const req = r.get("required");
+  if (req != null) attr.required = req as boolean;
   const ds = r.get("deprecatedSince");
   if (ds != null) attr.deprecatedSince = ds as string;
   const dr = r.get("deprecationReason");

@@ -1,5 +1,11 @@
 import { getSession } from "../neo4j.js";
 
+interface SubAttributeInfo {
+  name: string;
+  type: string;
+  description: string;
+}
+
 interface AttributeInfo {
   name: string;
   type: string;
@@ -13,6 +19,7 @@ interface AttributeInfo {
   storage?: string;
   deprecatedSince?: string;
   deprecationReason?: string;
+  consistsOf?: SubAttributeInfo[];
 }
 
 interface ParameterInfo {
@@ -56,9 +63,10 @@ export async function browseResource(
     getSession(identifier),
     getSession(identifier),
     getSession(identifier),
+    getSession(identifier),
   ]);
   try {
-    const [resourceResult, attrResult, opResult, capResult, paramRelResult] =
+    const [resourceResult, attrResult, opResult, capResult, paramRelResult, consistsOfResult] =
       await Promise.all([
         sessions[0].run(
           `MATCH (r:Resource {address: $address})
@@ -114,12 +122,33 @@ export async function browseResource(
            RETURN operation, parameter, requires, alternatives`,
           { address }
         ),
+        sessions[5].run(
+          `MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
+           WHERE a.type IN ['LIST', 'OBJECT']
+           MATCH (a)-[:CONSISTS_OF]->(sub:Attribute)
+           RETURN a.name AS parent,
+                  collect({name: sub.name, type: sub.type, description: sub.description}) AS subAttributes
+           ORDER BY a.name`,
+          { address }
+        ),
       ]);
 
     if (resourceResult.records.length === 0) {
       throw new Error(
         `Resource not found: ${address}. Use search_resources to find valid addresses.`
       );
+    }
+
+    // Build consists-of lookup
+    const consistsOfMap = new Map<string, SubAttributeInfo[]>();
+    for (const r of consistsOfResult.records) {
+      const parent = r.get("parent") as string;
+      const subs = (r.get("subAttributes") as SubAttributeInfo[]).filter(
+        (s) => s.name != null
+      );
+      if (subs.length > 0) {
+        consistsOfMap.set(parent, subs);
+      }
     }
 
     // Build parameter relationship lookup
@@ -163,6 +192,8 @@ export async function browseResource(
         if (nil != null) attr.nillable = nil as boolean;
         const expr = r.get("expressionsAllowed");
         if (expr != null) attr.expressionsAllowed = expr as boolean;
+        const subs = consistsOfMap.get(attr.name);
+        if (subs) attr.consistsOf = subs;
         return attr;
       }),
       operations: opResult.records.map((r) => {

@@ -132,7 +132,7 @@ query instead of trying to parse a large `browse_resource` result.
 | "find community stability attributes for logging"   | `search_attributes`    | query="logging", stability="community"       |
 | "give me an overview of the model"                  | `get_statistics`       | (identifier only)                            |
 | "how many resources does WildFly 39 have?"          | `get_statistics`       | identifier="39"                              |
-| "what attributes changed between WildFly 38 and 39?"| `compare_versions`     | identifier1="38", identifier2="39"           |
+| "what attributes changed between WildFly 38 and 39?"| `compare_versions`     | identifier1="38", identifier2="39" — includes attribute, operation, and parameter changes |
 | "what resources does the AI feature pack have?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
 | "show me the resource tree under datasources"       | `get_resource_tree`    | address="/subsystem=datasources"             |
 | "what's the full resource hierarchy?"               | `get_resource_tree`    | address="/"                                  |

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `browse_resource` now includes sub-attribute composition for complex types (LIST, OBJECT) via CONSISTS_OF traversal
+- `get_statistics` now returns model graph identity metadata (name, version, type, description) from the Identity node
+- `compare_versions` now detects parameter additions and removals on shared operations across versions
+
+### Changed
+- `search_resources` now returns resource description in results
+- `search_operations` now returns stability level and deprecation info (version, reason)
+- `search_attributes` now returns access type and required flag
+
 ## [0.7.1] - 2026-05-03
 
 ### Changed

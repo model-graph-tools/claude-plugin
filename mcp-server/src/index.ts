@@ -111,7 +111,7 @@ server.registerTool("search_resources", {
 
 server.registerTool("browse_resource", {
   description:
-    "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata, operation stability, and parameter relationships (requires/alternatives).",
+    "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata, operation stability, and parameter relationships (requires/alternatives). For complex attributes (LIST/OBJECT), shows sub-attribute composition via CONSISTS_OF.",
   inputSchema: z.object({
     address: z
       .string()
@@ -148,7 +148,7 @@ server.registerTool("describe_resource", {
 
 server.registerTool("search_operations", {
   description:
-    "Searches operations across all resources by name or description.",
+    "Searches operations across all resources by name or description. Returns stability level and deprecation info.",
   inputSchema: z.object({
     query: z
       .string()
@@ -167,7 +167,7 @@ server.registerTool("search_operations", {
 
 server.registerTool("search_attributes", {
   description:
-    "Searches attributes across all resources. Can filter to only deprecated attributes or by stability level.",
+    "Searches attributes across all resources. Can filter to only deprecated attributes or by stability level. Returns access type and required flag.",
   inputSchema: z.object({
     query: z
       .string()
@@ -263,7 +263,7 @@ server.registerTool("find_by_stability", {
 
 server.registerTool("get_statistics", {
   description:
-    "Overview of the management model: node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
+    "Overview of the management model: identity metadata (name, version, type), node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
   inputSchema: z.object({
     identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
   }),
@@ -278,7 +278,7 @@ server.registerTool("get_statistics", {
 
 server.registerTool("compare_versions", {
   description:
-    "Compares two WildFly versions or feature packs to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute and operation changes within resources that exist in both versions.",
+    "Compares two WildFly versions or feature packs to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute, operation, and parameter changes within resources that exist in both versions.",
   inputSchema: z.object({
     identifier1: z.string().describe('Older WildFly version or feature pack, e.g. "38"'),
     identifier2: z.string().describe('Newer WildFly version or feature pack, e.g. "39"'),

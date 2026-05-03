@@ -1,6 +1,13 @@
 import { getSession, hasConnection } from "../neo4j.js";
 import { startSource } from "./start-source.js";
 
+interface ChangedParameters {
+  resource: string;
+  operation: string;
+  added: string[];
+  removed: string[];
+}
+
 interface CompareResult {
   identifier1: string;
   identifier2: string;
@@ -9,6 +16,7 @@ interface CompareResult {
   newlyDeprecated: DeprecatedInfo[];
   changedAttributes: ChangedElements[];
   changedOperations: ChangedElements[];
+  changedParameters: ChangedParameters[];
 }
 
 interface DeprecatedInfo {
@@ -40,6 +48,7 @@ export async function compareVersions(
     deprecated1, deprecated2,
     attrs1, attrs2,
     ops1, ops2,
+    params1, params2,
   ] = await Promise.all([
     getResourceAddresses(identifier1),
     getResourceAddresses(identifier2),
@@ -49,6 +58,8 @@ export async function compareVersions(
     getElementsByResource(identifier2, "attribute"),
     getElementsByResource(identifier1, "operation"),
     getElementsByResource(identifier2, "operation"),
+    getParametersByOperation(identifier1),
+    getParametersByOperation(identifier2),
   ]);
 
   const set1 = new Set(addresses1);
@@ -66,6 +77,7 @@ export async function compareVersions(
 
   const changedAttributes = computeChanges(commonAddresses, attrs1, attrs2);
   const changedOperations = computeChanges(commonAddresses, ops1, ops2);
+  const changedParameters = computeParameterChanges(commonAddresses, ops1, ops2, params1, params2);
 
   return {
     identifier1,
@@ -75,6 +87,7 @@ export async function compareVersions(
     newlyDeprecated,
     changedAttributes,
     changedOperations,
+    changedParameters,
   };
 }
 
@@ -168,4 +181,60 @@ async function getDeprecatedKeys(identifier: string): Promise<DeprecatedInfo[]> 
   } finally {
     await session.close();
   }
+}
+
+async function getParametersByOperation(
+  identifier: string
+): Promise<Map<string, Map<string, Set<string>>>> {
+  const session = await getSession(identifier);
+  try {
+    const result = await session.run(
+      `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)-[:ACCEPTS]->(p:Parameter)
+       RETURN r.address AS resource, o.name AS operation, collect(p.name) AS names`
+    );
+    const map = new Map<string, Map<string, Set<string>>>();
+    for (const r of result.records) {
+      const resource = r.get("resource") as string;
+      const operation = r.get("operation") as string;
+      const names = new Set(r.get("names") as string[]);
+      if (!map.has(resource)) {
+        map.set(resource, new Map());
+      }
+      map.get(resource)!.set(operation, names);
+    }
+    return map;
+  } finally {
+    await session.close();
+  }
+}
+
+function computeParameterChanges(
+  commonAddresses: string[],
+  ops1: Map<string, Set<string>>,
+  ops2: Map<string, Set<string>>,
+  params1: Map<string, Map<string, Set<string>>>,
+  params2: Map<string, Map<string, Set<string>>>
+): ChangedParameters[] {
+  const results: ChangedParameters[] = [];
+  for (const addr of commonAddresses) {
+    const opsInBoth1 = ops1.get(addr) ?? new Set<string>();
+    const opsInBoth2 = ops2.get(addr) ?? new Set<string>();
+    const commonOps = [...opsInBoth2].filter((o) => opsInBoth1.has(o));
+    const opParams1 = params1.get(addr) ?? new Map<string, Set<string>>();
+    const opParams2 = params2.get(addr) ?? new Map<string, Set<string>>();
+    for (const op of commonOps) {
+      const p1 = opParams1.get(op) ?? new Set<string>();
+      const p2 = opParams2.get(op) ?? new Set<string>();
+      const added = [...p2].filter((n) => !p1.has(n)).sort();
+      const removed = [...p1].filter((n) => !p2.has(n)).sort();
+      if (added.length > 0 || removed.length > 0) {
+        results.push({ resource: addr, operation: op, added, removed });
+      }
+    }
+  }
+  return results.sort((a, b) =>
+    a.resource === b.resource
+      ? a.operation.localeCompare(b.operation)
+      : a.resource.localeCompare(b.resource)
+  );
 }

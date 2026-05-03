@@ -6,6 +6,7 @@ const DEFAULT_LIMIT = 25;
 interface ResourceResult {
   address: string;
   name: string;
+  description: string;
   singleton: boolean;
   childCount: number;
 }
@@ -38,6 +39,7 @@ export async function searchResources(
        OPTIONAL MATCH (child:Resource)-[:CHILD_OF]->(r)
        RETURN r.address AS address,
               r.name AS name,
+              r.description AS description,
               r.singleton AS singleton,
               count(child) AS childCount
        ORDER BY r.address
@@ -49,6 +51,7 @@ export async function searchResources(
       results: result.records.map((r) => ({
         address: r.get("address") as string,
         name: r.get("name") as string,
+        description: r.get("description") as string,
         singleton: (r.get("singleton") as boolean) ?? false,
         childCount: toNumber(r.get("childCount")),
       })),

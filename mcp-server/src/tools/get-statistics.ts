@@ -7,7 +7,16 @@ interface StabilityBreakdown {
   experimental: number;
 }
 
+interface IdentityInfo {
+  name: string;
+  identifier: string;
+  type: string;
+  version: string;
+  description: string;
+}
+
 interface StatisticsResult {
+  identity?: IdentityInfo;
   resources: number;
   attributes: number;
   operations: number;
@@ -56,9 +65,11 @@ const REL_TYPE_MAP: Record<string, keyof StatisticsResult["relationships"]> = {
 export async function getStatistics(
   identifier: string
 ): Promise<StatisticsResult> {
-  const sessions = await Promise.all([getSession(identifier), getSession(identifier), getSession(identifier)]);
+  const sessions = await Promise.all([
+    getSession(identifier), getSession(identifier), getSession(identifier), getSession(identifier),
+  ]);
   try {
-    const [nodeResult, deprecatedResult, relResult] = await Promise.all([
+    const [nodeResult, deprecatedResult, relResult, identityResult] = await Promise.all([
       sessions[0].run(
         `MATCH (n)
          WHERE n:Resource OR n:Attribute OR n:Operation OR n:Parameter OR n:Capability
@@ -75,6 +86,11 @@ export async function getStatistics(
       sessions[2].run(
         `MATCH ()-[r]->()
          RETURN type(r) AS relType, count(r) AS cnt`
+      ),
+      sessions[3].run(
+        `OPTIONAL MATCH (i:Identity)
+         RETURN i.name AS name, i.identifier AS identifier, i.type AS type,
+                i.version AS version, i.description AS description`
       ),
     ]);
 
@@ -130,7 +146,23 @@ export async function getStatistics(
       if (key) relationships[key] = cnt;
     }
 
+    let identity: IdentityInfo | undefined;
+    if (identityResult.records.length > 0) {
+      const ir = identityResult.records[0];
+      const name = ir.get("name");
+      if (name != null) {
+        identity = {
+          name: name as string,
+          identifier: ir.get("identifier") as string,
+          type: ir.get("type") as string,
+          version: ir.get("version") as string,
+          description: ir.get("description") as string,
+        };
+      }
+    }
+
     return {
+      identity,
       resources: counts.Resource,
       attributes: counts.Attribute,
       operations: counts.Operation,
