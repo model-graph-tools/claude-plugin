@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-05-03
+
 ### Added
 - `browse_resource` now includes sub-attribute composition for complex types (LIST, OBJECT) via CONSISTS_OF traversal
 - `get_statistics` now returns model graph identity metadata (name, version, type, description) from the Identity node
@@ -125,7 +127,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.6...v0.7.0
 [0.6.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.5...v0.6.6
