@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Broaden skill trigger phrasing for custom query matching and deduplicate inline Cypher templates by pointing to reference file
+
 ## [0.6.4] - 2026-05-03
 
 ### Added
