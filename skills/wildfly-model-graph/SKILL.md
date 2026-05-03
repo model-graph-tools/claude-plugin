@@ -209,7 +209,7 @@ contains more detail than needed. Use `describe_resource` instead.
   1. If there is an active model graph (from a previous query in this session), keep using it.
   2. If exactly one model graph is already running, use it.
   3. If multiple model graphs are running, prefer the latest WildFly version among them.
-  4. If no model graph is running, start the latest available WildFly version.
+  4. If no model graph is running, start the model graph for the latest available WildFly version.
   5. If the context is clearly about a feature pack (e.g., "AI subsystem"), prefer a running
      feature pack model graph over a WildFly version.
 - When comparing versions, the user might say "WildFly 39" — pass `"39"` as the tool's

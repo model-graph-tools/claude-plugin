@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Clarify skill wording to say "start the model graph for" a WildFly version, not "start" the version itself
+
 ## [0.7.3] - 2026-05-03
 
 ### Fixed
