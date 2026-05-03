@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Include README.md in npm published package to restore documentation on npmjs.com
+
 ## [0.7.2] - 2026-05-03
 
 ### Added
