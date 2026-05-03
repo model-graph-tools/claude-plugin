@@ -27,7 +27,7 @@ export async function findDeprecated(
     const queries: string[] = [];
     const types = elementType
       ? [elementType]
-      : ["resource", "attribute", "operation"];
+      : ["resource", "attribute", "operation", "parameter"];
 
     if (types.includes("attribute")) {
       queries.push(
@@ -47,6 +47,18 @@ export async function findDeprecated(
          ${sinceVersion ? "WHERE v.ordinal >= $sinceOrdinal" : ""}
          RETURN 'operation' AS elementType,
                 o.name AS name,
+                r.address AS resource,
+                v.name AS deprecatedSince,
+                d.reason AS reason`
+      );
+    }
+
+    if (types.includes("parameter")) {
+      queries.push(
+        `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)-[:ACCEPTS]->(p:Parameter)-[d:DEPRECATED_SINCE]->(v:Version)
+         ${sinceVersion ? "WHERE v.ordinal >= $sinceOrdinal" : ""}
+         RETURN 'parameter' AS elementType,
+                p.name AS name,
                 r.address AS resource,
                 v.name AS deprecatedSince,
                 d.reason AS reason`

@@ -26,7 +26,7 @@ export async function searchResources(
 
     const countResult = await session.run(
       `MATCH (r:Resource)
-       WHERE r.name =~ $regex OR r.address =~ $regex
+       WHERE r.name =~ $regex OR r.address =~ $regex OR r.description =~ $regex
        RETURN count(r) AS total`,
       { regex }
     );
@@ -34,7 +34,7 @@ export async function searchResources(
 
     const result = await session.run(
       `MATCH (r:Resource)
-       WHERE r.name =~ $regex OR r.address =~ $regex
+       WHERE r.name =~ $regex OR r.address =~ $regex OR r.description =~ $regex
        OPTIONAL MATCH (child:Resource)-[:CHILD_OF]->(r)
        RETURN r.address AS address,
               r.name AS name,

@@ -26,7 +26,7 @@ export async function findByStability(
     const queries: string[] = [];
     const types = elementType
       ? [elementType]
-      : ["resource", "attribute", "operation"];
+      : ["resource", "attribute", "operation", "parameter"];
 
     if (types.includes("resource")) {
       queries.push(
@@ -58,6 +58,17 @@ export async function findByStability(
                 o.name AS name,
                 r.address AS resource,
                 o.stability AS stability`
+      );
+    }
+
+    if (types.includes("parameter")) {
+      queries.push(
+        `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)-[:ACCEPTS]->(p:Parameter)
+         WHERE p.stability = $stability
+         RETURN 'parameter' AS elementType,
+                p.name AS name,
+                r.address AS resource,
+                p.stability AS stability`
       );
     }
 

@@ -54,8 +54,8 @@ messaging, clustering — is represented as a tree of **resources**, each with *
   the feature may change or be removed in future versions. Use `find_by_stability` to
   discover non-default elements, or `get_statistics` for a stability breakdown.
 
-- **Deprecation**: Resources, attributes, and operations can be deprecated starting from a
-  specific WildFly version, with a reason explaining why and what to use instead.
+- **Deprecation**: Resources, attributes, operations, and parameters can be deprecated starting
+  from a specific WildFly version, with a reason explaining why and what to use instead.
 
 ### Model graphs: WildFly versions and feature packs
 
@@ -130,6 +130,13 @@ use `run_cypher` with a targeted query instead of trying to parse a large `brows
 | "how many resources does WildFly 39 have?"          | `get_statistics`       | identifier="39"                              |
 | "what attributes changed between WildFly 38 and 39?"| `compare_versions`     | identifier1="38", identifier2="39"           |
 | "what resources does the AI feature pack have?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
+| "show me the resource tree under datasources"       | `get_resource_tree`    | address="/subsystem=datasources"             |
+| "what's the full resource hierarchy?"               | `get_resource_tree`    | address="/"                                  |
+| "what attributes depend on each other?"             | `find_relationships`   | address="/subsystem=datasources/data-source=*" |
+| "what attributes are mutually exclusive?"           | `find_relationships`   | address=..., scope="attributes"              |
+| "what parameters are required together?"            | `find_relationships`   | address=..., scope="parameters"              |
+| "find deprecated parameters"                        | `find_deprecated`      | element_type="parameter"                     |
+| "what parameters have preview stability?"           | `find_by_stability`    | stability="preview", element_type="parameter"|
 | "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39"           |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
@@ -240,6 +247,22 @@ Many questions require multiple tool calls. For example:
 
 Guide the user through this exploration naturally. After showing search results, suggest
 browsing a specific resource. After browsing, point out interesting operations or capabilities.
+
+### Exploring resource hierarchies
+
+When the user wants to see the resource tree under a subsystem or parent resource, use
+`get_resource_tree` instead of recursive `browse_resource` calls. It returns the full
+subtree in a single call with depth information. Use the optional `depth` parameter to
+limit how deep to traverse.
+
+### Understanding attribute and parameter relationships
+
+When the user asks about attribute dependencies ("what attributes must be set together?",
+"what attributes are mutually exclusive?"), use `find_relationships`. It exposes:
+- **REQUIRES**: Attributes/parameters that must be set together
+- **ALTERNATIVE**: Attributes/parameters that are mutually exclusive
+
+Use `scope="attributes"` or `scope="parameters"` to narrow the results, or omit for both.
 
 ## Limitations
 

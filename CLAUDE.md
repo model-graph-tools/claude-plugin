@@ -58,23 +58,25 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 
 ## MCP Tools
 
-14 tools registered in `src/index.ts`:
+16 tools registered in `src/index.ts`:
 
 | Tool | Purpose |
 |------|---------|
 | `list_sources` | Lists available WildFly versions and feature packs with container status |
 | `start_source` | Starts a Neo4j container for a model graph (auto-pulls image) |
 | `stop_source` | Stops a running Neo4j container |
-| `search_resources` | Searches resources by name or address pattern |
+| `search_resources` | Searches resources by name, address, or description |
 | `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
 | `describe_resource` | Returns a concise, human-readable markdown description of a resource — purpose, required add-operation parameters, required and optional attributes, and a CLI example. Use for "how do I add/configure X?" questions |
 | `search_operations` | Searches operations across all resources |
 | `search_attributes` | Searches attributes, with optional deprecated-only and stability level filters |
-| `find_capabilities` | Searches capabilities and their declaring/referencing resources |
-| `find_deprecated` | Finds deprecated elements, filterable by version and type |
-| `find_by_stability` | Finds elements by stability level (experimental, preview, community, default) |
+| `find_capabilities` | Searches capabilities and their declaring/referencing resources (via attributes and parameters) |
+| `find_deprecated` | Finds deprecated elements (resources, attributes, operations, parameters), filterable by version and type |
+| `find_by_stability` | Finds elements (resources, attributes, operations, parameters) by stability level (experimental, preview, community, default) |
 | `get_statistics` | Overview of a model graph: counts, stability breakdown, relationships |
 | `compare_versions` | Diffs two model graphs for added/removed/deprecated elements, including attribute and operation changes within shared resources |
+| `get_resource_tree` | Returns all resources in the subtree under a given address for hierarchy exploration |
+| `find_relationships` | Shows REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships between attributes and operation parameters |
 | `run_cypher` | Escape hatch: runs arbitrary read-only Cypher (100 row limit, 10s timeout) |
 
 ## Key Architecture

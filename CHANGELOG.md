@@ -8,7 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `get_resource_tree` MCP tool that returns the full resource subtree under a given address in one call, with depth info and optional depth limit — eliminates recursive `browse_resource` calls for hierarchy exploration
+- `find_relationships` MCP tool that exposes REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships between attributes and operation parameters for a resource
 - `describe_resource` MCP tool that returns concise markdown (not JSON) with required add-operation parameters, required/optional attributes, and a CLI example — purpose-built for "how do I add/configure X?" questions
+
+### Changed
+- `find_deprecated` now includes parameters in deprecation search (previously only resources, attributes, and operations)
+- `find_by_stability` now includes parameters in stability search (previously only resources, attributes, and operations)
+- `find_capabilities` now shows parameter capability references alongside attribute references via `referencedByParameters` field
+- `search_resources` now matches against resource descriptions in addition to name and address
 
 ## [0.6.6] - 2026-05-03
 

@@ -5,10 +5,17 @@ interface CapabilityReference {
   resource: string;
 }
 
+interface ParameterReference {
+  parameter: string;
+  operation: string;
+  resource: string;
+}
+
 interface CapabilityResult {
   capability: string;
   declaredBy: string[];
   referencedBy: CapabilityReference[];
+  referencedByParameters: ParameterReference[];
 }
 
 export async function findCapabilities(
@@ -25,9 +32,12 @@ export async function findCapabilities(
        OPTIONAL MATCH (r:Resource)-[:DECLARES_CAPABILITY]->(c)
        OPTIONAL MATCH (a:Attribute)-[:REFERENCES_CAPABILITY]->(c)
        OPTIONAL MATCH (ra:Resource)-[:HAS_ATTRIBUTE]->(a)
+       OPTIONAL MATCH (p:Parameter)-[:REFERENCES_CAPABILITY]->(c)
+       OPTIONAL MATCH (rp:Resource)-[:PROVIDES]->(op:Operation)-[:ACCEPTS]->(p)
        RETURN c.name AS capability,
               collect(DISTINCT r.address) AS declaredBy,
-              collect(DISTINCT {attribute: a.name, resource: ra.address}) AS referencedBy
+              collect(DISTINCT {attribute: a.name, resource: ra.address}) AS referencedBy,
+              collect(DISTINCT {parameter: p.name, operation: op.name, resource: rp.address}) AS referencedByParameters
        ORDER BY c.name`,
       { regex }
     );
@@ -39,6 +49,8 @@ export async function findCapabilities(
       ),
       referencedBy: (r.get("referencedBy") as Array<CapabilityReference | null>)
         .filter((ref): ref is CapabilityReference => ref?.attribute != null),
+      referencedByParameters: (r.get("referencedByParameters") as Array<ParameterReference | null>)
+        .filter((ref): ref is ParameterReference => ref?.parameter != null),
     }));
   } finally {
     await session.close();

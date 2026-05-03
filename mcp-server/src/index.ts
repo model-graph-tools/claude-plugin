@@ -18,6 +18,8 @@ import { findDeprecated } from "./tools/find-deprecated.js";
 import { findByStability } from "./tools/find-by-stability.js";
 import { compareVersions } from "./tools/compare-versions.js";
 import { getStatistics } from "./tools/get-statistics.js";
+import { getResourceTree } from "./tools/get-resource-tree.js";
+import { findRelationships } from "./tools/find-relationships.js";
 import { runCypher } from "./tools/run-cypher.js";
 
 const require = createRequire(import.meta.url);
@@ -92,9 +94,9 @@ server.registerTool("stop_source", {
 
 server.registerTool("search_resources", {
   description:
-    "Searches for management model resources by name or address pattern.",
+    "Searches for management model resources by name, address, or description.",
   inputSchema: z.object({
-    query: z.string().describe("Search term matched against resource name and address"),
+    query: z.string().describe("Search term matched against resource name, address, and description"),
     identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
@@ -194,7 +196,7 @@ server.registerTool("search_attributes", {
 
 server.registerTool("find_capabilities", {
   description:
-    "Searches for capabilities by name and shows which resources declare or reference them.",
+    "Searches for capabilities by name and shows which resources declare or reference them (via attributes and parameters).",
   inputSchema: z.object({
     query: z.string().describe("Search term matched against capability name"),
     identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
@@ -210,7 +212,7 @@ server.registerTool("find_capabilities", {
 
 server.registerTool("find_deprecated", {
   description:
-    "Finds all deprecated elements (resources, attributes, operations), optionally filtered by version or type.",
+    "Finds all deprecated elements (resources, attributes, operations, and parameters), optionally filtered by version or type.",
   inputSchema: z.object({
     identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     since_version: z
@@ -220,7 +222,7 @@ server.registerTool("find_deprecated", {
     element_type: z
       .string()
       .optional()
-      .describe('Filter by type: "resource", "attribute", or "operation"'),
+      .describe('Filter by type: "resource", "attribute", "operation", or "parameter"'),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
 }, async ({ identifier, since_version, element_type, limit }) => {
@@ -236,7 +238,7 @@ server.registerTool("find_deprecated", {
 
 server.registerTool("find_by_stability", {
   description:
-    "Finds all elements (resources, attributes, operations) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
+    "Finds all elements (resources, attributes, operations, and parameters) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
   inputSchema: z.object({
     identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     stability: z
@@ -245,7 +247,7 @@ server.registerTool("find_by_stability", {
     element_type: z
       .string()
       .optional()
-      .describe('Filter by type: "resource", "attribute", or "operation"'),
+      .describe('Filter by type: "resource", "attribute", "operation", or "parameter"'),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
 }, async ({ identifier, stability, element_type, limit }) => {
@@ -285,6 +287,50 @@ server.registerTool("compare_versions", {
   try {
     const [resolved1, resolved2] = await resolveIdentifiers(identifier1, identifier2);
     return textResult(await compareVersions(resolved1, resolved2));
+  } catch (e) {
+    return errorResult(e);
+  }
+});
+
+server.registerTool("get_resource_tree", {
+  description:
+    "Returns all resources in the subtree under a given address. Use to explore the resource hierarchy without recursive browse_resource calls.",
+  inputSchema: z.object({
+    address: z
+      .string()
+      .describe('Root address, e.g. "/subsystem=datasources". Use "/" for the full tree'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    depth: z
+      .number()
+      .optional()
+      .describe("Max depth to traverse (default: unlimited)"),
+  }),
+}, async ({ address, identifier, depth }) => {
+  try {
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await getResourceTree(resolved, address, depth));
+  } catch (e) {
+    return errorResult(e);
+  }
+});
+
+server.registerTool("find_relationships", {
+  description:
+    "Shows dependency and exclusivity relationships between attributes and between operation parameters for a resource. Exposes REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships.",
+  inputSchema: z.object({
+    address: z
+      .string()
+      .describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    scope: z
+      .enum(["attributes", "parameters", "all"])
+      .optional()
+      .describe('Which relationships to return: "attributes", "parameters", or "all" (default: "all")'),
+  }),
+}, async ({ address, identifier, scope }) => {
+  try {
+    const resolved = await resolveIdentifier(identifier);
+    return textResult(await findRelationships(resolved, address, scope));
   } catch (e) {
     return errorResult(e);
   }
