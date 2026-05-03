@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.6] - 2026-05-03
+
 ## [0.6.5] - 2026-05-03
 
 ### Changed
@@ -90,7 +92,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.5...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.6...HEAD
+[0.6.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.5...v0.6.6
 [0.6.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.2...v0.6.3
