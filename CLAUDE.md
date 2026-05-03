@@ -58,7 +58,7 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 
 ## MCP Tools
 
-13 tools registered in `src/index.ts`:
+14 tools registered in `src/index.ts`:
 
 | Tool | Purpose |
 |------|---------|
@@ -67,6 +67,7 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 | `stop_source` | Stops a running Neo4j container |
 | `search_resources` | Searches resources by name or address pattern |
 | `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
+| `describe_resource` | Returns a concise, human-readable markdown description of a resource — purpose, required add-operation parameters, required and optional attributes, and a CLI example. Use for "how do I add/configure X?" questions |
 | `search_operations` | Searches operations across all resources |
 | `search_attributes` | Searches attributes, with optional deprecated-only and stability level filters |
 | `find_capabilities` | Searches capabilities and their declaring/referencing resources |

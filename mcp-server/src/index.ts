@@ -10,6 +10,7 @@ import { startSource } from "./tools/start-source.js";
 import { stopSource } from "./tools/stop-source.js";
 import { searchResources } from "./tools/search-resources.js";
 import { browseResource } from "./tools/browse-resource.js";
+import { describeResource } from "./tools/describe-resource.js";
 import { searchOperations } from "./tools/search-operations.js";
 import { searchAttributes } from "./tools/search-attributes.js";
 import { findCapabilities } from "./tools/find-capabilities.js";
@@ -119,6 +120,25 @@ server.registerTool("browse_resource", {
   try {
     const resolved = await resolveIdentifier(identifier);
     return textResult(await browseResource(resolved, address));
+  } catch (e) {
+    return errorResult(e);
+  }
+});
+
+server.registerTool("describe_resource", {
+  description:
+    "Returns a concise, human-readable description of a resource — its purpose, required add-operation parameters, required and optional attributes, and a CLI example. Use this for 'how do I add/configure X?' questions instead of browse_resource.",
+  inputSchema: z.object({
+    address: z
+      .string()
+      .describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+  }),
+}, async ({ address, identifier }) => {
+  try {
+    const resolved = await resolveIdentifier(identifier);
+    const markdown = await describeResource(resolved, address);
+    return { content: [{ type: "text" as const, text: markdown }] };
   } catch (e) {
     return errorResult(e);
   }

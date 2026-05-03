@@ -117,7 +117,7 @@ use `run_cypher` with a targeted query instead of trying to parse a large `brows
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
 | "what operations can I do on a datasource?"         | `search_resources` then `browse_resource` | query="data-source", then browse a concrete result |
-| "how do I add a datasource?"                        | `run_cypher`           | Targeted queries for add-parameters and required attributes — see "Configuration how-to questions" below |
+| "how do I add a datasource?"                        | `describe_resource`    | address="/subsystem=datasources/data-source=*" — returns markdown with required params, attributes, and CLI example |
 | "is there an operation to test my DB connection?"   | `search_operations`    | query="test connection"                      |
 | "what attributes are deprecated in logging?"        | `search_attributes`    | query="logging", deprecated=true             |
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
@@ -181,37 +181,16 @@ a representative resource at the wildcard level.
 ### Configuration how-to questions
 
 When the user asks "how do I add X?", "how do I configure X?", or "what do I need for X?",
-they want a concise, actionable answer — not a raw data dump. Use targeted Cypher queries
-to fetch exactly the data you need — this is faster and avoids large payloads:
+use the `describe_resource` tool. It returns a concise, human-readable markdown summary with
+required parameters, attributes, and a CLI example — no JSON parsing needed.
 
 1. Use `search_resources` to find the resource address (if not already known).
-2. Use `run_cypher` with targeted queries to get just the relevant data. Two queries cover
-   most how-to questions (run them in parallel):
+2. Call `describe_resource` with the resource address.
+3. Present the markdown response to the user. Supplement with additional context if helpful
+   (e.g., mention related operations like `test-connection-in-pool` for datasources).
 
-   **Required add-operation parameters:**
-   ```cypher
-   MATCH (r:Resource {address: "<address>"})-[:PROVIDES]->(o:Operation {name: "add"})-[:ACCEPTS]->(p:Parameter)
-   RETURN p.name AS name, p.type AS type, p.required AS required, p.description AS description
-   ORDER BY p.required DESC, p.name
-   ```
-
-   **Required attributes:**
-   ```cypher
-   MATCH (r:Resource {address: "<address>"})-[:HAS_ATTRIBUTE]->(a:Attribute)
-   WHERE a.required = true
-   RETURN a.name AS name, a.type AS type, a.description AS description, a.`default-value` AS defaultValue
-   ORDER BY a.name
-   ```
-
-   See `references/cypher-queries.md` for more templates.
-
-3. Present the answer as:
-   - The `add` operation and its **required** parameters
-   - **Required attributes** (where `required: true`)
-   - **Key optional attributes** relevant to the question (e.g., for datasources:
-     `connection-url`, `driver-name`, `jndi-name`, `user-name`, `password`, pool settings)
-   - Any resource-specific operations (e.g., `test-connection-in-pool`)
-   - A brief CLI example using the JBoss CLI `/subsystem=.../resource=name:add(...)` syntax
+**Do NOT use `browse_resource` for how-to questions** — its response is too large and
+contains more detail than needed. Use `describe_resource` instead.
 
 ### Selecting the right model graph
 
