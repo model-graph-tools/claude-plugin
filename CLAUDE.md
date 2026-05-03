@@ -63,7 +63,7 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 | Tool | Purpose |
 |------|---------|
 | `list_sources` | Lists available WildFly versions and feature packs with container status |
-| `start_source` | Starts a Neo4j container for a source (auto-pulls image) |
+| `start_source` | Starts a Neo4j container for a model graph (auto-pulls image) |
 | `stop_source` | Stops a running Neo4j container |
 | `search_resources` | Searches resources by name or address pattern |
 | `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
@@ -72,22 +72,22 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 | `find_capabilities` | Searches capabilities and their declaring/referencing resources |
 | `find_deprecated` | Finds deprecated elements, filterable by version and type |
 | `find_by_stability` | Finds elements by stability level (experimental, preview, community, default) |
-| `get_statistics` | Overview of a source's model: counts, stability breakdown, relationships |
-| `compare_versions` | Diffs two sources for added/removed/deprecated elements, including attribute and operation changes within shared resources |
+| `get_statistics` | Overview of a model graph: counts, stability breakdown, relationships |
+| `compare_versions` | Diffs two model graphs for added/removed/deprecated elements, including attribute and operation changes within shared resources |
 | `run_cypher` | Escape hatch: runs arbitrary read-only Cypher (100 row limit, 10s timeout) |
 
 ## Key Architecture
 
 - **`mgt` CLI delegation** — Container lifecycle (start/stop/ps/versions/feature-packs) is handled by shelling out to `mgt --json`. The `mgt.ts` module wraps these calls. `mgt` must be installed and on PATH.
-- **One Neo4j container per source** — Each WildFly version or feature pack runs its own Neo4j instance. Cross-source queries (like `compare_versions`) connect to two containers simultaneously.
-- **Connection pooling** — `neo4j.ts` manages a `Map<string, Driver>` of Neo4j connections, reusing drivers across tool calls. Tracks the active source for session continuity.
+- **One Neo4j container per model graph** — Each WildFly version or feature pack runs its own Neo4j instance. Cross-graph queries (like `compare_versions`) connect to two containers simultaneously.
+- **Connection pooling** — `neo4j.ts` manages a `Map<string, Driver>` of Neo4j connections, reusing drivers across tool calls. Tracks the active model graph for session continuity.
 - **Zod schemas** — Tool input validation uses Zod v4.
 
 ## Domain
 
-The WildFly management model is a tree of **resources** (e.g., `/subsystem=datasources/data-source=ExampleDS`), each with **attributes**, **operations** (with **parameters**), and **capabilities**. The model is extracted from running WildFly instances (or feature pack doc-zips) by the [analyzer](https://github.com/model-graph-tools/analyzer) and stored in Neo4j. Each source gets its own Neo4j database, shipped as a container image at `quay.io/modelgraphtools/model`.
+The WildFly management model is a tree of **resources** (e.g., `/subsystem=datasources/data-source=ExampleDS`), each with **attributes**, **operations** (with **parameters**), and **capabilities**. The model is extracted from running WildFly instances (or feature pack doc-zips) by the [analyzer](https://github.com/model-graph-tools/analyzer) and stored in Neo4j. Each model graph gets its own Neo4j database, shipped as a container image at `quay.io/modelgraphtools/model`.
 
-Two source types:
+Two types of model graphs:
 - **WildFly versions** — identified by version number (e.g., `34`, `39`), image tag like `model:34.0.0.Final`
 - **Feature packs** — identified by `shortcut:version` (e.g., `ai:0.9.1`, `graphql:2.7.0`), image tag like `model:ai-1.0.0`
 

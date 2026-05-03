@@ -7,7 +7,7 @@ description: >
   like "what versions of WildFly are available", "show me the datasources
   subsystem", "what operations can I do on a datasource", "what changed
   between WildFly 38 and 39", "find deprecated attributes", "what
-  capabilities does elytron provide", "start the model database for WildFly
+  capabilities does elytron provide", "start the model graph for WildFly
   39", "search for logging resources", "compare feature packs", "show model
   statistics", "what experimental features exist", "explore WildFly
   configuration", or "run a Cypher query".
@@ -57,9 +57,9 @@ messaging, clustering — is represented as a tree of **resources**, each with *
 - **Deprecation**: Resources, attributes, and operations can be deprecated starting from a
   specific WildFly version, with a reason explaining why and what to use instead.
 
-### Sources: WildFly versions and feature packs
+### Model graphs: WildFly versions and feature packs
 
-The model graph covers two types of sources:
+There are model graphs for two types of products:
 
 - **WildFly versions**: The full management model of a WildFly standalone server
   (e.g., WildFly 34, 39). Identified by version number (`34`, `39`, `26.1`).
@@ -69,7 +69,7 @@ The model graph covers two types of sources:
   full WildFly server. Identified by `shortcut:version` (e.g., `ai:0.9.1`, `graphql:2.7.0`)
   for a specific version, or just the shortcut (e.g., `ai`) for the latest version.
 
-Both source types produce the same graph schema — the same query tools work for both.
+Both types produce the same graph schema — the same query tools work for both.
 When the user asks about a feature pack without specifying a version, use just the shortcut
 (e.g., `"ai"`). When a specific version is needed, use `shortcut:version` (e.g., `"ai:0.9.1"`).
 
@@ -106,9 +106,9 @@ Users often ask about these areas:
 |-----------------------------------------------------|------------------------|----------------------------------------------|
 | "what versions are available?"                      | `list_sources`         | (none)                                       |
 | "what feature packs are there?"                     | `list_sources`         | (none)                                       |
-| "start the model DB for WildFly 39"                 | `start_source`         | identifier="39"                              |
-| "start the model DB for the AI feature pack"        | `start_source`         | identifier="ai" (latest) or "ai:0.9.1"       |
-| "stop the model DB for WildFly 38"                  | `stop_source`          | identifier="38"                              |
+| "start the model graph for WildFly 39"              | `start_source`         | identifier="39"                              |
+| "start the model graph for the AI feature pack"     | `start_source`         | identifier="ai" (latest) or "ai:0.9.1"       |
+| "stop the model graph for WildFly 38"               | `stop_source`          | identifier="38"                              |
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
 | "what operations can I do on a datasource?"         | `search_resources` then `browse_resource` | query="data-source", then browse a concrete result |
@@ -124,7 +124,7 @@ Users often ask about these areas:
 | "give me an overview of the model"                  | `get_statistics`       | (identifier only)                            |
 | "how many resources does WildFly 39 have?"          | `get_statistics`       | identifier="39"                              |
 | "what attributes changed between WildFly 38 and 39?"| `compare_versions`     | identifier1="38", identifier2="39"           |
-| "what resources does the AI feature pack add?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
+| "what resources does the AI feature pack have?"      | `search_resources`     | identifier="ai" or "ai:0.9.1", query=""      |
 | "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39"           |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
@@ -132,24 +132,24 @@ specifying a base version, infer the previous version: call `list_sources` to ge
 available versions, then pick the highest version below X. For example, if X is 39
 and available versions include 34, 36, 38, 39, use 38 as identifier1.
 
-### Container lifecycle
+### Starting and stopping model graphs
 
-The Neo4j databases run as containers — one per WildFly version or feature pack. They are
-managed by the `mgt` CLI tool. Before querying a source, its container must be running.
+Each model graph runs as a database — one per WildFly version or feature pack. They are
+managed by the `mgt` CLI tool. Before querying a model graph, it must be running.
 
-**Important wording:** When talking about starting or stopping a source, always say you are
-starting/stopping the **model database** (or Neo4j container), not WildFly itself or the
-feature pack. WildFly is the application server whose management model is stored in the
-database. A feature pack is a build-time extension of WildFly — it cannot be "started" or
-"stopped" either. What starts and stops is the Neo4j container holding the model graph data.
+**Important wording:** When talking about starting or stopping, always say you are
+starting/stopping the **model graph**, not WildFly itself or the feature pack. WildFly is the
+application server whose management model is stored in the model graph. A feature pack is a
+build-time extension of WildFly — it cannot be "started" or "stopped" either. What starts and
+stops is the model graph database holding the data.
 
 Follow this pattern:
 
-1. If any query tool returns a "source not running" error, suggest using `start_source`
-2. Before `compare_versions`, check that both sources are running (use `list_sources`)
-3. If `start_source` fails because the image isn't available, tell the user they may need
-   to run `mgt analyze` for that source first
-4. Don't stop containers unless the user asks — they persist across sessions and are cheap
+1. If any query tool returns a "not running" error, suggest using `start_source`
+2. Before `compare_versions`, check that both model graphs are running (use `list_sources`)
+3. If `start_source` fails because the data isn't available locally, tell the user they may
+   need to run `mgt analyze` first
+4. Don't stop model graphs unless the user asks — they persist across sessions and are cheap
    to keep running
 5. If `start_source` or `stop_source` returns an error about `mgt` not being found, tell
    the user to install it from https://github.com/model-graph-tools/tooling
@@ -199,26 +199,26 @@ RETURN a.name, a.type, a.description, a.`default-value` AS defaultValue
 ORDER BY a.name
 ```
 
-### Source identifier handling
+### Selecting the right model graph
 
-- Always call `list_sources` at the start of a session or when the user references a source
-  you're unsure about. The response includes an `activeSource` field that shows which source
-  was last queried, and each source has an `active` flag.
-- If the user asks **"what model am I using?"**, **"what's the current source?"**, or similar,
-  call `list_sources` and report the `activeSource`. If none is active, say so.
-- If the user **specifies a version or feature pack**, map it to an identifier
-  (e.g., "WildFly 39" → `"39"`, "the AI feature pack" → `"ai"`,
+- Always call `list_sources` at the start of a session or when the user references a model
+  graph you're unsure about. The response includes an `activeSource` field that shows which
+  model graph was last queried, and each entry has an `active` flag.
+- If the user asks **"what model am I using?"**, **"what's the current model graph?"**, or
+  similar, call `list_sources` and report the `activeSource`. If none is active, say so.
+- If the user **specifies a version or feature pack**, map it to the tool's `identifier`
+  parameter (e.g., "WildFly 39" → `"39"`, "the AI feature pack" → `"ai"`,
   "AI feature pack 0.9.1" → `"ai:0.9.1"`).
-- If the user **does not specify a source**, pick one using this priority:
-  1. If there is an active source (from a previous query in this session), keep using it.
-  2. If exactly one source is already running, use it.
-  3. If multiple sources are running, prefer the latest WildFly version among them.
-  4. If no source is running, start the latest available WildFly version.
+- If the user **does not specify a model graph**, pick one using this priority:
+  1. If there is an active model graph (from a previous query in this session), keep using it.
+  2. If exactly one model graph is already running, use it.
+  3. If multiple model graphs are running, prefer the latest WildFly version among them.
+  4. If no model graph is running, start the latest available WildFly version.
   5. If the context is clearly about a feature pack (e.g., "AI subsystem"), prefer a running
-     feature pack source over a WildFly version.
-- When comparing versions, the user might say "WildFly 39" — map this to identifier "39"
-  for the tool parameter.
-- Feature pack identifiers use the format `shortcut:version` (e.g., `"ai:0.9.1"`,
+     feature pack model graph over a WildFly version.
+- When comparing versions, the user might say "WildFly 39" — pass `"39"` as the tool's
+  `identifier` parameter.
+- Feature packs use the format `shortcut:version` (e.g., `"ai:0.9.1"`,
   `"graphql:2.7.0"`). Use just the shortcut (e.g., `"ai"`) to target the latest version.
 
 ### Response formatting
@@ -231,8 +231,8 @@ When presenting results:
 - **Operation results**: Show the operation name, a brief description, and list required
   parameters. Mark optional parameters separately.
 - **Deprecation info**: Always show the version it was deprecated in and the reason.
-- **Source context**: When showing results, mention which source (WildFly version or feature
-  pack) the data comes from so the user has context.
+- **Model graph context**: When showing results, mention which model graph (WildFly version or
+  feature pack) the data comes from so the user has context.
 - **Large result sets**: If there are many results, summarize the count and show the most
   relevant ones. Ask the user if they want to see more or narrow the search.
 
@@ -251,11 +251,11 @@ browsing a specific resource. After browsing, point out interesting operations o
 ## Limitations
 
 - The graph database is read-only. You cannot modify the management model.
-- Each source (WildFly version or feature pack) is a separate Neo4j database. Cross-source
-  queries (except `compare_versions`) require multiple tool calls.
+- Each model graph (WildFly version or feature pack) is a separate database.
+  Cross-graph queries (except `compare_versions`) require multiple tool calls.
 - The `run_cypher` tool is available for advanced queries but results are raw JSON.
   Use structured tools first. See `references/cypher-queries.md` for example queries.
 - Very broad queries (e.g., "all attributes") may hit result limits. Help the user
   narrow their search.
-- Cross-type comparisons (comparing a WildFly version with a feature pack) are not
-  supported by `compare_versions`. Both identifiers should be of the same type.
+- Cross-type comparisons (comparing a WildFly version with a feature pack) are not supported
+  by `compare_versions`. Both entries should be of the same type.

@@ -15,7 +15,7 @@ export async function startSource(
   const result = await mgtStart(identifier);
   if (!result.success) {
     throw new Error(
-      result.error ?? `Failed to start source "${identifier}"`
+      result.error ?? `Failed to start model graph "${identifier}"`
     );
   }
   if (!result.bolt || !result.http) {

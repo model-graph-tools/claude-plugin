@@ -36,7 +36,7 @@ export async function getSession(identifier: string): Promise<Session> {
   const entry = connections.get(identifier);
   if (!entry) {
     throw new Error(
-      `No connection for source "${identifier}". Use start_source to start it first.`
+      `No connection for model graph "${identifier}". Use start_source to start it first.`
     );
   }
 
@@ -57,7 +57,7 @@ export async function getSession(identifier: string): Promise<Session> {
         connections.delete(identifier);
         lastVerified.delete(identifier);
         throw new Error(
-          `Cannot connect to source "${identifier}" at bolt://localhost:${entry.boltPort}. ` +
+          `Cannot connect to model graph "${identifier}" at bolt://localhost:${entry.boltPort}. ` +
             `The container may not be running or Neo4j may not be ready. Use start_source to reconnect.`
         );
       }

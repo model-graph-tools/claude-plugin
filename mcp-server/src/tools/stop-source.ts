@@ -13,7 +13,7 @@ export async function stopSource(
   const result = await mgtStop(identifier);
   if (!result.success) {
     throw new Error(
-      result.error ?? `Failed to stop source "${identifier}"`
+      result.error ?? `Failed to stop model graph "${identifier}"`
     );
   }
   const canonicalId = result.identifier ?? identifier;

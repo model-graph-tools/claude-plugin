@@ -45,7 +45,7 @@ function errorResult(error: unknown) {
 
 server.registerTool("list_sources", {
   description:
-    "Lists all known WildFly versions and feature packs with their container status (running/stopped/not_found).",
+    "Lists all known WildFly versions and feature packs with their availability (running/stopped/not_found).",
 }, async () => {
   try {
     return textResult(await listSources());
@@ -56,11 +56,11 @@ server.registerTool("list_sources", {
 
 server.registerTool("start_source", {
   description:
-    "Starts the Neo4j model database container for a WildFly version or feature pack. Pulls the image automatically if needed. Note: this starts the model database, not WildFly itself.",
+    "Starts the model graph for a WildFly version or feature pack. Downloads data automatically if needed. Note: this starts the model graph database, not WildFly itself.",
   inputSchema: z.object({
     identifier: z
       .string()
-      .describe('Source identifier, e.g. "39", "26.1", "ai:0.9.1"'),
+      .describe('WildFly version or feature pack, e.g. "39", "26.1", "ai:0.9.1"'),
   }),
 }, async ({ identifier }) => {
   try {
@@ -72,11 +72,11 @@ server.registerTool("start_source", {
 });
 
 server.registerTool("stop_source", {
-  description: "Stops the Neo4j model database container for a WildFly version or feature pack.",
+  description: "Stops the model graph for a WildFly version or feature pack.",
   inputSchema: z.object({
     identifier: z
       .string()
-      .describe('Source identifier, e.g. "39", "ai:0.9.1"'),
+      .describe('WildFly version or feature pack, e.g. "39", "ai:0.9.1"'),
   }),
 }, async ({ identifier }) => {
   try {
@@ -94,7 +94,7 @@ server.registerTool("search_resources", {
     "Searches for management model resources by name or address pattern.",
   inputSchema: z.object({
     query: z.string().describe("Search term matched against resource name and address"),
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
 }, async ({ query, identifier, limit }) => {
@@ -113,7 +113,7 @@ server.registerTool("browse_resource", {
     address: z
       .string()
       .describe('Resource address, e.g. "/subsystem=datasources"'),
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
   }),
 }, async ({ address, identifier }) => {
   try {
@@ -131,7 +131,7 @@ server.registerTool("search_operations", {
     query: z
       .string()
       .describe("Search term matched against operation name and description"),
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
 }, async ({ query, identifier, limit }) => {
@@ -150,7 +150,7 @@ server.registerTool("search_attributes", {
     query: z
       .string()
       .describe("Search term matched against attribute name and description"),
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     deprecated: z
       .boolean()
       .optional()
@@ -177,7 +177,7 @@ server.registerTool("find_capabilities", {
     "Searches for capabilities by name and shows which resources declare or reference them.",
   inputSchema: z.object({
     query: z.string().describe("Search term matched against capability name"),
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
   }),
 }, async ({ query, identifier }) => {
   try {
@@ -192,7 +192,7 @@ server.registerTool("find_deprecated", {
   description:
     "Finds all deprecated elements (resources, attributes, operations), optionally filtered by version or type.",
   inputSchema: z.object({
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     since_version: z
       .string()
       .optional()
@@ -218,7 +218,7 @@ server.registerTool("find_by_stability", {
   description:
     "Finds all elements (resources, attributes, operations) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
   inputSchema: z.object({
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
     stability: z
       .string()
       .describe('Stability level: "experimental", "preview", "community", or "default"'),
@@ -241,9 +241,9 @@ server.registerTool("find_by_stability", {
 
 server.registerTool("get_statistics", {
   description:
-    "Overview of a source's management model: node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
+    "Overview of the management model: node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
   inputSchema: z.object({
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
   }),
 }, async ({ identifier }) => {
   try {
@@ -256,10 +256,10 @@ server.registerTool("get_statistics", {
 
 server.registerTool("compare_versions", {
   description:
-    "Compares two sources to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute and operation changes within resources that exist in both versions.",
+    "Compares two WildFly versions or feature packs to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute and operation changes within resources that exist in both versions.",
   inputSchema: z.object({
-    identifier1: z.string().describe('Older source identifier, e.g. "38"'),
-    identifier2: z.string().describe('Newer source identifier, e.g. "39"'),
+    identifier1: z.string().describe('Older WildFly version or feature pack, e.g. "38"'),
+    identifier2: z.string().describe('Newer WildFly version or feature pack, e.g. "39"'),
   }),
 }, async ({ identifier1, identifier2 }) => {
   try {
@@ -272,10 +272,10 @@ server.registerTool("compare_versions", {
 
 server.registerTool("run_cypher", {
   description:
-    "Escape hatch for advanced users: runs an arbitrary read-only Cypher query against a source. Results capped at 100 rows with a 10s timeout.",
+    "Escape hatch for advanced users: runs an arbitrary read-only Cypher query against the management model. Results capped at 100 rows with a 10s timeout.",
   inputSchema: z.object({
     query: z.string().describe("Cypher query to execute"),
-    identifier: z.string().describe('Source identifier, e.g. "39"'),
+    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
   }),
 }, async ({ query, identifier }) => {
   try {
