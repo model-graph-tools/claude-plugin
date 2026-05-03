@@ -56,7 +56,7 @@ server.registerTool("list_sources", {
 
 server.registerTool("start_source", {
   description:
-    "Starts the model graph for a WildFly version or feature pack. Downloads data automatically if needed. Note: this starts the model graph database, not WildFly itself.",
+    "Starts the model graph for a WildFly version or feature pack. Downloads data automatically if needed — this may take up to a minute on first use. Note: this starts the model graph database, not WildFly itself.",
   inputSchema: z.object({
     identifier: z
       .string()

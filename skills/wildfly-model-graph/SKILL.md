@@ -143,6 +143,12 @@ application server whose management model is stored in the model graph. A featur
 build-time extension of WildFly — it cannot be "started" or "stopped" either. What starts and
 stops is the model graph database holding the data.
 
+**Startup timing:** Starting a model graph may take up to a minute, especially on first use
+when the container image needs to be downloaded. Before calling `start_source`, tell the user
+that starting the model graph may take a moment. If the image is being pulled for the first
+time, mention that this is a one-time download. Example: "I'll start the model graph for
+WildFly 39. This may take a moment — on first use, the data needs to be downloaded."
+
 Follow this pattern:
 
 1. If any query tool returns a "not running" error, suggest using `start_source`
@@ -153,6 +159,11 @@ Follow this pattern:
    to keep running
 5. If `start_source` or `stop_source` returns an error about `mgt` not being found, tell
    the user to install it from https://github.com/model-graph-tools/tooling
+6. If `start_source` times out, suggest the user check that Docker is running and has network
+   access. If Docker is running but the pull is slow, they can retry — the download resumes
+   from where it left off
+7. If `start_source` fails with a Docker-related error (not running, permission denied, disk
+   full), relay the specific error and suggest the corrective action
 
 ### Handling wildcard addresses
 

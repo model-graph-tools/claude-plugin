@@ -3,6 +3,7 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const MGT_COMMAND = "mgt";
+const RESOLVE_TIMEOUT_MS = 30_000;
 
 interface ResolveResult {
   identifier: string;
@@ -28,7 +29,7 @@ async function mgtResolve(input: string): Promise<ResolveResult[]> {
     const { stdout } = await execFileAsync(
       MGT_COMMAND,
       ["resolve", input, "--json"],
-      { shell: true }
+      { shell: true, timeout: RESOLVE_TIMEOUT_MS }
     );
     const results = JSON.parse(stdout) as ResolveResult[];
     if (results.length === 0) {
@@ -36,19 +37,26 @@ async function mgtResolve(input: string): Promise<ResolveResult[]> {
     }
     return results;
   } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      "code" in error &&
-      (error as NodeJS.ErrnoException).code === "ENOENT"
-    ) {
-      throw new Error(
-        "mgt CLI not found on PATH. Install it from https://github.com/model-graph-tools/tooling"
-      );
-    }
-    if (error instanceof Error && "stderr" in error) {
-      const stderr = (error as { stderr: string }).stderr;
-      if (stderr) {
-        throw new Error(`Failed to resolve "${input}": ${stderr.trim()}`);
+    if (error instanceof Error) {
+      const nodeError = error as NodeJS.ErrnoException & {
+        killed?: boolean;
+        signal?: string;
+        stderr?: string;
+      };
+      if (nodeError.code === "ENOENT") {
+        throw new Error(
+          "mgt CLI not found on PATH. Install it from https://github.com/model-graph-tools/tooling"
+        );
+      }
+      if (nodeError.killed && nodeError.signal === "SIGTERM") {
+        throw new Error(
+          `Resolving identifier "${input}" timed out. Check that mgt is working correctly.`
+        );
+      }
+      if (nodeError.stderr?.trim()) {
+        throw new Error(
+          `Failed to resolve "${input}": ${nodeError.stderr.trim()}`
+        );
       }
     }
     throw error;

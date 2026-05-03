@@ -3,6 +3,8 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const MGT_COMMAND = "mgt";
+const MGT_START_TIMEOUT_MS = 300_000;
+const MGT_DEFAULT_TIMEOUT_MS = 30_000;
 
 export interface WildFlyVersion {
   identifier: number;
@@ -41,31 +43,64 @@ export interface StopResult {
   error?: string;
 }
 
-class MgtNotFoundError extends Error {
-  constructor() {
-    super(
-      "mgt CLI not found on PATH. Install it from https://github.com/model-graph-tools/tooling"
-    );
-    this.name = "MgtNotFoundError";
-  }
-}
-
-async function runMgt(args: string[]): Promise<string> {
+async function runMgt(
+  args: string[],
+  timeoutMs: number = MGT_DEFAULT_TIMEOUT_MS
+): Promise<string> {
   try {
     const { stdout } = await execFileAsync(MGT_COMMAND, [...args, "--json"], {
       shell: true,
+      timeout: timeoutMs,
     });
     return stdout;
   } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      "code" in error &&
-      (error as NodeJS.ErrnoException).code === "ENOENT"
-    ) {
-      throw new MgtNotFoundError();
+    if (error instanceof Error) {
+      const nodeError = error as NodeJS.ErrnoException & {
+        killed?: boolean;
+        signal?: string;
+        stderr?: string;
+      };
+      if (nodeError.code === "ENOENT") {
+        throw new Error(
+          "mgt CLI not found on PATH. Install it from https://github.com/model-graph-tools/tooling"
+        );
+      }
+      if (nodeError.killed && nodeError.signal === "SIGTERM") {
+        const seconds = Math.round(timeoutMs / 1000);
+        throw new Error(
+          `mgt ${args[0]} timed out after ${seconds}s. ` +
+            "Check that Docker is running and has network access for image pulls."
+        );
+      }
+      const stderr = nodeError.stderr ?? "";
+      const message = parseMgtError(args[0], stderr);
+      if (message) {
+        throw new Error(message);
+      }
     }
     throw error;
   }
+}
+
+function parseMgtError(command: string, stderr: string): string | null {
+  const lower = stderr.toLowerCase();
+  if (
+    lower.includes("cannot connect to the docker daemon") ||
+    lower.includes("is the docker daemon running") ||
+    lower.includes("docker daemon is not running")
+  ) {
+    return `mgt ${command} failed: Docker does not appear to be running. Start Docker and try again.`;
+  }
+  if (lower.includes("permission denied")) {
+    return `mgt ${command} failed: Permission denied. Check that your user has access to Docker.`;
+  }
+  if (lower.includes("no space left on device") || lower.includes("disk full")) {
+    return `mgt ${command} failed: No disk space available for the container image.`;
+  }
+  if (stderr.trim()) {
+    return `mgt ${command} failed: ${stderr.trim()}`;
+  }
+  return null;
 }
 
 export async function mgtVersions(): Promise<WildFlyVersion[]> {
@@ -84,7 +119,7 @@ export async function mgtPs(): Promise<RunningContainer[]> {
 }
 
 export async function mgtStart(identifier: string): Promise<StartResult> {
-  const output = await runMgt(["start", identifier]);
+  const output = await runMgt(["start", identifier], MGT_START_TIMEOUT_MS);
   const results = JSON.parse(output) as StartResult[];
   if (results.length === 0) {
     throw new Error(`mgt start returned no results for "${identifier}"`);

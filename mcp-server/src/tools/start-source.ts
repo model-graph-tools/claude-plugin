@@ -1,4 +1,4 @@
-import { mgtStart } from "../mgt.js";
+import { mgtStart, mgtStop } from "../mgt.js";
 import { refreshConnection } from "../neo4j.js";
 import { trackStarted } from "../session.js";
 
@@ -7,6 +7,7 @@ interface StartSourceResult {
   status: "running";
   bolt: number;
   http: number;
+  message: string;
 }
 
 export async function startSource(
@@ -24,12 +25,18 @@ export async function startSource(
     );
   }
   const canonicalId = result.identifier ?? identifier;
-  refreshConnection(canonicalId, result.bolt);
-  trackStarted(canonicalId);
+  try {
+    refreshConnection(canonicalId, result.bolt);
+    trackStarted(canonicalId);
+  } catch (error) {
+    await mgtStop(canonicalId).catch(() => {});
+    throw error;
+  }
   return {
     identifier: canonicalId,
     status: "running",
     bolt: result.bolt,
     http: result.http,
+    message: `Model graph "${canonicalId}" is now running and ready for queries.`,
   };
 }
