@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `describe_resource` MCP tool that returns concise markdown (not JSON) with required add-operation parameters, required/optional attributes, and a CLI example — purpose-built for "how do I add/configure X?" questions
+
 ## [0.6.6] - 2026-05-03
 
 ## [0.6.5] - 2026-05-03
