@@ -11,7 +11,7 @@ WildFly exposes its entire configuration and runtime state through a management 
 - **Find** deprecated elements and track when they were deprecated
 - **Filter** by stability level to find experimental, preview, or community features
 - **Analyze** model statistics — element counts, stability breakdown, relationship counts
-- **Compare** two WildFly versions to see what was added, removed, or deprecated — including attribute and operation changes
+- **Compare** two WildFly versions to see what was added, removed, or deprecated — including attribute, operation, and parameter changes
 - **Explore** feature pack extensions (AI, GraphQL, etc.) using the same tools
 - **Run** arbitrary read-only Cypher queries for advanced use cases
 
