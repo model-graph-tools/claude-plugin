@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.4] - 2026-05-03
+
 ### Fixed
 - Clarify skill wording to say "start the model graph for" a WildFly version, not "start" the version itself
 
@@ -135,7 +137,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.3...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.4...HEAD
+[0.7.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.0...v0.7.1
