@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Use targeted Cypher queries instead of `browse_resource` for "how do I add/configure X" questions to avoid large payloads that trigger JSON post-processing workarounds
+- Add explicit prohibition against reading cached tool-result files or piping MCP output through shell scripts
+
 ## [0.6.4] - 2026-05-03
 
 ### Added

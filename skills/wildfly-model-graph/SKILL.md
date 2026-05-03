@@ -112,7 +112,7 @@ Users often ask about these areas:
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
 | "what operations can I do on a datasource?"         | `search_resources` then `browse_resource` | query="data-source", then browse a concrete result |
-| "how do I add a datasource?"                        | `browse_resource`      | address="/subsystem=datasources/data-source=*" — see "Configuration how-to questions" below |
+| "how do I add a datasource?"                        | `run_cypher`           | Targeted queries for add-parameters and required attributes — see "Configuration how-to questions" below |
 | "is there an operation to test my DB connection?"   | `search_operations`    | query="test connection"                      |
 | "what attributes are deprecated in logging?"        | `search_attributes`    | query="logging", deprecated=true             |
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
@@ -176,15 +176,31 @@ a representative resource at the wildcard level.
 ### Configuration how-to questions
 
 When the user asks "how do I add X?", "how do I configure X?", or "what do I need for X?",
-they want a concise, actionable answer — not a raw data dump. Follow this approach:
+they want a concise, actionable answer — not a raw data dump. Use targeted Cypher queries
+to fetch exactly the data you need — this is faster and avoids large payloads:
 
 1. Use `search_resources` to find the resource address (if not already known).
-2. Use `browse_resource` to get the full resource details.
-3. **Summarize directly from the tool response** — do NOT re-read the raw JSON from disk
-   or pipe it through shell scripts. The `browse_resource` response is already structured
-   with `attributes` (including `required`, `type`, `defaultValue`) and `operations`
-   (including `parameters` with `required` flags).
-4. Present the answer as:
+2. Use `run_cypher` with targeted queries to get just the relevant data. Two queries cover
+   most how-to questions (run them in parallel):
+
+   **Required add-operation parameters:**
+   ```cypher
+   MATCH (r:Resource {address: "<address>"})-[:PROVIDES]->(o:Operation {name: "add"})-[:ACCEPTS]->(p:Parameter)
+   RETURN p.name AS name, p.type AS type, p.required AS required, p.description AS description
+   ORDER BY p.required DESC, p.name
+   ```
+
+   **Required attributes:**
+   ```cypher
+   MATCH (r:Resource {address: "<address>"})-[:HAS_ATTRIBUTE]->(a:Attribute)
+   WHERE a.required = true
+   RETURN a.name AS name, a.type AS type, a.description AS description, a.`default-value` AS defaultValue
+   ORDER BY a.name
+   ```
+
+   See `references/cypher-queries.md` for more templates.
+
+3. Present the answer as:
    - The `add` operation and its **required** parameters
    - **Required attributes** (where `required: true`)
    - **Key optional attributes** relevant to the question (e.g., for datasources:
@@ -192,9 +208,9 @@ they want a concise, actionable answer — not a raw data dump. Follow this appr
    - Any resource-specific operations (e.g., `test-connection-in-pool`)
    - A brief CLI example using the JBoss CLI `/subsystem=.../resource=name:add(...)` syntax
 
-If the `browse_resource` output is too large to process comfortably, use `run_cypher` with
-a targeted query instead. See `references/cypher-queries.md` for templates like "add
-operation parameters" and "required attributes for a resource."
+**IMPORTANT:** Always answer directly from tool responses. Never read cached tool-result
+JSON files from disk, and never pipe MCP output through Bash scripts or `python3` to parse
+it. If you need more data, make another MCP tool call.
 
 ### Selecting the right model graph
 

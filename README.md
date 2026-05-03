@@ -71,20 +71,20 @@ Use `/mgt:model` followed by your question:
 /mgt:model Tell me more about credential stores.
 ```
 
+**Stability levels**
+
+```
+/mgt:model Are there any community features in WildFly 39?
+/mgt:model Show me all preview resources.
+/mgt:model What community stability attributes exist?
+```
+
 **Capabilities and deprecation**
 
 ```
 /mgt:model How does capabilities work?
 /mgt:model What capabilities does elytron provide?
 /mgt:model What operations have been deprecated recently?
-```
-
-**Stability levels**
-
-```
-/mgt:model Are there any experimental features in WildFly 39?
-/mgt:model Show me all preview resources.
-/mgt:model What community stability attributes exist?
 ```
 
 **Compare versions**
