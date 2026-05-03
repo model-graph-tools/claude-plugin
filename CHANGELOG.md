@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-05-03
+
 ### Added
 - `get_resource_tree` MCP tool that returns the full resource subtree under a given address in one call, with depth info and optional depth limit — eliminates recursive `browse_resource` calls for hierarchy exploration
 - `find_relationships` MCP tool that exposes REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships between attributes and operation parameters for a resource
@@ -103,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.6...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.6...v0.7.0
 [0.6.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.5...v0.6.6
 [0.6.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.4...v0.6.5
 [0.6.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.3...v0.6.4
