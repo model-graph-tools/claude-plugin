@@ -45,6 +45,17 @@ WHERE a.required = true AND
 RETURN r.address, a.name, a.default
 ```
 
+## Capability queries
+
+Find all resources that declare a capability matching a pattern:
+
+```cypher
+MATCH (r:Resource)-[:DECLARES_CAPABILITY]->(c:Capability)
+WHERE c.name CONTAINS "data-source"
+RETURN r.address, c.name
+ORDER BY c.name
+```
+
 ## Operation parameter analysis
 
 List all add operations with more than two required parameters:

@@ -1,22 +1,16 @@
 ---
 name: wildfly-model-graph
+version: 0.7.1
 description: >
-  This skill should be used when the user asks about the WildFly management
-  model, WildFly subsystems, JBoss EAP configuration, management resources,
-  attributes, operations, capabilities, or stability levels. Covers queries
-  like "what versions of WildFly are available", "show me the datasources
-  subsystem", "what operations can I do on a datasource", "what changed
-  between WildFly 38 and 39", "find deprecated attributes", "what
-  capabilities does elytron provide", "start the model graph for WildFly
-  39", "search for logging resources", "compare feature packs", "show model
-  statistics", "what experimental features exist", "explore WildFly
-  configuration", "run a custom query against the model", "show the
-  resource hierarchy under a subsystem", "how do I add a datasource",
-  "what attributes depend on each other", or "what parameters are required
-  together".
-  Also applies when the user mentions specific WildFly subsystems such as
-  undertow, elytron, datasources, messaging, infinispan, or logging in a
-  management model context.
+  This skill should be used when the user asks about the WildFly or JBoss EAP
+  management model, including resources, attributes, operations, capabilities,
+  stability levels, or deprecations. Covers queries like "what versions of
+  WildFly are available", "show me the datasources subsystem", "what changed
+  between WildFly 38 and 39", "find deprecated attributes", "what capabilities
+  does elytron provide", "start the model graph for WildFly 39", "how do I add
+  a datasource", "what attributes depend on each other", and "what experimental
+  features exist". Also applies when the user mentions WildFly subsystems such
+  as undertow, elytron, datasources, messaging, infinispan, or logging.
 ---
 
 ## Domain Knowledge
@@ -121,7 +115,7 @@ query instead of trying to parse a large `browse_resource` result.
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
 | "what operations can I do on a datasource?"         | `search_resources` then `browse_resource` | query="data-source", then browse a concrete result |
-| "how do I add a datasource?"                        | `describe_resource`    | address="/subsystem=datasources/data-source=*" — returns markdown with required params, attributes, and CLI example |
+| "how do I add a datasource?"                        | `describe_resource`    | address="/subsystem=datasources/data-source=*" — see [Configuration how-to questions](#configuration-how-to-questions) |
 | "is there an operation to test my DB connection?"   | `search_operations`    | query="test connection"                      |
 | "what attributes are deprecated in logging?"        | `search_attributes`    | query="logging", deprecated=true             |
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
@@ -272,7 +266,8 @@ Use `scope="attributes"` or `scope="parameters"` to narrow the results, or omit 
 - Each model graph (WildFly version or feature pack) is a separate database.
   Cross-graph queries (except `compare_versions`) require multiple tool calls.
 - The `run_cypher` tool is available for advanced queries but results are raw JSON.
-  Use structured tools first. See `references/cypher-queries.md` for example queries.
+  Use structured tools first. See `references/graph-schema.md` for the complete node
+  and relationship schema, and `references/cypher-queries.md` for example queries.
 - Very broad queries (e.g., "all attributes") may hit result limits. Help the user
   narrow their search.
 - Cross-type comparisons (comparing a WildFly version with a feature pack) are not supported
