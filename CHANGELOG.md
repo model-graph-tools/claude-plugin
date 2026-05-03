@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `search_resources` now returns resource description in results
 - `search_operations` now returns stability level and deprecation info (version, reason)
 - `search_attributes` now returns access type and required flag
+- Trim skill description for better trigger precision and add version field to skill frontmatter
+- Add graph-schema reference pointer and capability query example to Cypher reference
+- Consolidate duplicate `describe_resource` guidance in skill via cross-reference
 
 ## [0.7.1] - 2026-05-03
 
