@@ -7,11 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Broaden skill trigger phrasing for custom query matching and deduplicate inline Cypher templates by pointing to reference file
-
-## [0.6.4] - 2026-05-03
-
 ### Added
 - Timeout protection for all `mgt` CLI calls (5 min for start, 30 sec for others) to prevent indefinite hangs
 - Actionable error messages for common Docker failures (not running, permission denied, disk full)
@@ -20,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Replace technical terminology with user-friendly wording in tool descriptions and skill
+- Broaden skill trigger phrasing for custom query matching and deduplicate inline Cypher templates by pointing to a reference file
 
 ## [0.6.3] - 2026-05-02
 
@@ -86,8 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.4...HEAD
-[0.6.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.3...v0.6.4
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.3...HEAD
 [0.6.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.6.0...v0.6.1
