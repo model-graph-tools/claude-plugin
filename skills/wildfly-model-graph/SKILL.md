@@ -100,6 +100,11 @@ Users often ask about these areas:
 
 ## How to use the tools
 
+**CRITICAL RULE:** Never read cached tool-result JSON files from disk (`cat ...tool-results/*.json`),
+and never pipe MCP tool output through `python3`, `jq`, or any Bash post-processing. All MCP tool
+responses are structured — summarize directly from the tool response. If the response is too large,
+use `run_cypher` with a targeted query instead of trying to parse a large `browse_resource` result.
+
 ### Translating user intent
 
 | User says...                                        | Tool to use            | Key parameters                              |
@@ -207,10 +212,6 @@ to fetch exactly the data you need — this is faster and avoids large payloads:
      `connection-url`, `driver-name`, `jndi-name`, `user-name`, `password`, pool settings)
    - Any resource-specific operations (e.g., `test-connection-in-pool`)
    - A brief CLI example using the JBoss CLI `/subsystem=.../resource=name:add(...)` syntax
-
-**IMPORTANT:** Always answer directly from tool responses. Never read cached tool-result
-JSON files from disk, and never pipe MCP output through Bash scripts or `python3` to parse
-it. If you need more data, make another MCP tool call.
 
 ### Selecting the right model graph
 
