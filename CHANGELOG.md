@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.6] - 2026-05-04
+
 ### Changed
 - Strengthen wording rules in skill to explicitly prohibit "start WildFly" phrasing in all responses, not just start/stop scenarios
 - Add a critical wording rule at the top of the tool usage section as an unmissable reminder
@@ -147,7 +149,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.5...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.6...HEAD
+[0.7.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.2...v0.7.3
