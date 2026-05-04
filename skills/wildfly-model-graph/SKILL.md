@@ -2,21 +2,22 @@
 name: wildfly-model-graph
 description: >
   This skill should be used when the user asks about the WildFly or JBoss EAP
-  management model, including resources, attributes, operations, capabilities,
-  stability levels, or deprecations. Covers queries like "what versions of
-  WildFly are available", "show me the datasources subsystem", "what changed
-  between WildFly 38 and 39", "find deprecated attributes", "what capabilities
-  does elytron provide", "start the model graph for WildFly 39", "how do I add
-  a datasource", "what attributes depend on each other", and "what experimental
-  features exist". Also applies when the user mentions WildFly subsystems such
-  as undertow, elytron, datasources, messaging, infinispan, or logging.
+  management model or model graph, including resources, attributes, operations,
+  capabilities, stability levels, or deprecations. Covers queries like "what
+  versions of WildFly are available", "show me the datasources subsystem",
+  "what changed between WildFly 38 and 39", "find deprecated attributes",
+  "what capabilities does elytron provide", "start the model graph for
+  WildFly 39", "how do I add a datasource", "what attributes depend on each
+  other", "what experimental features exist", and "compare WildFly versions".
+  Also applies when the user mentions WildFly subsystems such as undertow,
+  elytron, datasources, messaging, infinispan, or logging, or says "EAP".
 license: Apache-2.0
 compatibility: >
   Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
   for running Neo4j model graph containers, and network access to pull container
   images from quay.io on first use.
 metadata:
-  version: "0.7.1"
+  version: "0.7.6"
   author: model-graph-tools
 ---
 
@@ -104,11 +105,6 @@ Users often ask about these areas:
 
 ## How to use the tools
 
-**CRITICAL WORDING RULE:** You are querying a **model graph database**, not a running WildFly
-server. Never say "I'll start WildFly" or "I'll start the latest WildFly version" — say
-"I'll start the **model graph** for WildFly 39." The `identifier` parameter selects which
-model graph to query, not which WildFly server to connect to.
-
 **CRITICAL RULE:** Never read cached tool-result JSON files from disk (`cat ...tool-results/*.json`),
 and never pipe MCP tool output through `python3`, `jq`, or any Bash post-processing. Tool responses
 are already structured and parsed by Claude — post-processing adds latency and error risk. Summarize
@@ -145,7 +141,7 @@ query instead of trying to parse a large `browse_resource` result.
 | "what attributes depend on each other?" / "are mutually exclusive?" / "what parameters are required together?" | `find_relationships` | address=..., optional scope="attributes" or "parameters" |
 | "find deprecated parameters"                        | `find_deprecated`      | element_type="parameter"                     |
 | "what parameters have preview stability?"           | `find_by_stability`    | stability="preview", element_type="parameter"|
-| "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39"           |
+| "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39" — see `references/` for schema and example queries |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
 specifying a base version, infer the previous version: call `list_sources` to get
