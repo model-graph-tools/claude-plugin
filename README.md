@@ -124,8 +124,8 @@ This plugin is part of the [model-graph-tools](https://github.com/model-graph-to
 
 | Project | Description |
 |---------|-------------|
-| [tooling](https://github.com/model-graph-tools/tooling) | `mgt` — Rust CLI that analyzes WildFly instances, builds Neo4j model images, and manages container lifecycle |
-| [analyzer](https://github.com/model-graph-tools/analyzer) | Java tool that reads the WildFly management model and populates Neo4j |
+| [tooling](https://github.com/model-graph-tools/tooling) | `mgt` — Command line tool that analyzes WildFly instances, builds Neo4j model images, and manages container lifecycle |
+| [analyzer](https://github.com/model-graph-tools/analyzer) | Java tool that reads the WildFly management model and populates Neo4j                                                 |
 
 ## Contributing
 
