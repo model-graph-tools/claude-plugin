@@ -1,8 +1,8 @@
-# Model Graph Tools Claude Code Plugin
+# Model Graph Tools
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin for exploring the [WildFly](https://wildfly.org) management model via natural language.
+Explore the [WildFly](https://wildfly.org) management model via natural language — from any AI agent that supports [MCP](https://modelcontextprotocol.io/) and [Agent Skills](https://agentskills.io/).
 
-WildFly exposes its entire configuration and runtime state through a management model — a tree of resources, each with attributes, operations, and capabilities. This plugin lets you search, browse, and compare that model across WildFly versions and feature packs, powered by Neo4j graph databases and the [`mgt`](https://github.com/model-graph-tools/tooling) CLI.
+WildFly exposes its entire configuration and runtime state through a management model — a tree of resources, each with attributes, operations, and capabilities. This project lets you search, browse, and compare that model across WildFly versions and feature packs, powered by Neo4j graph databases and the [`mgt`](https://github.com/model-graph-tools/tooling) CLI.
 
 ## What You Can Do
 
@@ -19,12 +19,13 @@ WildFly exposes its entire configuration and runtime state through a management 
 
 ### Prerequisites
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 - [`mgt`](https://github.com/model-graph-tools/tooling) CLI installed and on PATH
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/) for running Neo4j containers
 - [Node.js](https://nodejs.org/) 20+
 
-### From Marketplace
+### Claude Code
+
+#### From Marketplace
 
 ```bash
 claude plugin marketplace add https://github.com/model-graph-tools/claude-plugin
@@ -33,7 +34,7 @@ claude plugin install mgt@model-graph-tools
 
 The MCP server is fetched automatically from [npm](https://www.npmjs.com/package/@model-graph-tools/mcp-server) via `npx` — no build step required.
 
-### From Source
+#### From Source
 
 ```bash
 git clone https://github.com/model-graph-tools/claude-plugin.git
@@ -47,6 +48,112 @@ Then load the plugin locally:
 ```bash
 claude --plugin-dir /path/to/claude-plugin
 ```
+
+### Other AI Agents
+
+The MCP server and skill follow open standards ([MCP](https://modelcontextprotocol.io/) and [Agent Skills](https://agentskills.io/)) and work with any compatible AI agent. Setup has two parts:
+
+1. **Configure the MCP server** in your agent's settings
+2. **Install the skill** by copying the `skills/wildfly-model-graph/` directory from this repository into your agent's skills folder
+
+For most agents, the universal skills directory is `.agents/skills/` (project-level) or `~/.agents/skills/` (user-level). See the [Agent Skills client list](https://agentskills.io/clients) for all supported agents.
+
+#### Gemini CLI
+
+Add to `~/.gemini/settings.json` (or project-level `.gemini/settings.json`):
+
+```json
+{
+  "mcpServers": {
+    "wildfly-model-graph": {
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server"]
+    }
+  }
+}
+```
+
+Install the skill:
+
+```bash
+# User-level (available in all projects)
+cp -r skills/wildfly-model-graph ~/.agents/skills/
+
+# Or project-level
+cp -r skills/wildfly-model-graph .agents/skills/
+```
+
+#### OpenAI Codex
+
+Add to `~/.codex/config.toml` (or project-level `.codex/config.toml`):
+
+```toml
+[mcp_servers.wildfly-model-graph]
+command = "npx"
+args = ["--yes", "@model-graph-tools/mcp-server"]
+```
+
+Install the skill:
+
+```bash
+cp -r skills/wildfly-model-graph ~/.agents/skills/
+```
+
+#### VS Code / GitHub Copilot
+
+Add to `.vscode/mcp.json` in your workspace:
+
+```json
+{
+  "servers": {
+    "wildfly-model-graph": {
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server"]
+    }
+  }
+}
+```
+
+Install the skill:
+
+```bash
+# Project-level
+cp -r skills/wildfly-model-graph .agents/skills/
+
+# Or user-level
+cp -r skills/wildfly-model-graph ~/.agents/skills/
+```
+
+#### Cursor
+
+Add to `~/.cursor/mcp.json` (or project-level `.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "wildfly-model-graph": {
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server"]
+    }
+  }
+}
+```
+
+Install the skill:
+
+```bash
+cp -r skills/wildfly-model-graph ~/.agents/skills/
+```
+
+#### Other MCP-Compatible Agents
+
+For any agent that supports MCP over stdio, configure it to run:
+
+```
+npx --yes @model-graph-tools/mcp-server
+```
+
+Copy the skill directory to your agent's skills folder (typically `.agents/skills/` or `~/.agents/skills/`). See the [Agent Skills specification](https://agentskills.io/specification) for details.
 
 ## Usage
 

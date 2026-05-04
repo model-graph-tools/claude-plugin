@@ -1,6 +1,5 @@
 ---
 name: wildfly-model-graph
-version: 0.7.1
 description: >
   This skill should be used when the user asks about the WildFly or JBoss EAP
   management model, including resources, attributes, operations, capabilities,
@@ -11,6 +10,14 @@ description: >
   a datasource", "what attributes depend on each other", and "what experimental
   features exist". Also applies when the user mentions WildFly subsystems such
   as undertow, elytron, datasources, messaging, infinispan, or logging.
+license: Apache-2.0
+compatibility: >
+  Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
+  for running Neo4j model graph containers, and network access to pull container
+  images from quay.io on first use.
+metadata:
+  version: "0.7.1"
+  author: model-graph-tools
 ---
 
 ## Domain Knowledge

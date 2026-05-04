@@ -2,7 +2,7 @@
 
 An [MCP](https://modelcontextprotocol.io/) server for querying the [WildFly](https://wildfly.org) management model stored in Neo4j graph databases.
 
-This package is the backend for the [Model Graph Tools Claude Code plugin](https://github.com/model-graph-tools/claude-plugin). It provides 16 tools for searching, browsing, and comparing the WildFly management model across versions and feature packs.
+This package is part of the [Model Graph Tools](https://github.com/model-graph-tools/claude-plugin) project. It provides 16 tools for searching, browsing, and comparing the WildFly management model across versions and feature packs. It works with any AI agent that supports MCP — see [Platform Configuration](#platform-configuration) below.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ This package is the backend for the [Model Graph Tools Claude Code plugin](https
 
 ## Usage
 
-This server is designed to be launched by the Claude Code plugin via `npx`. You don't normally run it directly — install the [plugin](https://github.com/model-graph-tools/claude-plugin) instead.
+This server communicates over stdio using the MCP protocol. It is typically launched automatically by your AI agent — configure it as shown below.
 
 To run standalone (for development or debugging):
 
@@ -20,7 +20,75 @@ To run standalone (for development or debugging):
 npx @model-graph-tools/mcp-server
 ```
 
-The server communicates over stdio using the MCP protocol.
+## Platform Configuration
+
+### Claude Code
+
+Install the [plugin](https://github.com/model-graph-tools/claude-plugin) — the MCP server is configured automatically:
+
+```bash
+claude plugin marketplace add https://github.com/model-graph-tools/claude-plugin
+claude plugin install mgt@model-graph-tools
+```
+
+### Gemini CLI
+
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "wildfly-model-graph": {
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server"]
+    }
+  }
+}
+```
+
+### OpenAI Codex
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.wildfly-model-graph]
+command = "npx"
+args = ["--yes", "@model-graph-tools/mcp-server"]
+```
+
+### VS Code / GitHub Copilot
+
+Add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "wildfly-model-graph": {
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server"]
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "wildfly-model-graph": {
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server"]
+    }
+  }
+}
+```
+
+### Other Agents
+
+For any MCP-compatible agent, configure it to run `npx --yes @model-graph-tools/mcp-server` over stdio. See the [main README](https://github.com/model-graph-tools/claude-plugin) for full setup instructions including the [Agent Skill](https://agentskills.io/) installation.
 
 ## Tools
 

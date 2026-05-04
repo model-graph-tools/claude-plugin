@@ -8,9 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Cross-platform installation instructions for Gemini CLI, OpenAI Codex, VS Code / GitHub Copilot, Cursor, and generic MCP-compatible agents
+- Platform configuration section in MCP server README with config snippets for all major AI agents
 - Unit tests for `utils.ts`, `mgt.ts`, `neo4j.ts`, and `run-cypher.ts` (71 tests total across 5 test files)
 
 ### Changed
+- Make SKILL.md fully compliant with the [Agent Skills](https://agentskills.io/) open standard — add `license`, `compatibility`, and `metadata` fields; move `version` into `metadata`
+- Broaden project positioning from Claude Code-only to multi-platform (any MCP + Agent Skills compatible agent)
 - Extract duplicated `escapeRegex`, `toNumber`, and `validateQueryLength` utilities into shared `utils.ts` module
 
 ### Fixed
