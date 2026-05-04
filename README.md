@@ -82,7 +82,7 @@ Use `/mgt:model` followed by your question:
 **Capabilities and deprecation**
 
 ```
-/mgt:model How does capabilities work?
+/mgt:model How do capabilities work?
 /mgt:model What capabilities does elytron provide?
 /mgt:model What operations have been deprecated recently?
 ```
