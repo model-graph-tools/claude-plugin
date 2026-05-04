@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-05-04
+
 ### Added
 - Cross-platform installation instructions for Gemini CLI, OpenAI Codex, VS Code / GitHub Copilot, Cursor, and generic MCP-compatible agents
 - Platform configuration section in MCP server README with config snippets for all major AI agents
@@ -172,7 +174,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.6...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.6...v0.8.0
 [0.7.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.3...v0.7.4
