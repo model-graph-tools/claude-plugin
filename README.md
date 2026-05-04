@@ -159,6 +159,9 @@ Copy the skill directory to your agent's skills folder (typically `.agents/skill
 
 ### Slash Command
 
+> [!NOTE]
+> Slash commands are a Claude Code feature. Other agents use the skill (which activates automatically based on context) and MCP tools directly — see [Natural Language](#natural-language) below.
+
 Use `/mgt:model` followed by your question:
 
 **Model overview**
