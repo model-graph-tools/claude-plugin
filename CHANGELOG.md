@@ -17,8 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Sync skill metadata version to match the plugin version (0.7.6)
 - Add "model graph", "EAP", and "compare WildFly versions" as explicit trigger terms in skill description
-- Deduplicate wording rules by removing redundant block at top of tool usage section
-- Add reference file pointer to the `run_cypher` row in the intent mapping table
+- Deduplicate wording rules by removing redundant block at the top of a tool usage section
+- Add a reference file pointer to the `run_cypher` row in the intent mapping table
 - Make SKILL.md fully compliant with the [Agent Skills](https://agentskills.io/) open standard — add `license`, `compatibility`, and `metadata` fields; move `version` into `metadata`
 - Broaden project positioning from Claude Code-only to multi-platform (any MCP + Agent Skills compatible agent)
 - Extract duplicated `escapeRegex`, `toNumber`, and `validateQueryLength` utilities into shared `utils.ts` module
