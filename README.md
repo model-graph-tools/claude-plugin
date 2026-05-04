@@ -219,18 +219,18 @@ The skill also activates automatically when the agent detects WildFly management
 ### Container Lifecycle
 
 Each WildFly version or feature pack runs as a separate Neo4j container pulled from
-[quay.io/modelgraphtools/model](https://quay.io/repository/modelgraphtools/model). The plugin manages these through `mgt`:
+[quay.io/modelgraphtools/model](https://quay.io/repository/modelgraphtools/model). The MCP server manages these through `mgt`:
 
 - Images are pulled if not present locally
 - Containers are started on demand when you query a source
-- If a source isn't running, the plugin will suggest starting it
+- If a source isn't running, the agent will suggest starting it
 - Containers started during a session are automatically stopped when the MCP server shuts down
 - Containers started outside the session (e.g., via `mgt start`) persist and are not affected
 - Stop containers explicitly at any time: `/mgt:model stop WildFly 39`
 
 ## Related Projects
 
-This plugin is part of the [model-graph-tools](https://github.com/model-graph-tools) ecosystem:
+This project is part of the [model-graph-tools](https://github.com/model-graph-tools) ecosystem:
 
 | Project | Description |
 |---------|-------------|
