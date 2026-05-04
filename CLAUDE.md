@@ -4,13 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repository is a **Claude Code plugin** for exploring the WildFly management model via natural language. The repo root is the plugin root.
+This repository provides an **MCP server** and **Agent Skill** for exploring the WildFly management model via natural language. It follows open standards ([MCP](https://modelcontextprotocol.io/) and [Agent Skills](https://agentskills.io/)) and works with any compatible AI agent — Claude Code, Gemini CLI, OpenAI Codex, VS Code/Copilot, Cursor, and others.
+
+For Claude Code, the repo root doubles as a plugin root (see `.claude-plugin/`).
 
 ## Repository Structure
 
 ```
 claude-plugin/                   # Plugin root
-├── .claude-plugin/
+├── .claude-plugin/              # Claude Code plugin packaging
 │   ├── plugin.json              # Plugin manifest (skills, mcpServers)
 │   └── marketplace.json         # Marketplace manifest
 ├── skills/
@@ -34,16 +36,15 @@ claude-plugin/                   # Plugin root
 
 ## Installation
 
+The MCP server is published to npm as [`@model-graph-tools/mcp-server`](https://www.npmjs.com/package/@model-graph-tools/mcp-server) and fetched via `npx` at runtime.
+
+**Claude Code** (plugin):
 ```bash
-# From marketplace
 claude plugin marketplace add https://github.com/model-graph-tools/claude-plugin
 claude plugin install mgt@model-graph-tools
-
-# Local development/testing
-claude --plugin-dir /path/to/claude-plugin
 ```
 
-The MCP server is published to npm as [`@model-graph-tools/mcp-server`](https://www.npmjs.com/package/@model-graph-tools/mcp-server) and fetched via `npx` at runtime.
+**Other agents** (MCP + skill): Configure `npx --yes @model-graph-tools/mcp-server` as an MCP server and copy `skills/wildfly-model-graph/` into your agent's skills folder. See the [README](README.md) for agent-specific setup.
 
 ## Build & Run
 
