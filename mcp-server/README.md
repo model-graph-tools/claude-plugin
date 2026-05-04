@@ -2,7 +2,7 @@
 
 An [MCP](https://modelcontextprotocol.io/) server for querying the [WildFly](https://wildfly.org) management model stored in Neo4j graph databases.
 
-This package is the backend for the [Model Graph Tools Claude Code plugin](https://github.com/model-graph-tools/claude-plugin). It provides 13 tools for searching, browsing, and comparing the WildFly management model across versions and feature packs.
+This package is the backend for the [Model Graph Tools Claude Code plugin](https://github.com/model-graph-tools/claude-plugin). It provides 16 tools for searching, browsing, and comparing the WildFly management model across versions and feature packs.
 
 ## Prerequisites
 
@@ -31,6 +31,7 @@ The server communicates over stdio using the MCP protocol.
 | `stop_source` | Stops a running Neo4j container |
 | `search_resources` | Searches resources by name or address pattern |
 | `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
+| `describe_resource` | Returns a concise, human-readable description of a resource — purpose, required add-operation parameters, required and optional attributes, and a CLI example |
 | `search_operations` | Searches operations across all resources |
 | `search_attributes` | Searches attributes, with optional deprecated-only and stability level filters |
 | `find_capabilities` | Searches capabilities and their declaring/referencing resources |
@@ -38,6 +39,8 @@ The server communicates over stdio using the MCP protocol.
 | `find_by_stability` | Finds elements by stability level (experimental, preview, community, default) |
 | `get_statistics` | Overview of a source's model: counts, stability breakdown, relationships |
 | `compare_versions` | Diffs two sources for added/removed/deprecated elements, including attribute and operation changes within shared resources |
+| `get_resource_tree` | Returns all resources in the subtree under a given address for hierarchy exploration |
+| `find_relationships` | Shows REQUIRES and ALTERNATIVE relationships between attributes and operation parameters |
 | `run_cypher` | Runs arbitrary read-only Cypher queries (100 row limit, 10s timeout) |
 
 ## Related Projects
