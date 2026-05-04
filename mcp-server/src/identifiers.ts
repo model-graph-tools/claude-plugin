@@ -29,7 +29,7 @@ async function mgtResolve(input: string): Promise<ResolveResult[]> {
     const { stdout } = await execFileAsync(
       MGT_COMMAND,
       ["resolve", input, "--json"],
-      { shell: true, timeout: RESOLVE_TIMEOUT_MS }
+      { timeout: RESOLVE_TIMEOUT_MS }
     );
     const results = JSON.parse(stdout) as ResolveResult[];
     if (results.length === 0) {

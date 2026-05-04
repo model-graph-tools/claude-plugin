@@ -49,7 +49,6 @@ async function runMgt(
 ): Promise<string> {
   try {
     const { stdout } = await execFileAsync(MGT_COMMAND, [...args, "--json"], {
-      shell: true,
       timeout: timeoutMs,
     });
     return stdout;

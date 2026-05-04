@@ -32,7 +32,7 @@ describe("resolveIdentifier", () => {
 
     const result = await resolveIdentifier("39");
     expect(result).toBe("39.0");
-    expect(mockExecFile).toHaveBeenCalledWith("mgt", ["resolve", "39", "--json"], { shell: true });
+    expect(mockExecFile).toHaveBeenCalledWith("mgt", ["resolve", "39", "--json"], { timeout: 30000 });
   });
 
   it("resolves already-canonical WildFly version", async () => {
@@ -89,7 +89,7 @@ describe("resolveIdentifiers", () => {
     const [id1, id2] = await resolveIdentifiers("38", "39");
     expect(id1).toBe("38.0");
     expect(id2).toBe("39.0");
-    expect(mockExecFile).toHaveBeenCalledWith("mgt", ["resolve", "38,39", "--json"], { shell: true });
+    expect(mockExecFile).toHaveBeenCalledWith("mgt", ["resolve", "38,39", "--json"], { timeout: 30000 });
   });
 
   it("resolves mixed WildFly and feature pack identifiers", async () => {

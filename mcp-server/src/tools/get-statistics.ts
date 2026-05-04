@@ -1,4 +1,5 @@
 import { getSession } from "../neo4j.js";
+import { toNumber } from "../utils.js";
 
 interface StabilityBreakdown {
   default: number;
@@ -179,12 +180,4 @@ export async function getStatistics(
   } finally {
     await Promise.all(sessions.map((s) => s.close()));
   }
-}
-
-function toNumber(val: unknown): number {
-  if (typeof val === "number") return val;
-  if (val && typeof val === "object" && "toNumber" in val) {
-    return (val as { toNumber(): number }).toNumber();
-  }
-  return 0;
 }

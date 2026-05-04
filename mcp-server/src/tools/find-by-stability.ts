@@ -1,5 +1,6 @@
 import neo4j from "neo4j-driver";
 import { getSession } from "../neo4j.js";
+import { toNumber } from "../utils.js";
 
 const DEFAULT_LIMIT = 50;
 
@@ -87,8 +88,8 @@ export async function findByStability(
       const countWrapper = `CALL { ${unionQuery} } RETURN count(*) AS total`;
       const countResult = await session.run(countWrapper, { stability });
       totalCount = toNumber(countResult.records[0]?.get("total"));
-    } catch {
-      // CALL subquery may not be supported; fall back to result length
+    } catch (countError) {
+      console.error("Count subquery failed, using result length:", countError);
     }
 
     return {
@@ -107,12 +108,4 @@ export async function findByStability(
   } finally {
     await session.close();
   }
-}
-
-function toNumber(val: unknown): number {
-  if (typeof val === "number") return val;
-  if (val && typeof val === "object" && "toNumber" in val) {
-    return (val as { toNumber(): number }).toNumber();
-  }
-  return 0;
 }

@@ -1,5 +1,6 @@
 import neo4j from "neo4j-driver";
 import { getSession } from "../neo4j.js";
+import { escapeRegex, toNumber, validateQueryLength } from "../utils.js";
 
 const DEFAULT_LIMIT = 25;
 
@@ -26,6 +27,7 @@ export async function searchAttributes(
   stability?: string,
   limit: number = DEFAULT_LIMIT
 ): Promise<SearchAttributesResult> {
+  validateQueryLength(query);
   const session = await getSession(identifier);
   try {
     const regex = `(?i).*${escapeRegex(query)}.*`;
@@ -91,16 +93,4 @@ function mapRecord(r: { get(key: string): unknown }): AttributeResult {
   const dr = r.get("deprecationReason");
   if (dr != null) attr.deprecationReason = dr as string;
   return attr;
-}
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function toNumber(val: unknown): number {
-  if (typeof val === "number") return val;
-  if (val && typeof val === "object" && "toNumber" in val) {
-    return (val as { toNumber(): number }).toNumber();
-  }
-  return 0;
 }

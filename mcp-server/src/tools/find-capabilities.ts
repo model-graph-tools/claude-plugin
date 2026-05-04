@@ -1,4 +1,5 @@
 import { getSession } from "../neo4j.js";
+import { escapeRegex, validateQueryLength } from "../utils.js";
 
 interface CapabilityReference {
   attribute: string;
@@ -22,6 +23,7 @@ export async function findCapabilities(
   identifier: string,
   query: string
 ): Promise<CapabilityResult[]> {
+  validateQueryLength(query);
   const session = await getSession(identifier);
   try {
     const regex = `(?i).*${escapeRegex(query)}.*`;
@@ -55,8 +57,4 @@ export async function findCapabilities(
   } finally {
     await session.close();
   }
-}
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

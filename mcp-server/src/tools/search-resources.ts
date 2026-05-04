@@ -1,5 +1,6 @@
 import neo4j from "neo4j-driver";
 import { getSession } from "../neo4j.js";
+import { escapeRegex, toNumber, validateQueryLength } from "../utils.js";
 
 const DEFAULT_LIMIT = 25;
 
@@ -21,6 +22,7 @@ export async function searchResources(
   query: string,
   limit: number = DEFAULT_LIMIT
 ): Promise<SearchResourcesResult> {
+  validateQueryLength(query);
   const session = await getSession(identifier);
   try {
     const regex = `(?i).*${escapeRegex(query)}.*`;
@@ -60,16 +62,4 @@ export async function searchResources(
   } finally {
     await session.close();
   }
-}
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function toNumber(val: unknown): number {
-  if (typeof val === "number") return val;
-  if (val && typeof val === "object" && "toNumber" in val) {
-    return (val as { toNumber(): number }).toNumber();
-  }
-  return 0;
 }

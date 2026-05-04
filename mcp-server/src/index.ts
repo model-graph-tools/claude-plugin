@@ -357,7 +357,9 @@ server.registerTool("run_cypher", {
 async function shutdown(): Promise<void> {
   await closeAll();
   const stopPromises = Array.from(getStartedBySession()).map((id) =>
-    mgtStop(id).catch(() => {})
+    mgtStop(id).catch((err) => {
+      console.error(`Failed to stop ${id} during shutdown:`, err);
+    })
   );
   await Promise.all(stopPromises);
 }

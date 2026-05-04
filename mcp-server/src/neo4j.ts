@@ -12,7 +12,7 @@ let activeSource: string | null = null;
 
 function createDriver(boltPort: number): Driver {
   return neo4j.driver(`bolt://localhost:${boltPort}`, undefined, {
-    maxConnectionPoolSize: 5,
+    maxConnectionPoolSize: 10,
     connectionAcquisitionTimeout: 5000,
   });
 }
@@ -20,7 +20,9 @@ function createDriver(boltPort: number): Driver {
 export function refreshConnection(identifier: string, boltPort: number): Driver {
   const existing = connections.get(identifier);
   if (existing) {
-    existing.driver.close().catch(() => {});
+    existing.driver.close().catch((err) => {
+      console.error(`Failed to close driver for ${identifier}:`, err);
+    });
   }
   lastVerified.delete(identifier);
   const driver = createDriver(boltPort);
@@ -46,18 +48,22 @@ export async function getSession(identifier: string): Promise<Session> {
     try {
       await entry.driver.verifyConnectivity();
       lastVerified.set(identifier, now);
-    } catch {
-      entry.driver.close().catch(() => {});
+    } catch (verifyError) {
+      console.error(`Connection verification failed for ${identifier}, attempting reconnect:`, verifyError);
+      entry.driver.close().catch((err) => {
+        console.error(`Failed to close stale driver for ${identifier}:`, err);
+      });
       const freshDriver = createDriver(entry.boltPort);
       connections.set(identifier, { driver: freshDriver, boltPort: entry.boltPort });
       try {
         await freshDriver.verifyConnectivity();
         lastVerified.set(identifier, Date.now());
-      } catch {
+      } catch (reconnectError) {
         connections.delete(identifier);
         lastVerified.delete(identifier);
+        const detail = reconnectError instanceof Error ? reconnectError.message : String(reconnectError);
         throw new Error(
-          `Cannot connect to model graph "${identifier}" at bolt://localhost:${entry.boltPort}. ` +
+          `Cannot connect to model graph "${identifier}" at bolt://localhost:${entry.boltPort}: ${detail}. ` +
             `The container may not be running or Neo4j may not be ready. Use start_source to reconnect.`
         );
       }
@@ -72,10 +78,6 @@ export async function getSession(identifier: string): Promise<Session> {
 
 export function getActiveSource(): string | null {
   return activeSource;
-}
-
-export function clearActiveSource(): void {
-  activeSource = null;
 }
 
 export async function closeConnection(identifier: string): Promise<void> {

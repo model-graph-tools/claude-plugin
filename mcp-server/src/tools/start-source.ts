@@ -29,7 +29,9 @@ export async function startSource(
     refreshConnection(canonicalId, result.bolt);
     trackStarted(canonicalId);
   } catch (error) {
-    await mgtStop(canonicalId).catch(() => {});
+    await mgtStop(canonicalId).catch((err) => {
+      console.error(`Failed to stop ${canonicalId} during rollback:`, err);
+    });
     throw error;
   }
   return {

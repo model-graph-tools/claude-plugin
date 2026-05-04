@@ -1,6 +1,7 @@
 import { getSession } from "../neo4j.js";
 
 const MAX_ROWS = 100;
+const MAX_QUERY_LENGTH = 10_000;
 const QUERY_TIMEOUT_MS = 10_000;
 
 interface RunCypherResult {
@@ -14,6 +15,9 @@ export async function runCypher(
   identifier: string,
   query: string
 ): Promise<RunCypherResult> {
+  if (query.length > MAX_QUERY_LENGTH) {
+    throw new Error(`Query too long (max ${MAX_QUERY_LENGTH} characters)`);
+  }
   if (isMutatingQuery(query)) {
     throw new Error(
       "Write operations are not allowed. The model databases are read-only."
@@ -46,8 +50,8 @@ export async function runCypher(
 }
 
 function isMutatingQuery(query: string): boolean {
-  const upper = query.toUpperCase().trim();
-  return /\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|CALL\s+\{)\b/.test(upper);
+  const normalized = query.normalize("NFKC").toUpperCase().trim();
+  return /\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{)\b/.test(normalized);
 }
 
 function toPlainValue(val: unknown): unknown {
