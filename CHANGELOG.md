@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Strengthen wording rules in skill to explicitly prohibit "start WildFly" phrasing in all responses, not just start/stop scenarios
+- Add critical wording rule at the top of the tool usage section as an unmissable reminder
+- Make `start_source` tool description more emphatic about the model graph vs. WildFly distinction
+
 ## [0.7.4] - 2026-05-03
 
 ### Fixed

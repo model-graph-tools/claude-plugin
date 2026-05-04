@@ -97,6 +97,11 @@ Users often ask about these areas:
 
 ## How to use the tools
 
+**CRITICAL WORDING RULE:** You are querying a **model graph database**, not a running WildFly
+server. Never say "I'll start WildFly" or "I'll start the latest WildFly version" — say
+"I'll start the **model graph** for WildFly 39." The `identifier` parameter selects which
+model graph to query, not which WildFly server to connect to.
+
 **CRITICAL RULE:** Never read cached tool-result JSON files from disk (`cat ...tool-results/*.json`),
 and never pipe MCP tool output through `python3`, `jq`, or any Bash post-processing. Tool responses
 are already structured and parsed by Claude — post-processing adds latency and error risk. Summarize
@@ -145,11 +150,19 @@ and available versions include 34, 36, 38, 39, use 38 as identifier1.
 Each model graph runs as a database — one per WildFly version or feature pack. They are
 managed by the `mgt` CLI tool. Before querying a model graph, it must be running.
 
-**Important wording:** When talking about starting or stopping, always say you are
-starting/stopping the **model graph**, not WildFly itself or the feature pack. WildFly is the
-application server whose management model is stored in the model graph. A feature pack is a
-build-time extension of WildFly — it cannot be "started" or "stopped" either. What starts and
-stops is the model graph database holding the data.
+**Important wording — applies to ALL responses, not just start/stop:**
+
+- NEVER say "I'll start WildFly", "start the latest WildFly version", or "start WildFly 39".
+  WildFly is a running application server — you are NOT starting it.
+- ALWAYS say "I'll start the **model graph** for WildFly 39" or "I'll start the **model graph**
+  for the AI feature pack".
+- This applies equally when describing what you're about to do before querying: say "I'll look
+  this up in the model graph for WildFly 39", NOT "I'll start WildFly 39 and look up...".
+- The `identifier` parameter on tools refers to which model graph to query — it is NOT the
+  WildFly server version being started or connected to.
+- What starts and stops is the **model graph database** holding the extracted management model
+  data. WildFly itself and feature packs are never started, stopped, or connected to by these
+  tools.
 
 **Startup timing:** Starting a model graph may take up to a minute, especially on first use
 when the container image needs to be downloaded. Before calling `start_source`, tell the user
