@@ -214,7 +214,7 @@ Use `/mgt:model` followed by your question:
 
 ### Natural Language
 
-The skill also activates automatically when Claude detects WildFly management model context in your conversation — just ask about subsystems, resources, attributes, or operations naturally. So most of the questions above should also work without using the slash command.
+The skill also activates automatically when the agent detects WildFly management model context in your conversation — just ask about subsystems, resources, attributes, or operations naturally. So most of the questions above should also work without using the slash command.
 
 ### Container Lifecycle
 
@@ -286,7 +286,7 @@ claude-plugin/
 └── README.md
 ```
 
-### Adding a New Tool
+### Adding New Tools
 
 1. Create a new file in `mcp-server/src/tools/`
 2. Implement the query function with a Neo4j session
