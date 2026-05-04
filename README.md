@@ -108,7 +108,8 @@ The skill also activates automatically when Claude detects WildFly management mo
 
 ### Container Lifecycle
 
-Each WildFly version or feature pack runs as a separate Neo4j container. The plugin manages these through `mgt`:
+Each WildFly version or feature pack runs as a separate Neo4j container pulled from
+[quay.io/modelgraphtools/model](https://quay.io/repository/modelgraphtools/model). The plugin manages these through `mgt`:
 
 - Images are pulled if not present locally
 - Containers are started on demand when you query a source
