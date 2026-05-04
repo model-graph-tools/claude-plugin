@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Unit tests for `utils.ts`, `mgt.ts`, `neo4j.ts`, and `run-cypher.ts` (71 tests total across 5 test files)
+
+### Changed
+- Extract duplicated `escapeRegex`, `toNumber`, and `validateQueryLength` utilities into shared `utils.ts` module
+
+### Fixed
+- Remove `shell: true` from `execFileAsync` calls to eliminate command injection risk
+- Increase Neo4j connection pool size from 5 to 10 to accommodate `browse_resource` parallel sessions
+- Strengthen Cypher mutation detection with Unicode normalization (NFKC) and additional keywords (`FOREACH`, `CALL {}`)
+- Add query length limits to `run_cypher` (10,000 chars) and search tools (200 chars) to prevent ReDoS
+- Replace silent `.catch(() => {})` blocks with error logging for better debuggability
+- Remove dead `clearActiveSource` export from `neo4j.ts`
+
 ## [0.7.6] - 2026-05-04
 
 ### Changed
