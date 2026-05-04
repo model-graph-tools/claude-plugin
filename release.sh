@@ -143,7 +143,7 @@ sed -i '' "/^\[Unreleased\]/a\\
 [${RELEASE_VERSION}]: https://github.com/model-graph-tools/claude-plugin/compare/v${PREV_TAG}...${TAG}" CHANGELOG.md
 
 msg "Committing and tagging..."
-git add .claude-plugin/plugin.json mcp-server/package.json CHANGELOG.md
+git add .claude-plugin/plugin.json mcp-server/package.json skills/wildfly-model-graph/SKILL.md CHANGELOG.md
 git commit -m "$(cat <<EOF
 chore: release v${RELEASE_VERSION}
 EOF

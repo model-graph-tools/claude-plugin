@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extract duplicated `escapeRegex`, `toNumber`, and `validateQueryLength` utilities into shared `utils.ts` module
 
 ### Fixed
+- Include `SKILL.md` metadata version in `versionBump.sh` and `release.sh` to prevent version drift across releases
 - Remove `shell: true` from `execFileAsync` calls to eliminate command injection risk
 - Increase Neo4j connection pool size from 5 to 10 to accommodate `browse_resource` parallel sessions
 - Strengthen Cypher mutation detection with Unicode normalization (NFKC) and additional keywords (`FOREACH`, `CALL {}`)

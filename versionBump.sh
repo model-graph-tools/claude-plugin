@@ -48,6 +48,9 @@ is_semver "${VERSION}" || die "Version is not a semantic version: ${VERSION}"
 sed -i '' -E "s/\"version\": \"[0-9]+\.[0-9]+\.[0-9]+\"/\"version\": \"${VERSION}\"/" .claude-plugin/plugin.json
 sed -i '' -E "s/@model-graph-tools\/mcp-server@[0-9]+\.[0-9]+\.[0-9]+/@model-graph-tools\/mcp-server@${VERSION}/" .claude-plugin/plugin.json
 
+# skills/wildfly-model-graph/SKILL.md: update metadata.version
+sed -i '' -E "s/version: \"[0-9]+\.[0-9]+\.[0-9]+\"/version: \"${VERSION}\"/" skills/wildfly-model-graph/SKILL.md
+
 # mcp-server/package.json: update top-level "version" only
 node -e "
 const fs = require('fs');
