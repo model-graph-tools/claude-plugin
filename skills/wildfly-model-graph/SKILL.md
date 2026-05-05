@@ -60,7 +60,11 @@ messaging, clustering — is represented as a tree of **resources**, each with *
   discover non-default elements, or `get_statistics` for a stability breakdown.
 
 - **Deprecation**: Resources, attributes, operations, and parameters can be deprecated starting
-  from a specific WildFly version, with a reason explaining why and what to use instead.
+  from a specific management model version, with a reason explaining why and what to use instead.
+  **Important:** Deprecation versions (e.g., `3.2.0`, `18.0.0`) refer to the **management model
+  version**, not the WildFly server version. The management model has its own versioning scheme
+  that evolves independently from WildFly releases. Do not conflate these — a deprecation since
+  model version `18.0.0` does not mean "since WildFly 18".
 
 ### Model graphs: WildFly versions and feature packs
 
@@ -128,7 +132,7 @@ query instead of trying to parse a large `browse_resource` result.
 | "what attributes are deprecated in logging?"        | `search_attributes`    | query="logging", deprecated=true             |
 | "what capabilities does the datasource declare?"    | `find_capabilities`    | query="data-source"                          |
 | "what's new in WildFly 39?"                         | `compare_versions`     | identifier1="38", identifier2="39"           |
-| "show all deprecated stuff since WildFly 30"        | `find_deprecated`      | since_version="30.0.0"                       |
+| "show all deprecated stuff since model version 30"  | `find_deprecated`      | since_version="30.0.0"                       |
 | "what experimental features are in WildFly 39?"     | `find_by_stability`    | stability="experimental"                     |
 | "show preview attributes"                           | `find_by_stability`    | stability="preview", element_type="attribute"|
 | "find community stability attributes for logging"   | `search_attributes`    | query="logging", stability="community"       |

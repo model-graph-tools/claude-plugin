@@ -55,7 +55,7 @@ export async function searchOperations(
               collect(CASE WHEN p IS NOT NULL THEN
                 {name: p.name, type: p.type, required: p.required}
               END) AS parameters,
-              v.name AS deprecatedSince,
+              (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
               d.reason AS deprecationReason
        ORDER BY o.name, r.address
        LIMIT $limit`,

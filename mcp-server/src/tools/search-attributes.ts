@@ -61,7 +61,7 @@ export async function searchAttributes(
               a.description AS description,
               a.\`access-type\` AS accessType,
               a.required AS required,
-              v.name AS deprecatedSince,
+              (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
               d.reason AS deprecationReason
        ORDER BY a.name, r.address
        LIMIT $limit`,

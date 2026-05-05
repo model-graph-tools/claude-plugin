@@ -37,7 +37,8 @@ export async function findDeprecated(
          RETURN 'attribute' AS elementType,
                 a.name AS name,
                 r.address AS resource,
-                v.name AS deprecatedSince,
+                (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
+                v.ordinal AS _ordinal,
                 d.reason AS reason`
       );
     }
@@ -49,7 +50,8 @@ export async function findDeprecated(
          RETURN 'operation' AS elementType,
                 o.name AS name,
                 r.address AS resource,
-                v.name AS deprecatedSince,
+                (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
+                v.ordinal AS _ordinal,
                 d.reason AS reason`
       );
     }
@@ -61,7 +63,8 @@ export async function findDeprecated(
          RETURN 'parameter' AS elementType,
                 p.name AS name,
                 r.address AS resource,
-                v.name AS deprecatedSince,
+                (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
+                v.ordinal AS _ordinal,
                 d.reason AS reason`
       );
     }
@@ -73,13 +76,14 @@ export async function findDeprecated(
          RETURN 'resource' AS elementType,
                 r.address AS name,
                 null AS resource,
-                v.name AS deprecatedSince,
+                (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
+                v.ordinal AS _ordinal,
                 d.reason AS reason`
       );
     }
 
     const unionQuery = queries.join("\nUNION ALL\n");
-    const fullQuery = `${unionQuery}\nORDER BY deprecatedSince DESC, name\nLIMIT $limit`;
+    const fullQuery = `${unionQuery}\nORDER BY _ordinal DESC, name\nLIMIT $limit`;
 
     const sinceOrdinal = sinceVersion ? versionToOrdinal(sinceVersion) : 0;
 

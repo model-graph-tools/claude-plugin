@@ -90,7 +90,9 @@ A service contract that a resource declares or references.
 
 ### Version
 
-A WildFly version used to track deprecation.
+A management model version used to track deprecation. These versions refer to the
+**management model version**, not the WildFly server version. The management model
+has its own versioning scheme that evolves independently from WildFly releases.
 
 | Property | Type | Mandatory | Description |
 |----------|------|-----------|-------------|

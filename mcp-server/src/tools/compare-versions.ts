@@ -155,16 +155,16 @@ async function getDeprecatedKeys(identifier: string): Promise<DeprecatedInfo[]> 
       `MATCH (a:Attribute)-[d:DEPRECATED_SINCE]->(v:Version)
        OPTIONAL MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a)
        RETURN 'attribute' AS elementType, a.name AS name, r.address AS resource,
-              v.name AS deprecatedSince, d.reason AS reason
+              (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince, d.reason AS reason
        UNION ALL
        MATCH (o:Operation)-[d:DEPRECATED_SINCE]->(v:Version)
        OPTIONAL MATCH (r:Resource)-[:PROVIDES]->(o)
        RETURN 'operation' AS elementType, o.name AS name, r.address AS resource,
-              v.name AS deprecatedSince, d.reason AS reason
+              (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince, d.reason AS reason
        UNION ALL
        MATCH (r:Resource)-[d:DEPRECATED_SINCE]->(v:Version)
        RETURN 'resource' AS elementType, r.address AS name, null AS resource,
-              v.name AS deprecatedSince, d.reason AS reason`
+              (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince, d.reason AS reason`
     );
     return result.records.map((r) => {
       const elem: DeprecatedInfo = {

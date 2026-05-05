@@ -218,7 +218,7 @@ server.registerTool("find_deprecated", {
     since_version: z
       .string()
       .optional()
-      .describe('Only show items deprecated since this version, e.g. "25.0.0"'),
+      .describe('Only show items deprecated since this management model version, e.g. "25.0.0". Note: this is the management model version, not the WildFly server version.'),
     element_type: z
       .string()
       .optional()

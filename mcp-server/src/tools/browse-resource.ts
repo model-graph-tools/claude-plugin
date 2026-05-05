@@ -89,7 +89,7 @@ export async function browseResource(
                   a.nillable AS nillable,
                   a.\`expressions-allowed\` AS expressionsAllowed,
                   a.storage AS storage,
-                  v.name AS deprecatedSince, d.reason AS deprecationReason
+                  (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince, d.reason AS deprecationReason
            ORDER BY a.name`,
           { address }
         ),
@@ -102,7 +102,7 @@ export async function browseResource(
                   collect(CASE WHEN p IS NOT NULL THEN
                     {name: p.name, type: p.type, required: p.required, description: p.description}
                   END) AS parameters,
-                  v.name AS deprecatedSince, d.reason AS deprecationReason
+                  (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince, d.reason AS deprecationReason
            ORDER BY o.name`,
           { address }
         ),
