@@ -7,12 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Clarify in skill and graph schema that deprecation versions refer to the management model version, not the WildFly server version
+
 ### Fixed
 - Fix deprecation version info always returning null — all Cypher queries referenced a non-existent `name` property on `Version` nodes instead of constructing the version string from `major`, `minor`, and `patch` properties
 - Fix deprecation result sorting in `find_deprecated` to use numeric `ordinal` instead of lexicographic version string comparison
-
-### Changed
-- Clarify in skill and graph schema that deprecation versions refer to the management model version, not the WildFly server version
 
 ## [0.8.0] - 2026-05-04
 
