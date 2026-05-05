@@ -29,6 +29,7 @@
   ],
   "author": "Harald Pehl",
   "license": "Apache-2.0",
+  "homepage": "https://model-graph-tools.github.io/",
   "repository": {
     "type": "git",
     "url": "https://github.com/model-graph-tools/claude-plugin.git",
