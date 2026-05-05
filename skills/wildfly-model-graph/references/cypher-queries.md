@@ -41,8 +41,8 @@ List all attributes which are required and have a default value:
 ```cypher
 MATCH (r:Resource)-->(a:Attribute)
 WHERE a.required = true AND
-      a.default IS NOT NULL
-RETURN r.address, a.name, a.default
+      a.`default-value` IS NOT NULL
+RETURN r.address, a.name, a.`default-value`
 ```
 
 ## Capability queries

@@ -34,7 +34,7 @@ A named configuration property on a resource.
 | access-type | STRING | no | `read-write`, `read-only`, or `metric` |
 | allowed | LIST\<STRING\> | no | Enumeration of allowed values |
 | attribute-group | STRING | no | Logical grouping name |
-| default | STRING | no | Default value (as string) |
+| default-value | STRING | no | Default value (as string). In Cypher queries, use backtick escaping: `` a.`default-value` `` |
 | max | INTEGER | no | Maximum numeric value |
 | min | INTEGER | no | Minimum numeric value |
 | max-length | INTEGER | no | Maximum string length |

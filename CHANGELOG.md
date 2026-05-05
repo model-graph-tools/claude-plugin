@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Broaden skill trigger phrases with "JBoss", "management API", and "configuration schema" for better discovery by users unfamiliar with "model graph" terminology
+- Qualify the critical rule about not piping tool output through shell commands as applicable to agents with shell access, making the skill more agent-agnostic
+- Add explicit guidance to read reference files before writing `run_cypher` queries
+
+### Fixed
+- Fix `default` property name in graph schema reference — actual Neo4j property is `default-value` (requires backtick escaping in Cypher)
+- Fix Cypher example query using `a.default` instead of correct `` a.`default-value` `` property name
+
 ## [0.8.1] - 2026-05-05
 
 ### Changed
