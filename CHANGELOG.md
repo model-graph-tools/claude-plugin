@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-05-06
+
 ### Added
 - Structured error code dispatch in MCP server via `MgtCliError` class and `tryParseJsonError()` — dispatches on stable error codes (`UNKNOWN_IDENTIFIER`, `CONTAINER_RUNTIME_NOT_FOUND`, etc.) emitted by `mgt` CLI instead of brittle string matching
 - `error_code` field on `StartResult` and `StopResult` interfaces for per-item error codes
@@ -216,7 +218,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.2...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.2...v0.9.0
 [0.8.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.7.6...v0.8.0
