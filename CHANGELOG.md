@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-05-06
+
 ### Added
 - Auto-connect to already-running Neo4j containers — `getSession()` now discovers containers started outside the MCP session via `mgtPs()` lookup, eliminating false "use start_source" errors
 - Readiness polling with exponential backoff (`waitForReady`) after container startup to prevent "connection refused" errors on first query
@@ -244,7 +246,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.2...v0.9.0
 [0.8.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.1...v0.8.2
