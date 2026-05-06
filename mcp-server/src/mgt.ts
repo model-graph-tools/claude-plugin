@@ -35,12 +35,41 @@ export interface StartResult {
   bolt?: number;
   http?: number;
   error?: string;
+  error_code?: string;
 }
 
 export interface StopResult {
   identifier: string;
   success: boolean;
   error?: string;
+  error_code?: string;
+}
+
+interface MgtJsonError {
+  error: { code: string; message: string };
+}
+
+export class MgtCliError extends Error {
+  public readonly errorCode: string;
+
+  constructor(code: string, message: string) {
+    super(message);
+    this.name = "MgtCliError";
+    this.errorCode = code;
+  }
+}
+
+function tryParseJsonError(stdout: string): MgtJsonError | null {
+  if (!stdout.trim()) return null;
+  try {
+    const parsed = JSON.parse(stdout.trim());
+    if (parsed?.error?.code && parsed?.error?.message) {
+      return parsed as MgtJsonError;
+    }
+  } catch {
+    // not valid JSON
+  }
+  return null;
 }
 
 async function runMgt(
@@ -58,6 +87,7 @@ async function runMgt(
         killed?: boolean;
         signal?: string;
         stderr?: string;
+        stdout?: string;
       };
       if (nodeError.code === "ENOENT") {
         throw new Error(
@@ -68,9 +98,17 @@ async function runMgt(
         const seconds = Math.round(timeoutMs / 1000);
         throw new Error(
           `mgt ${args[0]} timed out after ${seconds}s. ` +
-            "Check that Docker is running and has network access for image pulls."
+            "Possible causes: Docker is not running, a container image pull is slow, " +
+            "or metadata is being downloaded for the first time."
         );
       }
+
+      const jsonError = tryParseJsonError(nodeError.stdout ?? "");
+      if (jsonError) {
+        throw new MgtCliError(jsonError.error.code, jsonError.error.message);
+      }
+
+      // Fallback for older mgt versions without structured error codes
       const stderr = nodeError.stderr ?? "";
       const message = parseMgtError(args[0], stderr);
       if (message) {
@@ -81,6 +119,7 @@ async function runMgt(
   }
 }
 
+/** @deprecated Fallback for mgt versions that don't emit JSON error codes. */
 function parseMgtError(command: string, stderr: string): string | null {
   const lower = stderr.toLowerCase();
   if (
@@ -95,6 +134,43 @@ function parseMgtError(command: string, stderr: string): string | null {
   }
   if (lower.includes("no space left on device") || lower.includes("disk full")) {
     return `mgt ${command} failed: No disk space available for the container image.`;
+  }
+  if (
+    lower.includes("invalid version or feature pack") ||
+    lower.includes("unknown version") ||
+    lower.includes("unknown feature pack")
+  ) {
+    const match = stderr.match(/invalid version or feature pack '([^']+)'/i)
+      ?? stderr.match(/unknown (?:version|feature pack) '?([^'"\n]+)/i);
+    const id = match?.[1] ?? "the requested identifier";
+    return (
+      `"${id}" is not a known WildFly version or feature pack. ` +
+      "Use the list_sources tool to see available versions and feature packs."
+    );
+  }
+  if (
+    lower.includes("wildfly-images.toml") ||
+    lower.includes("feature-packs.toml") ||
+    lower.includes("mgt update")
+  ) {
+    return (
+      `mgt ${command} failed: WildFly metadata configuration is missing or corrupt. ` +
+      "Run 'mgt update' to download the latest configuration files. " +
+      "This requires network access to GitHub."
+    );
+  }
+  if (
+    lower.includes("error sending request") ||
+    lower.includes("connection refused") ||
+    lower.includes("dns error") ||
+    lower.includes("timed out") ||
+    lower.includes("network is unreachable")
+  ) {
+    return (
+      `mgt ${command} failed: A network request failed. ` +
+      "Check your internet connection. " +
+      "If this is the first run, mgt needs to download metadata from GitHub."
+    );
   }
   if (stderr.trim()) {
     return `mgt ${command} failed: ${stderr.trim()}`;

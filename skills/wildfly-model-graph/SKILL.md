@@ -194,6 +194,13 @@ Follow this pattern:
    from where it left off
 7. If `start_source` fails with a Docker-related error (not running, permission denied, disk
    full), relay the specific error and suggest the corrective action
+8. If `start_source` fails with an "unknown version" or "unknown feature pack" error, the
+   requested WildFly version or feature pack does not exist in the metadata. Call
+   `list_sources` to get the available versions and feature packs, tell the user which ones
+   are available, and suggest the closest match. For example, if the user asked for
+   "WildFly 99", show the latest available version and ask if they meant that one. If the
+   user asked for a feature pack that doesn't exist (e.g., "Foo"), list the known feature
+   pack shortcuts.
 
 ### Handling wildcard addresses
 
