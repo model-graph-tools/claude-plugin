@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move `license` and `compatibility` from top-level skill frontmatter into `metadata` block
 - Add deprecation Cypher query example to `references/cypher-queries.md`
 - Add `engines` (node >=18), `bugs` (GitHub issues URL), and `model-context-protocol` keyword to `mcp-server/package.json`; replace agent-specific `claude-code` keyword; reorder fields to follow `sort-package-json` convention
+- Add `keywords`, `homepage`, `license`, and `repository` to `plugin.json`
+- Add top-level `description`, `owner.email`, plugin `category`, and `tags` to `marketplace.json`; change owner to personal name
 
 ## [0.8.2] - 2026-05-05
 

@@ -2,10 +2,21 @@
   "name": "mgt",
   "version": "0.8.2",
   "description": "Search and browse the WildFly management model across versions and feature packs",
+  "keywords": [
+    "wildfly",
+    "jboss",
+    "management-model",
+    "mcp",
+    "model-context-protocol",
+    "neo4j"
+  ],
+  "homepage": "https://model-graph-tools.github.io/",
+  "license": "Apache-2.0",
   "author": {
     "name": "Harald Pehl",
     "email": "harald.pehl@gmail.com"
   },
+  "repository": "https://github.com/model-graph-tools/claude-plugin",
   "mcpServers": {
     "wildfly-model-graph": {
       "command": "npx",

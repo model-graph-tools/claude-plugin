@@ -1,12 +1,16 @@
 {
   "name": "model-graph-tools",
+  "description": "Tools for exploring and querying the WildFly management model graph",
   "owner": {
-    "name": "Model Graph Tools"
+    "name": "Harald Pehl",
+    "email": "harald.pehl@gmail.com"
   },
   "plugins": [
     {
       "name": "mgt",
       "description": "Search and browse the WildFly management model across versions and feature packs",
+      "category": "development",
+      "tags": ["wildfly", "jboss", "management-model", "mcp", "neo4j"],
       "source": {
         "source": "github",
         "repo": "model-graph-tools/claude-plugin",
