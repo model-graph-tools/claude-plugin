@@ -109,8 +109,10 @@ export async function runMgt(
         const seconds = Math.round(timeoutMs / 1000);
         throw new Error(
           `mgt ${args[0]} timed out after ${seconds}s. ` +
-            "Possible causes: Docker is not running, a container image pull is slow, " +
-            "or metadata is being downloaded for the first time."
+            "This can happen on first use when container images need to be downloaded. " +
+            "To resolve: (1) Verify Docker is running ('docker info'). " +
+            "(2) Check your network connection — the first run downloads ~500MB. " +
+            "(3) Try again — the download may have been slow but should resume."
         );
       }
 

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Auto-connect to already-running Neo4j containers — `getSession()` now discovers containers started outside the MCP session via `mgtPs()` lookup, eliminating false "use start_source" errors
+- Readiness polling with exponential backoff (`waitForReady`) after container startup to prevent "connection refused" errors on first query
+- Handle already-running containers in `start_source` — returns success with "already running" message instead of throwing a container name conflict error
+- Unit tests for `start-source.ts` covering success, already-running, rollback, and missing-port scenarios
+
+### Changed
+- Improve timeout error messages with actionable guidance (check Docker, verify network, retry)
+
+### Removed
+- Remove unused `"stopped"` status from `list_sources` response type — `mgt ps` cannot distinguish stopped from never-started
+
 ## [0.10.0] - 2026-05-06
 
 ### Added

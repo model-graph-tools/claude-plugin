@@ -5,8 +5,8 @@ import { createRequire } from "node:module";
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { resolveIdentifier, resolveIdentifiers } from "./identifiers.js";
-import { mgtStop } from "./mgt.js";
-import { closeAll } from "./neo4j.js";
+import { mgtStop, mgtPs } from "./mgt.js";
+import { closeAll, setContainerLookup } from "./neo4j.js";
 import { getStartedBySession } from "./session.js";
 import { listSources } from "./tools/list-sources.js";
 import { startSource } from "./tools/start-source.js";
@@ -80,7 +80,7 @@ function handleTool<T>(fn: (params: T) => Promise<unknown>) {
 
 server.registerTool("list_sources", {
   description:
-    "Lists all known WildFly versions and feature packs with their availability (running/stopped/not_found).",
+    "Lists all known WildFly versions and feature packs with their availability (running/not_found).",
 }, handleTool(async () => {
   return listSources();
 }));
@@ -395,6 +395,16 @@ async function shutdown(): Promise<void> {
   );
   await Promise.all(stopPromises);
 }
+
+setContainerLookup(async (identifier: string) => {
+  try {
+    const containers = await mgtPs();
+    const match = containers.find((c) => c.identifier === identifier);
+    return match ? { bolt: match.bolt } : null;
+  } catch {
+    return null;
+  }
+});
 
 async function main() {
   process.on("SIGINT", async () => {

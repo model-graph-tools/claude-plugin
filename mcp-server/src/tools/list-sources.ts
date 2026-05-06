@@ -11,7 +11,7 @@ interface SourceInfo {
   type: "wildfly" | "feature-pack";
   name: string;
   version: string;
-  status: "running" | "stopped" | "not_found";
+  status: "running" | "not_found";
   active: boolean;
   bolt?: number;
   http?: number;
