@@ -278,7 +278,7 @@ claude-plugin/
 │   │   ├── neo4j.ts             # Neo4j connection management
 │   │   ├── mgt.ts               # mgt CLI wrapper
 │   │   ├── session.ts           # Session state management
-│   │   └── tools/               # One file per MCP tool (16 tools)
+│   │   └── tools/               # One file per MCP tool (20 tools)
 │   ├── build.mjs                # Custom build script
 │   ├── package.json
 │   └── tsconfig.json
