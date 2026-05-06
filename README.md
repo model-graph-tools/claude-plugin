@@ -6,10 +6,16 @@ WildFly exposes its entire configuration and runtime state through a management 
 
 ## What You Can Do
 
-- **Search** resources, attributes, and operations by name or pattern
-- **Browse** the resource tree with full attribute, operation, and capability details
+- **Search** resources, attributes, operations, and capabilities by name or pattern
+- **Browse** the resource tree and explore subtrees with full attribute, operation, and capability details
+- **Describe** resources in human-readable form — purpose, required parameters, and CLI examples
 - **Find** deprecated elements and track when they were deprecated
 - **Filter** by stability level to find experimental, preview, or community features
+- **Discover** attribute and parameter relationships — dependencies (REQUIRES) and exclusivity (ALTERNATIVE)
+- **Audit** security-sensitive attributes — passwords, keys, and secrets marked with IS_SENSITIVE
+- **Inspect** allowed values, numeric ranges, and string length constraints for attributes and parameters
+- **Identify** attributes that require a server restart after modification, filterable by restart level
+- **Group** related attributes by their logical attribute groups within resources
 - **Analyze** model statistics — element counts, stability breakdown, relationship counts
 - **Compare** two WildFly versions to see what was added, removed, or deprecated — including attribute, operation, and parameter changes
 - **Explore** feature pack extensions (AI, GraphQL, etc.) using the same tools
