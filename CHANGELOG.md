@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill guidance for handling unknown WildFly version or feature pack errors (suggest `list_sources` and closest match)
 
 ### Changed
+- Bump `neo4j-driver` from v5 to v6, `typescript` from v5 to v6, `esbuild` to 0.28, `tsx` to 4.21, `@types/node` to 25, and `zod` to 4.4
+- Add `types: ["node"]` to `tsconfig.json` for TypeScript 6 compatibility
+- Relax `assignIfNotNull` generic constraint in `browse-resource.ts` to fix TypeScript 6 stricter index-signature checks
 - Keep `parseMgtError()` as deprecated fallback for older `mgt` versions without structured error codes
 - Add `author` field to plugin.json
 - Improve skill trigger phrases: add "what feature packs are there", "what's new in WildFly 39", "what sub-attributes does X have", "show the resource tree for undertow"; replace vague "configuration schema" trigger

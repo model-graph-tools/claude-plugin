@@ -229,11 +229,7 @@ export async function browseResource(
   }
 }
 
-function assignIfNotNull<T extends Record<string, unknown>>(
-  obj: T,
-  key: keyof T,
-  value: unknown
-): void {
+function assignIfNotNull<T>(obj: T, key: keyof T, value: unknown): void {
   if (value != null) {
     (obj as Record<string, unknown>)[key as string] = value;
   }
