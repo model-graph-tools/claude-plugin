@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-05-06
+
 ### Added
 - 4 new MCP tools: `find_sensitive_attributes` (audit passwords, keys, secrets), `get_allowed_values` (option values, numeric ranges, string constraints), `find_restart_required` (attributes needing server restart), `find_attribute_groups` (logical attribute groupings)
 - Add comments and section headers across all MCP server source files for readability
@@ -230,7 +232,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.2...v0.9.0
 [0.8.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.8.0...v0.8.1
