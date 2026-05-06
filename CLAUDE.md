@@ -105,9 +105,9 @@ Two types of model graphs:
 
 ## Graph Schema
 
-Nodes: `Resource`, `Attribute`, `Operation`, `Parameter`, `Capability`, `Version`
+Nodes: `Resource`, `Attribute`, `Operation`, `Parameter`, `Capability`, `Constraint`, `Version`, `Identity`
 
-Key relationships: `CHILD_OF`, `HAS_ATTRIBUTE`, `PROVIDES`, `ACCEPTS`, `DECLARES_CAPABILITY`, `REFERENCES_CAPABILITY`, `DEPRECATED_SINCE`, `REQUIRES`, `ALTERNATIVE`
+Key relationships: `CHILD_OF`, `HAS_ATTRIBUTE`, `PROVIDES`, `ACCEPTS`, `DECLARES_CAPABILITY`, `REFERENCES_CAPABILITY`, `DEPRECATED_SINCE`, `REQUIRES`, `ALTERNATIVE`, `CONSISTS_OF`, `IS_SENSITIVE`
 
 ## Dependencies
 
