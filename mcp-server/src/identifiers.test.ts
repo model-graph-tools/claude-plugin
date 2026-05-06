@@ -67,7 +67,7 @@ describe("resolveIdentifier", () => {
     mockError("Unknown identifier: unknown");
 
     await expect(resolveIdentifier("unknown")).rejects.toThrow(
-      'Failed to resolve "unknown": Unknown identifier: unknown'
+      "mgt resolve failed: Unknown identifier: unknown"
     );
   });
 

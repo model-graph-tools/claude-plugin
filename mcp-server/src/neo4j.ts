@@ -1,14 +1,26 @@
+// Connection pool for Neo4j model graph databases.
+// Each WildFly version/feature pack runs in its own Neo4j container.
+// This module maps identifiers to Bolt drivers and periodically re-verifies connectivity.
+
 import neo4j, { type Driver, type Session } from "neo4j-driver";
+
+// --- Types ---
 
 interface ConnectionEntry {
   driver: Driver;
   boltPort: number;
 }
 
+// --- State ---
+
+// Re-verify connectivity after this interval to detect containers that stopped
 const VERIFY_INTERVAL_MS = 30_000;
 const connections = new Map<string, ConnectionEntry>();
 const lastVerified = new Map<string, number>();
+// Tracks the most recently used model graph for session continuity
 let activeSource: string | null = null;
+
+// --- Connection lifecycle ---
 
 function createDriver(boltPort: number): Driver {
   return neo4j.driver(`bolt://localhost:${boltPort}`, undefined, {
@@ -33,6 +45,8 @@ export function refreshConnection(identifier: string, boltPort: number): Driver 
 export function hasConnection(identifier: string): boolean {
   return connections.has(identifier);
 }
+
+// --- Session access ---
 
 export async function getSession(identifier: string): Promise<Session> {
   const entry = connections.get(identifier);
@@ -79,6 +93,26 @@ export async function getSession(identifier: string): Promise<Session> {
 export function getActiveSource(): string | null {
   return activeSource;
 }
+
+export function ensureConnection(identifier: string, boltPort: number): void {
+  const existing = connections.get(identifier);
+  if (!existing || existing.boltPort !== boltPort) {
+    refreshConnection(identifier, boltPort);
+  }
+}
+
+export async function getSessions(identifier: string, count: number): Promise<Session[]> {
+  const first = await getSession(identifier);
+  if (count <= 1) return [first];
+
+  const entry = connections.get(identifier)!;
+  const rest = Array.from({ length: count - 1 }, () =>
+    entry.driver.session({ defaultAccessMode: neo4j.session.READ })
+  );
+  return [first, ...rest];
+}
+
+// --- Cleanup ---
 
 export async function closeConnection(identifier: string): Promise<void> {
   const entry = connections.get(identifier);

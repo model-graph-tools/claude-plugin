@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- 4 new MCP tools: `find_sensitive_attributes` (audit passwords, keys, secrets), `get_allowed_values` (option values, numeric ranges, string constraints), `find_restart_required` (attributes needing server restart), `find_attribute_groups` (logical attribute groupings)
+- Add comments and section headers across all MCP server source files for readability
+
+### Changed
+- Update slash command tool list to include all 20 tools
+- Trim skill description from ~680 to ~480 characters for better trigger precision
+- Reorganize tool registration in `index.ts` by functional groups (lifecycle, exploration, search, analysis, advanced)
+- Group code by visibility and purpose in `browse-resource.ts`, `describe-resource.ts`, `find-deprecated.ts`, `search-operations.ts`, `search-attributes.ts`, `get-statistics.ts`, and other tool files
+- Add Cypher query examples for sensitive attributes, allowed values, restart requirements, and attribute groups to `references/cypher-queries.md`
+- Update CLAUDE.md tool table to document all 20 tools with expanded descriptions
+
 ## [0.9.0] - 2026-05-06
 
 ### Added

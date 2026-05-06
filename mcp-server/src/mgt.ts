@@ -1,10 +1,17 @@
+// Wraps the `mgt` CLI to manage Neo4j model graph containers.
+// All commands are invoked with `--json` for machine-readable output.
+
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+
+// --- Constants ---
 
 const execFileAsync = promisify(execFile);
 const MGT_COMMAND = "mgt";
 const MGT_START_TIMEOUT_MS = 300_000;
 const MGT_DEFAULT_TIMEOUT_MS = 30_000;
+
+// --- Types ---
 
 export interface WildFlyVersion {
   identifier: number;
@@ -49,6 +56,8 @@ interface MgtJsonError {
   error: { code: string; message: string };
 }
 
+// --- Error handling ---
+
 export class MgtCliError extends Error {
   public readonly errorCode: string;
 
@@ -72,7 +81,9 @@ function tryParseJsonError(stdout: string): MgtJsonError | null {
   return null;
 }
 
-async function runMgt(
+// --- Command execution ---
+
+export async function runMgt(
   args: string[],
   timeoutMs: number = MGT_DEFAULT_TIMEOUT_MS
 ): Promise<string> {
@@ -177,6 +188,8 @@ function parseMgtError(command: string, stderr: string): string | null {
   }
   return null;
 }
+
+// --- High-level CLI commands ---
 
 export async function mgtVersions(): Promise<WildFlyVersion[]> {
   const output = await runMgt(["versions"]);

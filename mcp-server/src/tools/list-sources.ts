@@ -1,5 +1,10 @@
+// Lists all known WildFly versions and feature packs, merging static metadata
+// from `mgt versions`/`mgt feature-packs` with live container status from `mgt ps`.
+
 import { mgtVersions, mgtFeaturePacks, mgtPs } from "../mgt.js";
-import { getActiveSource, refreshConnection } from "../neo4j.js";
+import { getActiveSource, ensureConnection } from "../neo4j.js";
+
+// --- Types ---
 
 interface SourceInfo {
   identifier: string;
@@ -34,7 +39,7 @@ export async function listSources(): Promise<ListSourcesResult> {
   for (const v of versions) {
     const container = runningByIdentifier.get(v.short_version);
     if (container) {
-      refreshConnection(v.short_version, container.bolt);
+      ensureConnection(v.short_version, container.bolt);
     }
     sources.push({
       identifier: v.short_version,
@@ -56,7 +61,7 @@ export async function listSources(): Promise<ListSourcesResult> {
 
     const container = runningByIdentifier.get(id);
     if (container) {
-      refreshConnection(id, container.bolt);
+      ensureConnection(id, container.bolt);
     }
     sources.push({
       identifier: id,

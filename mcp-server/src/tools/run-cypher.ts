@@ -1,4 +1,10 @@
+// Escape hatch for running arbitrary read-only Cypher queries.
+// Rejects mutating keywords and caps results at 100 rows with a 10s timeout.
+
 import { getSession } from "../neo4j.js";
+import { toPlainValue } from "../utils.js";
+
+// --- Constants ---
 
 const MAX_ROWS = 100;
 const MAX_QUERY_LENGTH = 10_000;
@@ -52,23 +58,4 @@ export async function runCypher(
 function isMutatingQuery(query: string): boolean {
   const normalized = query.normalize("NFKC").toUpperCase().trim();
   return /\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{)\b/.test(normalized);
-}
-
-function toPlainValue(val: unknown): unknown {
-  if (val == null) return null;
-  if (typeof val === "object" && "toNumber" in val) {
-    return (val as { toNumber(): number }).toNumber();
-  }
-  if (typeof val === "object" && "properties" in val) {
-    const node = val as { properties: Record<string, unknown> };
-    const plain: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(node.properties)) {
-      plain[k] = toPlainValue(v);
-    }
-    return plain;
-  }
-  if (Array.isArray(val)) {
-    return val.map(toPlainValue);
-  }
-  return val;
 }

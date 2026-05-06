@@ -2,19 +2,14 @@
 name: wildfly-model-graph
 description: >
   This skill should be used when the user asks about the WildFly, JBoss, or
-  JBoss EAP management model, management API, or model graph, including
-  resources, attributes, operations, capabilities, stability levels, or
-  deprecations. Covers queries like "what versions of WildFly are available",
-  "what feature packs are there", "show me the datasources subsystem",
-  "what changed between WildFly 38 and 39", "what's new in WildFly 39",
-  "find deprecated attributes", "what capabilities does elytron provide",
-  "start the model graph for WildFly 39", "how do I add a datasource",
-  "what sub-attributes does connection-url have", "show the resource tree
-  for undertow", "what attributes depend on each other", "what experimental
-  features exist", "compare WildFly versions", and "run a Cypher query against
-  the model". Also applies when the user mentions WildFly subsystems such as
-  undertow, elytron, datasources, messaging, infinispan, or logging, or
-  references the mgt CLI tool.
+  JBoss EAP management model, management API, or model graph. Covers resources,
+  attributes, operations, capabilities, stability levels, deprecations, and
+  version comparisons. Applies to queries like "show me the datasources subsystem",
+  "what changed between WildFly 38 and 39", "find deprecated attributes",
+  "what capabilities does elytron provide", "start the model graph for WildFly 39",
+  "how do I add a datasource", "compare WildFly versions", "run a Cypher query
+  against the model", or "what requires a server restart". Also applies when
+  the user mentions WildFly subsystems or the mgt CLI tool.
 license: Apache-2.0
 compatibility: >
   Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
@@ -70,6 +65,30 @@ messaging, clustering — is represented as a tree of **resources**, each with *
   that evolves independently from WildFly releases. Do not conflate these — a deprecation since
   model version `18.0.0` does not mean "since WildFly 18".
 
+- **Sensitivity**: Attributes can be marked as security-sensitive via `IS_SENSITIVE`
+  relationships to `Constraint` nodes. Sensitive attributes typically contain passwords,
+  keys, or other secrets. Use `find_sensitive_attributes` to discover them.
+
+- **Allowed values and constraints**: Many attributes and parameters have constrained value
+  sets (`allowed` property with enumerated values) or numeric/length ranges (`min`, `max`,
+  `min-length`, `max-length`). Some also carry a `unit` (e.g., `MILLISECONDS`, `BYTES`).
+  Use `get_allowed_values` to discover what values an attribute or parameter accepts.
+
+- **Restart requirements**: Some attribute changes take effect immediately, others require
+  restarting services (`no-services`, `all-services`) or the entire JVM (`jvm`). The
+  `restart-required` property indicates the level. Use `find_restart_required` to discover
+  which configuration changes need restarts.
+
+- **Attribute groups**: Attributes within a resource can be organized into logical groups
+  (e.g., "connection", "pool", "security"). The `attribute-group` property identifies
+  this grouping. Use `find_attribute_groups` to explore them.
+
+- **Operation characteristics**: Operations have properties beyond name and parameters:
+  `read-only` (whether the operation only reads state), `runtime-only` (whether it only
+  affects runtime, not persisted config), and `global` (whether available on all resources).
+  Use `search_operations` with `read_only` or `runtime_only` filters to find operations
+  by their characteristics.
+
 ### Model graphs: WildFly versions and feature packs
 
 There are model graphs for two types of products:
@@ -124,7 +143,7 @@ Users often ask about these areas:
 | "stop the model graph for WildFly 38"               | `stop_source`          | identifier="38"                              |
 | "find resources for datasources"                    | `search_resources`     | query="datasource"                           |
 | "show me the undertow subsystem"                    | `browse_resource`      | address="/subsystem=undertow"                |
-| "what operations can I do on a datasource?"         | `search_resources` then `browse_resource` | query="data-source", then browse a concrete result |
+| "what operations can I do on a datasource?"         | `search_operations`   | query="", resource_filter="data-source"      |
 | "how do I add a datasource?"                        | `describe_resource`    | address="/subsystem=datasources/data-source=*" — see [Configuration how-to questions](#configuration-how-to-questions) |
 | "is there an operation to test my DB connection?"   | `search_operations`    | query="test connection"                      |
 | "what attributes are deprecated in logging?"        | `search_attributes`    | query="logging", deprecated=true             |
@@ -144,6 +163,18 @@ Users often ask about these areas:
 | "find deprecated parameters"                        | `find_deprecated`      | element_type="parameter"                     |
 | "what parameters have preview stability?"           | `find_by_stability`    | stability="preview", element_type="parameter"|
 | "what sub-attributes does X have?" / "show full attribute details" | `browse_resource` | address=... — the response includes sub-attribute composition (CONSISTS_OF) for complex LIST/OBJECT attributes |
+| "which attributes are sensitive / secret?"          | `find_sensitive_attributes` | (identifier only, or query="password")      |
+| "show me all passwords in the model"                | `find_sensitive_attributes` | query="password"                             |
+| "what requires a server restart?"                   | `find_restart_required` | (identifier only)                              |
+| "which changes need a full JVM restart?"            | `find_restart_required` | restart_type="jvm"                             |
+| "what restart-required attributes exist for datasources?" | `find_restart_required` | resource_filter="datasource"             |
+| "what values can I set for isolation level?"        | `get_allowed_values`   | query="isolation"                              |
+| "what are the allowed values for transaction isolation?" | `get_allowed_values` | query="transaction-isolation"                |
+| "what attribute groups exist for undertow?"         | `find_attribute_groups` | resource="/subsystem=undertow"                |
+| "what resources use attribute groups?"              | `find_attribute_groups` | (identifier only — returns all groups)        |
+| "is this operation read-only?"                      | `search_operations`    | query="test-connection", read_only=true        |
+| "what operations modify state on a datasource?"     | `search_operations`    | resource_filter="data-source", read_only=false |
+| "what runtime-only operations exist?"               | `search_operations`    | query="", runtime_only=true                    |
 | "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39" — before writing a query, read `references/graph-schema.md` for available node labels, properties, and relationships, and consult `references/cypher-queries.md` for reusable patterns |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
@@ -292,6 +323,27 @@ When the user asks about attribute dependencies ("what attributes must be set to
 - **ALTERNATIVE**: Attributes/parameters that are mutually exclusive
 
 Use `scope="attributes"` or `scope="parameters"` to narrow the results, or omit for both.
+
+### Querying sensitive attributes
+
+Use `find_sensitive_attributes` when the user asks about passwords, secrets, keys, or security-sensitive configuration. The tool follows `IS_SENSITIVE` relationships from attributes to `Constraint` nodes. Results include the constraint name and type, which indicate *why* the attribute is sensitive (e.g., a credential, a vault expression). Use the optional `query` parameter to narrow results by attribute name or resource address (e.g., `query="password"` or `query="elytron"`).
+
+### Discovering allowed values and constraints
+
+Use `get_allowed_values` when the user asks "what values can I set for X?" or "what are the valid options for Y?". It searches both attributes and parameters for elements that have enumerated `allowed` values, numeric ranges (`min`/`max`), or string length constraints (`min-length`/`max-length`). For a quick check on a single known attribute, `browse_resource` also returns these fields — but `get_allowed_values` is better for cross-resource searches.
+
+### Finding restart-required attributes
+
+Use `find_restart_required` when the user asks what changes need a server restart. The `restart-required` property has three levels:
+- **no-services** — only the affected services are restarted (least disruptive)
+- **all-services** — all services in the server are restarted
+- **jvm** — the entire JVM must be restarted (most disruptive)
+
+Use `restart_type` to filter by level and `resource_filter` to scope to a specific subsystem.
+
+### Exploring attribute groups
+
+Use `find_attribute_groups` when the user asks about logical groupings of attributes within resources. Attribute groups cluster related attributes together (e.g., all connection-pool settings, all timeout settings). Use `resource` to query a specific resource or `group_name` to search by group name across all resources.
 
 ### Handling empty results
 

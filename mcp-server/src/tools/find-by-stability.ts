@@ -1,3 +1,6 @@
+// Finds elements by stability level (experimental, preview, community, default).
+// Builds a UNION ALL query across all requested element types.
+
 import neo4j from "neo4j-driver";
 import { getSession } from "../neo4j.js";
 import { toNumber } from "../utils.js";

@@ -1,9 +1,7 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
+// Resolves user-provided identifiers (e.g. "39", "ai:0.9.1") to canonical
+// identifiers via `mgt resolve`. Handles both single and paired lookups.
 
-const execFileAsync = promisify(execFile);
-const MGT_COMMAND = "mgt";
-const RESOLVE_TIMEOUT_MS = 30_000;
+import { runMgt } from "./mgt.js";
 
 interface ResolveResult {
   identifier: string;
@@ -25,40 +23,10 @@ export async function resolveIdentifiers(
 }
 
 async function mgtResolve(input: string): Promise<ResolveResult[]> {
-  try {
-    const { stdout } = await execFileAsync(
-      MGT_COMMAND,
-      ["resolve", input, "--json"],
-      { timeout: RESOLVE_TIMEOUT_MS }
-    );
-    const results = JSON.parse(stdout) as ResolveResult[];
-    if (results.length === 0) {
-      throw new Error(`Could not resolve identifier "${input}"`);
-    }
-    return results;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      const nodeError = error as NodeJS.ErrnoException & {
-        killed?: boolean;
-        signal?: string;
-        stderr?: string;
-      };
-      if (nodeError.code === "ENOENT") {
-        throw new Error(
-          "mgt CLI not found on PATH. Install it from https://github.com/model-graph-tools/tooling"
-        );
-      }
-      if (nodeError.killed && nodeError.signal === "SIGTERM") {
-        throw new Error(
-          `Resolving identifier "${input}" timed out. Check that mgt is working correctly.`
-        );
-      }
-      if (nodeError.stderr?.trim()) {
-        throw new Error(
-          `Failed to resolve "${input}": ${nodeError.stderr.trim()}`
-        );
-      }
-    }
-    throw error;
+  const output = await runMgt(["resolve", input]);
+  const results = JSON.parse(output) as ResolveResult[];
+  if (results.length === 0) {
+    throw new Error(`Could not resolve identifier "${input}"`);
   }
+  return results;
 }

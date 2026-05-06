@@ -1,3 +1,5 @@
+// Stops a running model graph container and cleans up its Neo4j connection.
+
 import { mgtStop } from "../mgt.js";
 import { closeConnection } from "../neo4j.js";
 import { untrackStarted } from "../session.js";

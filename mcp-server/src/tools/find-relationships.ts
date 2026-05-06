@@ -1,4 +1,9 @@
-import { getSession } from "../neo4j.js";
+// Exposes REQUIRES and ALTERNATIVE relationships between attributes and
+// between operation parameters for a given resource.
+
+import { getSessions } from "../neo4j.js";
+
+// --- Types ---
 
 interface AttributeRelationship {
   attribute: string;
@@ -27,10 +32,8 @@ export async function findRelationships(
   const includeAttributes = scope === "all" || scope === "attributes";
   const includeParameters = scope === "all" || scope === "parameters";
 
-  const sessions = await Promise.all([
-    ...(includeAttributes ? [getSession(identifier)] : []),
-    ...(includeParameters ? [getSession(identifier)] : []),
-  ]);
+  const sessionCount = (includeAttributes ? 1 : 0) + (includeParameters ? 1 : 0);
+  const sessions = await getSessions(identifier, sessionCount);
 
   try {
     const promises: Promise<unknown>[] = [];

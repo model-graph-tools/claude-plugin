@@ -1,4 +1,9 @@
-import { getSession } from "../neo4j.js";
+// Generates a concise markdown summary of a resource: purpose, add-operation parameters,
+// required/optional attributes with constraints, and a CLI example.
+
+import { getSessions } from "../neo4j.js";
+
+// --- Types ---
 
 interface ParameterRow {
   name: string;
@@ -12,17 +17,18 @@ interface AttributeRow {
   type: string;
   description: string;
   defaultValue: string | null;
+  allowed: string[] | null;
+  unit: string | null;
+  restartRequired: string | null;
 }
+
+// --- Main ---
 
 export async function describeResource(
   identifier: string,
   address: string
 ): Promise<string> {
-  const sessions = await Promise.all([
-    getSession(identifier),
-    getSession(identifier),
-    getSession(identifier),
-  ]);
+  const sessions = await getSessions(identifier, 3);
   try {
     const [resourceResult, requiredAttrsResult, optionalAttrsResult] =
       await Promise.all([
@@ -39,7 +45,9 @@ export async function describeResource(
           `MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
            WHERE a.required = true
            RETURN a.name AS name, a.type AS type,
-                  a.description AS description, a.\`default-value\` AS defaultValue
+                  a.description AS description, a.\`default-value\` AS defaultValue,
+                  a.allowed AS allowed, a.unit AS unit,
+                  a.\`restart-required\` AS restartRequired
            ORDER BY a.name`,
           { address }
         ),
@@ -48,7 +56,9 @@ export async function describeResource(
            WHERE (a.required IS NULL OR a.required = false)
              AND NOT EXISTS { (a)-[:DEPRECATED_SINCE]->() }
            RETURN a.name AS name, a.type AS type,
-                  a.description AS description, a.\`default-value\` AS defaultValue
+                  a.description AS description, a.\`default-value\` AS defaultValue,
+                  a.allowed AS allowed, a.unit AS unit,
+                  a.\`restart-required\` AS restartRequired
            ORDER BY a.name`,
           { address }
         ),
@@ -78,6 +88,9 @@ export async function describeResource(
       type: r.get("type") as string,
       description: r.get("description") as string,
       defaultValue: r.get("defaultValue") as string | null,
+      allowed: r.get("allowed") as string[] | null,
+      unit: r.get("unit") as string | null,
+      restartRequired: r.get("restartRequired") as string | null,
     }));
 
     const optionalAttrs: AttributeRow[] = optionalAttrsResult.records.map((r) => ({
@@ -85,6 +98,9 @@ export async function describeResource(
       type: r.get("type") as string,
       description: r.get("description") as string,
       defaultValue: r.get("defaultValue") as string | null,
+      allowed: r.get("allowed") as string[] | null,
+      unit: r.get("unit") as string | null,
+      restartRequired: r.get("restartRequired") as string | null,
     }));
 
     return formatMarkdown(
@@ -99,6 +115,8 @@ export async function describeResource(
     await Promise.all(sessions.map((s) => s.close()));
   }
 }
+
+// --- Markdown formatting ---
 
 function formatMarkdown(
   name: string,
@@ -182,13 +200,28 @@ function formatParamTable(params: ParameterRow[]): string[] {
 
 function formatAttrTable(attrs: AttributeRow[]): string[] {
   const lines: string[] = [];
-  lines.push("| Attribute | Type | Default | Description |");
-  lines.push("|-----------|------|---------|-------------|");
+  lines.push("| Attribute | Type | Default | Constraints | Description |");
+  lines.push("|-----------|------|---------|-------------|-------------|");
   for (const a of attrs) {
     const def = a.defaultValue ?? "-";
-    lines.push(`| ${a.name} | ${a.type} | ${def} | ${truncate(a.description)} |`);
+    const constraints = formatConstraints(a);
+    lines.push(`| ${a.name} | ${a.type} | ${def} | ${constraints} | ${truncate(a.description)} |`);
   }
   return lines;
+}
+
+function formatConstraints(attr: AttributeRow): string {
+  const parts: string[] = [];
+  if (attr.allowed != null && attr.allowed.length > 0) {
+    parts.push(attr.allowed.join(", "));
+  }
+  if (attr.unit != null) {
+    parts.push(attr.unit);
+  }
+  if (attr.restartRequired != null) {
+    parts.push(`restart: ${attr.restartRequired}`);
+  }
+  return parts.length > 0 ? parts.join("; ") : "-";
 }
 
 function truncate(text: string, maxLength = 120): string {

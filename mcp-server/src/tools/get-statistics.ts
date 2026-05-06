@@ -1,5 +1,10 @@
-import { getSession } from "../neo4j.js";
+// Collects model graph statistics: node counts, stability breakdown per element type,
+// deprecation counts, and relationship counts. Runs four parallel Cypher queries.
+
+import { getSessions } from "../neo4j.js";
 import { toNumber } from "../utils.js";
+
+// --- Types ---
 
 interface StabilityBreakdown {
   default: number;
@@ -14,6 +19,11 @@ interface IdentityInfo {
   type: string;
   version: string;
   description: string;
+  groupId?: string;
+  artifactId?: string;
+  url?: string;
+  scmUrl?: string;
+  licenses?: string;
 }
 
 interface StatisticsResult {
@@ -32,6 +42,7 @@ interface StatisticsResult {
     resources: StabilityBreakdown;
     attributes: StabilityBreakdown;
     operations: StabilityBreakdown;
+    parameters: StabilityBreakdown;
   };
   relationships: {
     childOf: number;
@@ -42,8 +53,13 @@ interface StatisticsResult {
     referencesCapability: number;
     requires: number;
     alternative: number;
+    isSensitive: number;
+    consistsOf: number;
+    deprecatedSince: number;
   };
 }
+
+// --- Constants ---
 
 const EMPTY_STABILITY: StabilityBreakdown = {
   default: 0,
@@ -61,14 +77,17 @@ const REL_TYPE_MAP: Record<string, keyof StatisticsResult["relationships"]> = {
   REFERENCES_CAPABILITY: "referencesCapability",
   REQUIRES: "requires",
   ALTERNATIVE: "alternative",
+  IS_SENSITIVE: "isSensitive",
+  CONSISTS_OF: "consistsOf",
+  DEPRECATED_SINCE: "deprecatedSince",
 };
+
+// --- Main ---
 
 export async function getStatistics(
   identifier: string
 ): Promise<StatisticsResult> {
-  const sessions = await Promise.all([
-    getSession(identifier), getSession(identifier), getSession(identifier), getSession(identifier),
-  ]);
+  const sessions = await getSessions(identifier, 4);
   try {
     const [nodeResult, deprecatedResult, relResult, identityResult] = await Promise.all([
       sessions[0].run(
@@ -91,7 +110,9 @@ export async function getStatistics(
       sessions[3].run(
         `OPTIONAL MATCH (i:Identity)
          RETURN i.name AS name, i.identifier AS identifier, i.type AS type,
-                i.version AS version, i.description AS description`
+                i.version AS version, i.description AS description,
+                i.\`group-id\` AS groupId, i.\`artifact-id\` AS artifactId,
+                i.url AS url, i.\`scm-url\` AS scmUrl, i.licenses AS licenses`
       ),
     ]);
 
@@ -106,6 +127,7 @@ export async function getStatistics(
       Resource: { ...EMPTY_STABILITY },
       Attribute: { ...EMPTY_STABILITY },
       Operation: { ...EMPTY_STABILITY },
+      Parameter: { ...EMPTY_STABILITY },
     };
 
     for (const r of nodeResult.records) {
@@ -139,6 +161,9 @@ export async function getStatistics(
       referencesCapability: 0,
       requires: 0,
       alternative: 0,
+      isSensitive: 0,
+      consistsOf: 0,
+      deprecatedSince: 0,
     };
     for (const r of relResult.records) {
       const relType = r.get("relType") as string;
@@ -159,6 +184,16 @@ export async function getStatistics(
           version: ir.get("version") as string,
           description: ir.get("description") as string,
         };
+        const groupId = ir.get("groupId");
+        if (groupId != null) identity.groupId = groupId as string;
+        const artifactId = ir.get("artifactId");
+        if (artifactId != null) identity.artifactId = artifactId as string;
+        const url = ir.get("url");
+        if (url != null) identity.url = url as string;
+        const scmUrl = ir.get("scmUrl");
+        if (scmUrl != null) identity.scmUrl = scmUrl as string;
+        const licenses = ir.get("licenses");
+        if (licenses != null) identity.licenses = licenses as string;
       }
     }
 
@@ -174,6 +209,7 @@ export async function getStatistics(
         resources: stabilityMap.Resource,
         attributes: stabilityMap.Attribute,
         operations: stabilityMap.Operation,
+        parameters: stabilityMap.Parameter,
       },
       relationships,
     };

@@ -97,3 +97,88 @@ WHERE a.required = true
 RETURN a.name AS name, a.type AS type, a.description AS description, a.`default-value` AS defaultValue
 ORDER BY a.name
 ```
+
+## Sensitivity queries
+
+Find all security-sensitive attributes:
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)-[:IS_SENSITIVE]->(c:Constraint)
+RETURN r.address AS resource, a.name AS attribute, a.type AS type,
+       c.name AS constraint, c.type AS constraintType
+ORDER BY r.address, a.name
+```
+
+Find sensitive attributes matching a keyword (e.g., passwords):
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)-[:IS_SENSITIVE]->(c:Constraint)
+WHERE a.name =~ '(?i).*password.*'
+RETURN r.address AS resource, a.name AS attribute, c.name AS constraint
+ORDER BY r.address
+```
+
+## Restart-required queries
+
+Find all attributes that require a JVM restart:
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE a.`restart-required` = 'jvm'
+RETURN r.address AS resource, a.name AS attribute, a.type AS type
+ORDER BY r.address, a.name
+```
+
+Find restart-required attributes in a specific subsystem:
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE a.`restart-required` IS NOT NULL
+  AND r.address =~ '(?i).*undertow.*'
+RETURN r.address AS resource, a.name AS attribute,
+       a.`restart-required` AS restartLevel
+ORDER BY a.`restart-required`, r.address
+```
+
+## Allowed values queries
+
+Find attributes with enumerated allowed values:
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE a.allowed IS NOT NULL
+RETURN r.address AS resource, a.name AS attribute, a.allowed AS allowedValues
+ORDER BY r.address, a.name
+LIMIT 25
+```
+
+Find attributes or parameters with numeric range constraints:
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE a.min IS NOT NULL OR a.max IS NOT NULL
+RETURN r.address AS resource, a.name AS attribute,
+       a.min AS min, a.max AS max, a.unit AS unit
+ORDER BY r.address, a.name
+```
+
+## Attribute group queries
+
+List all attribute groups and their member attributes for a resource:
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE r.address = '/subsystem=undertow/server=*/http-listener=*'
+  AND a.`attribute-group` IS NOT NULL
+RETURN a.`attribute-group` AS groupName, collect(a.name) AS attributes
+ORDER BY groupName
+```
+
+Find all resources that use a specific attribute group name:
+
+```cypher
+MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
+WHERE a.`attribute-group` =~ '(?i).*connection.*'
+RETURN DISTINCT r.address AS resource, a.`attribute-group` AS groupName
+ORDER BY r.address
+```

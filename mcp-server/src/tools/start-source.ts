@@ -1,3 +1,6 @@
+// Starts a model graph container via `mgt start`, establishes a Neo4j connection,
+// and tracks it for graceful shutdown. Rolls back on connection failure.
+
 import { mgtStart, mgtStop } from "../mgt.js";
 import { refreshConnection } from "../neo4j.js";
 import { trackStarted } from "../session.js";

@@ -1,8 +1,15 @@
+// Searches attributes across all resources with optional deprecated-only
+// and stability level filters.
+
 import neo4j from "neo4j-driver";
 import { getSession } from "../neo4j.js";
-import { escapeRegex, toNumber, validateQueryLength } from "../utils.js";
+import { escapeRegex, pickDefined, toNumber, validateQueryLength } from "../utils.js";
+
+// --- Constants ---
 
 const DEFAULT_LIMIT = 25;
+
+// --- Types ---
 
 interface AttributeResult {
   resource: string;
@@ -78,19 +85,16 @@ export async function searchAttributes(
 }
 
 function mapRecord(r: { get(key: string): unknown }): AttributeResult {
-  const attr: AttributeResult = {
+  return {
     resource: r.get("resource") as string,
     name: r.get("name") as string,
     type: r.get("type") as string,
     description: r.get("description") as string,
-  };
-  const at = r.get("accessType");
-  if (at != null) attr.accessType = at as string;
-  const req = r.get("required");
-  if (req != null) attr.required = req as boolean;
-  const ds = r.get("deprecatedSince");
-  if (ds != null) attr.deprecatedSince = ds as string;
-  const dr = r.get("deprecationReason");
-  if (dr != null) attr.deprecationReason = dr as string;
-  return attr;
+    ...pickDefined({
+      accessType: r.get("accessType"),
+      required: r.get("required"),
+      deprecatedSince: r.get("deprecatedSince"),
+      deprecationReason: r.get("deprecationReason"),
+    }),
+  } as AttributeResult;
 }

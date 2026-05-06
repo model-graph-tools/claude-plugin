@@ -1,3 +1,6 @@
+// MCP server entry point. Registers all tools and starts the stdio transport.
+// Tool handlers delegate to per-tool modules in ./tools/.
+
 import { createRequire } from "node:module";
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
@@ -20,6 +23,10 @@ import { compareVersions } from "./tools/compare-versions.js";
 import { getStatistics } from "./tools/get-statistics.js";
 import { getResourceTree } from "./tools/get-resource-tree.js";
 import { findRelationships } from "./tools/find-relationships.js";
+import { findSensitiveAttributes } from "./tools/find-sensitive-attributes.js";
+import { getAllowedValues } from "./tools/get-allowed-values.js";
+import { findRestartRequired } from "./tools/find-restart-required.js";
+import { findAttributeGroups } from "./tools/find-attribute-groups.js";
 import { runCypher } from "./tools/run-cypher.js";
 
 const require = createRequire(import.meta.url);
@@ -30,11 +37,21 @@ const server = new McpServer({
   version,
 });
 
-function textResult(data: unknown) {
-  return {
-    content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
-  };
-}
+// --- Shared schemas ---
+
+const identifierParam = z
+  .string()
+  .describe('WildFly version or feature pack, e.g. "39"');
+
+const stabilityEnum = z
+  .enum(["experimental", "preview", "community", "default"])
+  .describe('Stability level: "experimental", "preview", "community", or "default"');
+
+const elementTypeEnum = z
+  .enum(["resource", "attribute", "operation", "parameter"])
+  .describe('Filter by type: "resource", "attribute", "operation", or "parameter"');
+
+// --- Tool handler wrapper ---
 
 function errorResult(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
@@ -44,18 +61,29 @@ function errorResult(error: unknown) {
   };
 }
 
+function handleTool<T>(fn: (params: T) => Promise<unknown>) {
+  return async (params: T) => {
+    try {
+      const result = await fn(params);
+      const text =
+        typeof result === "string"
+          ? result
+          : JSON.stringify(result, null, 2);
+      return { content: [{ type: "text" as const, text }] };
+    } catch (e) {
+      return errorResult(e);
+    }
+  };
+}
+
 // --- Lifecycle tools ---
 
 server.registerTool("list_sources", {
   description:
     "Lists all known WildFly versions and feature packs with their availability (running/stopped/not_found).",
-}, async () => {
-  try {
-    return textResult(await listSources());
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async () => {
+  return listSources();
+}));
 
 server.registerTool("start_source", {
   description:
@@ -65,14 +93,10 @@ server.registerTool("start_source", {
       .string()
       .describe('WildFly version or feature pack, e.g. "39", "26.1", "ai:0.9.1"'),
   }),
-}, async ({ identifier }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await startSource(resolved));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ identifier }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return startSource(resolved);
+}));
 
 server.registerTool("stop_source", {
   description: "Stops the model graph for a WildFly version or feature pack.",
@@ -81,14 +105,10 @@ server.registerTool("stop_source", {
       .string()
       .describe('WildFly version or feature pack, e.g. "39", "ai:0.9.1"'),
   }),
-}, async ({ identifier }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await stopSource(resolved));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ identifier }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return stopSource(resolved);
+}));
 
 // --- Query tools ---
 
@@ -97,35 +117,27 @@ server.registerTool("search_resources", {
     "Searches for management model resources by name, address, or description.",
   inputSchema: z.object({
     query: z.string().describe("Search term matched against resource name, address, and description"),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, async ({ query, identifier, limit }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await searchResources(resolved, query, limit));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ query, identifier, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return searchResources(resolved, query, limit);
+}));
 
 server.registerTool("browse_resource", {
   description:
-    "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata, operation stability, and parameter relationships (requires/alternatives). For complex attributes (LIST/OBJECT), shows sub-attribute composition via CONSISTS_OF.",
+    "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata (allowed values, units, restart requirements, attribute groups), operation stability and characteristics (read-only, runtime-only, global), parameter relationships (requires/alternatives), and sub-attribute composition via CONSISTS_OF for complex attributes (LIST/OBJECT).",
   inputSchema: z.object({
     address: z
       .string()
       .describe('Resource address, e.g. "/subsystem=datasources"'),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
   }),
-}, async ({ address, identifier }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await browseResource(resolved, address));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ address, identifier }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return browseResource(resolved, address);
+}));
 
 server.registerTool("describe_resource", {
   description:
@@ -134,36 +146,39 @@ server.registerTool("describe_resource", {
     address: z
       .string()
       .describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
   }),
-}, async ({ address, identifier }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    const markdown = await describeResource(resolved, address);
-    return { content: [{ type: "text" as const, text: markdown }] };
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ address, identifier }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return describeResource(resolved, address);
+}));
 
 server.registerTool("search_operations", {
   description:
-    "Searches operations across all resources by name or description. Returns stability level and deprecation info.",
+    "Searches operations across all resources by name or description. Can filter by resource address, read-only vs. mutating, and runtime-only. Returns stability level, deprecation info, and operation characteristics.",
   inputSchema: z.object({
     query: z
       .string()
       .describe("Search term matched against operation name and description"),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
+    resource_filter: z
+      .string()
+      .optional()
+      .describe("Filter to operations in resources matching this address substring"),
+    read_only: z
+      .boolean()
+      .optional()
+      .describe("If true, only return read-only operations; if false, only mutating operations"),
+    runtime_only: z
+      .boolean()
+      .optional()
+      .describe("If true, only return runtime-only operations"),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, async ({ query, identifier, limit }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await searchOperations(resolved, query, limit));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ query, identifier, resource_filter, read_only, runtime_only, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return searchOperations(resolved, query, resource_filter, read_only, runtime_only, limit);
+}));
 
 server.registerTool("search_attributes", {
   description:
@@ -172,109 +187,72 @@ server.registerTool("search_attributes", {
     query: z
       .string()
       .describe("Search term matched against attribute name and description"),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
     deprecated: z
       .boolean()
       .optional()
       .describe("If true, only return deprecated attributes"),
-    stability: z
-      .string()
-      .optional()
-      .describe('Filter by stability level: "experimental", "preview", "community", or "default"'),
+    stability: stabilityEnum.optional(),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, async ({ query, identifier, deprecated, stability, limit }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(
-      await searchAttributes(resolved, query, deprecated, stability, limit)
-    );
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ query, identifier, deprecated, stability, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return searchAttributes(resolved, query, deprecated, stability, limit);
+}));
 
 server.registerTool("find_capabilities", {
   description:
     "Searches for capabilities by name and shows which resources declare or reference them (via attributes and parameters).",
   inputSchema: z.object({
     query: z.string().describe("Search term matched against capability name"),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
   }),
-}, async ({ query, identifier }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await findCapabilities(resolved, query));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ query, identifier }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return findCapabilities(resolved, query);
+}));
 
 server.registerTool("find_deprecated", {
   description:
     "Finds all deprecated elements (resources, attributes, operations, and parameters), optionally filtered by version or type.",
   inputSchema: z.object({
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
     since_version: z
       .string()
       .optional()
       .describe('Only show items deprecated since this management model version, e.g. "25.0.0". Note: this is the management model version, not the WildFly server version.'),
-    element_type: z
-      .string()
-      .optional()
-      .describe('Filter by type: "resource", "attribute", "operation", or "parameter"'),
+    element_type: elementTypeEnum.optional(),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
-}, async ({ identifier, since_version, element_type, limit }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(
-      await findDeprecated(resolved, since_version, element_type, limit)
-    );
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ identifier, since_version, element_type, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return findDeprecated(resolved, since_version, element_type, limit);
+}));
 
 server.registerTool("find_by_stability", {
   description:
     "Finds all elements (resources, attributes, operations, and parameters) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
   inputSchema: z.object({
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
-    stability: z
-      .string()
-      .describe('Stability level: "experimental", "preview", "community", or "default"'),
-    element_type: z
-      .string()
-      .optional()
-      .describe('Filter by type: "resource", "attribute", "operation", or "parameter"'),
+    identifier: identifierParam,
+    stability: stabilityEnum,
+    element_type: elementTypeEnum.optional(),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
-}, async ({ identifier, stability, element_type, limit }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(
-      await findByStability(resolved, stability, element_type, limit)
-    );
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ identifier, stability, element_type, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return findByStability(resolved, stability, element_type, limit);
+}));
 
 server.registerTool("get_statistics", {
   description:
     "Overview of the management model: identity metadata (name, version, type), node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
   inputSchema: z.object({
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
   }),
-}, async ({ identifier }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await getStatistics(resolved));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ identifier }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return getStatistics(resolved);
+}));
 
 server.registerTool("compare_versions", {
   description:
@@ -283,14 +261,10 @@ server.registerTool("compare_versions", {
     identifier1: z.string().describe('Older WildFly version or feature pack, e.g. "38"'),
     identifier2: z.string().describe('Newer WildFly version or feature pack, e.g. "39"'),
   }),
-}, async ({ identifier1, identifier2 }) => {
-  try {
-    const [resolved1, resolved2] = await resolveIdentifiers(identifier1, identifier2);
-    return textResult(await compareVersions(resolved1, resolved2));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ identifier1, identifier2 }) => {
+  const [resolved1, resolved2] = await resolveIdentifiers(identifier1, identifier2);
+  return compareVersions(resolved1, resolved2);
+}));
 
 server.registerTool("get_resource_tree", {
   description:
@@ -299,20 +273,16 @@ server.registerTool("get_resource_tree", {
     address: z
       .string()
       .describe('Root address, e.g. "/subsystem=datasources". Use "/" for the full tree'),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
     depth: z
       .number()
       .optional()
       .describe("Max depth to traverse (default: unlimited)"),
   }),
-}, async ({ address, identifier, depth }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await getResourceTree(resolved, address, depth));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ address, identifier, depth }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return getResourceTree(resolved, address, depth);
+}));
 
 server.registerTool("find_relationships", {
   description:
@@ -321,36 +291,98 @@ server.registerTool("find_relationships", {
     address: z
       .string()
       .describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
     scope: z
       .enum(["attributes", "parameters", "all"])
       .optional()
       .describe('Which relationships to return: "attributes", "parameters", or "all" (default: "all")'),
   }),
-}, async ({ address, identifier, scope }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await findRelationships(resolved, address, scope));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ address, identifier, scope }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return findRelationships(resolved, address, scope);
+}));
+
+server.registerTool("find_sensitive_attributes", {
+  description:
+    "Find security-sensitive attributes marked with IS_SENSITIVE constraints. Returns attributes with their constraint type and resource. Use to audit passwords, keys, and other secrets in the management model.",
+  inputSchema: z.object({
+    identifier: identifierParam,
+    query: z
+      .string()
+      .optional()
+      .describe("Optional filter by attribute name or resource address"),
+    limit: z.number().optional().describe("Max results (default 50)"),
+  }),
+}, handleTool(async ({ identifier, query, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return findSensitiveAttributes(resolved, query, limit);
+}));
+
+server.registerTool("get_allowed_values", {
+  description:
+    "Get allowed option values, numeric ranges, and string length constraints for attributes and parameters. Answers 'what values can I set for X?' questions.",
+  inputSchema: z.object({
+    query: z
+      .string()
+      .describe("Search term matched against attribute or parameter name and description"),
+    identifier: identifierParam,
+    limit: z.number().optional().describe("Max results (default 25)"),
+  }),
+}, handleTool(async ({ query, identifier, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return getAllowedValues(resolved, query, limit);
+}));
+
+server.registerTool("find_restart_required", {
+  description:
+    'Find attributes that require a server restart after modification. Filter by restart level (no-services, all-services, jvm) and/or resource address. Answers "what changes need a server restart?" questions.',
+  inputSchema: z.object({
+    identifier: identifierParam,
+    restart_type: z
+      .enum(["no-services", "all-services", "jvm"])
+      .optional()
+      .describe('Filter by restart level: "no-services", "all-services", or "jvm"'),
+    resource_filter: z
+      .string()
+      .optional()
+      .describe("Filter results to a resource address substring"),
+    limit: z.number().optional().describe("Max results (default 50)"),
+  }),
+}, handleTool(async ({ identifier, restart_type, resource_filter, limit }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return findRestartRequired(resolved, restart_type, resource_filter, limit);
+}));
+
+server.registerTool("find_attribute_groups", {
+  description:
+    "Discover attribute groups — logical groupings of related attributes within resources. Filter by resource address or group name.",
+  inputSchema: z.object({
+    identifier: identifierParam,
+    resource: z
+      .string()
+      .optional()
+      .describe("Specific resource address to query"),
+    group_name: z
+      .string()
+      .optional()
+      .describe("Filter by group name substring"),
+  }),
+}, handleTool(async ({ identifier, resource, group_name }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return findAttributeGroups(resolved, resource, group_name);
+}));
 
 server.registerTool("run_cypher", {
   description:
     "Escape hatch for advanced users: runs an arbitrary read-only Cypher query against the management model. Results capped at 100 rows with a 10s timeout.",
   inputSchema: z.object({
     query: z.string().describe("Cypher query to execute"),
-    identifier: z.string().describe('WildFly version or feature pack, e.g. "39"'),
+    identifier: identifierParam,
   }),
-}, async ({ query, identifier }) => {
-  try {
-    const resolved = await resolveIdentifier(identifier);
-    return textResult(await runCypher(resolved, query));
-  } catch (e) {
-    return errorResult(e);
-  }
-});
+}, handleTool(async ({ query, identifier }) => {
+  const resolved = await resolveIdentifier(identifier);
+  return runCypher(resolved, query);
+}));
 
 // --- Server startup ---
 

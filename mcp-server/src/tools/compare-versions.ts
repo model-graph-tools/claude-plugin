@@ -1,5 +1,11 @@
+// Diffs two model graphs for added/removed resources, newly deprecated elements,
+// and attribute/operation/parameter changes within resources that exist in both.
+// Automatically starts containers for both identifiers if not already running.
+
 import { getSession, hasConnection } from "../neo4j.js";
 import { startSource } from "./start-source.js";
+
+// --- Types ---
 
 interface ChangedParameters {
   resource: string;
@@ -32,6 +38,8 @@ interface ChangedElements {
   added: string[];
   removed: string[];
 }
+
+// --- Main ---
 
 export async function compareVersions(
   identifier1: string,
@@ -91,6 +99,8 @@ export async function compareVersions(
   };
 }
 
+// --- Set-difference helpers ---
+
 function computeChanges(
   commonAddresses: string[],
   map1: Map<string, Set<string>>,
@@ -108,6 +118,8 @@ function computeChanges(
   }
   return results.sort((a, b) => a.resource.localeCompare(b.resource));
 }
+
+// --- Data fetchers ---
 
 async function getResourceAddresses(identifier: string): Promise<string[]> {
   const session = await getSession(identifier);

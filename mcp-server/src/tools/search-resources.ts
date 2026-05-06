@@ -1,3 +1,5 @@
+// Fuzzy-searches resources by name, address, or description using regex matching.
+
 import neo4j from "neo4j-driver";
 import { getSession } from "../neo4j.js";
 import { escapeRegex, toNumber, validateQueryLength } from "../utils.js";

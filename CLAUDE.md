@@ -63,7 +63,7 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 
 ## MCP Tools
 
-16 tools registered in `src/index.ts`:
+20 tools registered in `src/index.ts`:
 
 | Tool | Purpose |
 |------|---------|
@@ -71,17 +71,21 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 | `start_source` | Starts a Neo4j container for a model graph (auto-pulls image) |
 | `stop_source` | Stops a running Neo4j container |
 | `search_resources` | Searches resources by name, address, or description |
-| `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage, sub-attribute composition for complex types), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
-| `describe_resource` | Returns a concise, human-readable markdown description of a resource — purpose, required add-operation parameters, required and optional attributes, and a CLI example. Use for "how do I add/configure X?" questions |
-| `search_operations` | Searches operations across all resources, includes stability and deprecation info |
+| `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage, allowed values, units, restart requirements, attribute groups, sub-attribute composition for complex types), operations (with stability, read-only, runtime-only, global characteristics), parameter relationships (requires/alternatives), and capabilities |
+| `describe_resource` | Returns a concise, human-readable markdown description of a resource — purpose, required add-operation parameters, required and optional attributes with constraints, and a CLI example. Use for "how do I add/configure X?" questions |
+| `search_operations` | Searches operations across all resources. Can filter by resource address, read-only vs. mutating, and runtime-only. Returns stability, deprecation info, and operation characteristics |
 | `search_attributes` | Searches attributes with optional deprecated-only and stability level filters, includes access type and required flag |
 | `find_capabilities` | Searches capabilities and their declaring/referencing resources (via attributes and parameters) |
 | `find_deprecated` | Finds deprecated elements (resources, attributes, operations, parameters), filterable by version and type |
 | `find_by_stability` | Finds elements (resources, attributes, operations, parameters) by stability level (experimental, preview, community, default) |
-| `get_statistics` | Overview of a model graph: identity metadata, counts, stability breakdown, relationships |
+| `get_statistics` | Overview of a model graph: identity metadata, counts, stability breakdown (including parameters), IS_SENSITIVE/CONSISTS_OF/DEPRECATED_SINCE relationship counts |
 | `compare_versions` | Diffs two model graphs for added/removed/deprecated elements, including attribute, operation, and parameter changes within shared resources |
 | `get_resource_tree` | Returns all resources in the subtree under a given address for hierarchy exploration |
 | `find_relationships` | Shows REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships between attributes and operation parameters |
+| `find_sensitive_attributes` | Finds security-sensitive attributes via IS_SENSITIVE constraints. Use to audit passwords, keys, and secrets in the management model |
+| `get_allowed_values` | Gets allowed option values, numeric ranges, and string length constraints for attributes and parameters |
+| `find_restart_required` | Finds attributes that require a server restart after modification. Filterable by restart level (no-services, all-services, jvm) and resource address |
+| `find_attribute_groups` | Discovers attribute groups — logical groupings of related attributes within resources |
 | `run_cypher` | Escape hatch: runs arbitrary read-only Cypher (100 row limit, 10s timeout) |
 
 ## Key Architecture

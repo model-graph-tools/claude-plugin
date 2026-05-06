@@ -1,8 +1,15 @@
+// Finds deprecated elements across the model graph, optionally filtered by
+// management model version and element type. Builds a UNION ALL query per type.
+
 import neo4j from "neo4j-driver";
 import { getSession } from "../neo4j.js";
 import { toNumber } from "../utils.js";
 
+// --- Constants ---
+
 const DEFAULT_LIMIT = 50;
+
+// --- Types ---
 
 interface DeprecatedElement {
   elementType: string;
@@ -30,15 +37,17 @@ export async function findDeprecated(
       ? [elementType]
       : ["resource", "attribute", "operation", "parameter"];
 
+    const versionFilter = sinceVersion ? buildVersionFilter() : "";
+
     if (types.includes("attribute")) {
       queries.push(
         `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)-[d:DEPRECATED_SINCE]->(v:Version)
-         ${sinceVersion ? "WHERE v.ordinal >= $sinceOrdinal" : ""}
+         ${versionFilter}
          RETURN 'attribute' AS elementType,
                 a.name AS name,
                 r.address AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
-                v.ordinal AS _ordinal,
+                v.major AS _major, v.minor AS _minor, v.patch AS _patch,
                 d.reason AS reason`
       );
     }
@@ -46,12 +55,12 @@ export async function findDeprecated(
     if (types.includes("operation")) {
       queries.push(
         `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)-[d:DEPRECATED_SINCE]->(v:Version)
-         ${sinceVersion ? "WHERE v.ordinal >= $sinceOrdinal" : ""}
+         ${versionFilter}
          RETURN 'operation' AS elementType,
                 o.name AS name,
                 r.address AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
-                v.ordinal AS _ordinal,
+                v.major AS _major, v.minor AS _minor, v.patch AS _patch,
                 d.reason AS reason`
       );
     }
@@ -59,12 +68,12 @@ export async function findDeprecated(
     if (types.includes("parameter")) {
       queries.push(
         `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)-[:ACCEPTS]->(p:Parameter)-[d:DEPRECATED_SINCE]->(v:Version)
-         ${sinceVersion ? "WHERE v.ordinal >= $sinceOrdinal" : ""}
+         ${versionFilter}
          RETURN 'parameter' AS elementType,
                 p.name AS name,
                 r.address AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
-                v.ordinal AS _ordinal,
+                v.major AS _major, v.minor AS _minor, v.patch AS _patch,
                 d.reason AS reason`
       );
     }
@@ -72,37 +81,36 @@ export async function findDeprecated(
     if (types.includes("resource")) {
       queries.push(
         `MATCH (r:Resource)-[d:DEPRECATED_SINCE]->(v:Version)
-         ${sinceVersion ? "WHERE v.ordinal >= $sinceOrdinal" : ""}
+         ${versionFilter}
          RETURN 'resource' AS elementType,
                 r.address AS name,
                 null AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
-                v.ordinal AS _ordinal,
+                v.major AS _major, v.minor AS _minor, v.patch AS _patch,
                 d.reason AS reason`
       );
     }
 
     const unionQuery = queries.join("\nUNION ALL\n");
-    const fullQuery = `${unionQuery}\nORDER BY _ordinal DESC, name\nLIMIT $limit`;
-
-    const sinceOrdinal = sinceVersion ? versionToOrdinal(sinceVersion) : 0;
+    const fullQuery = `${unionQuery}\nORDER BY _major DESC, _minor DESC, _patch DESC, name\nLIMIT $limit`;
 
     const params: Record<string, unknown> = { limit: neo4j.int(limit) };
     if (sinceVersion) {
-      params.sinceOrdinal = neo4j.int(sinceOrdinal);
+      const parsed = parseVersion(sinceVersion);
+      params.sinceMajor = neo4j.int(parsed.major);
+      params.sinceMinor = neo4j.int(parsed.minor);
+      params.sincePatch = neo4j.int(parsed.patch);
     }
 
     const result = await session.run(fullQuery, params);
 
-    const countQuery = `${queries.join("\nUNION ALL\n")}`;
-    const countWrapper = `CALL { ${countQuery} } RETURN count(*) AS total`;
-
     let totalCount = result.records.length;
     try {
+      const countWrapper = `CALL { ${unionQuery} } RETURN count(*) AS total`;
       const countResult = await session.run(countWrapper, params);
       totalCount = toNumber(countResult.records[0]?.get("total"));
-    } catch (countError) {
-      console.error("Count subquery failed, using result length:", countError);
+    } catch {
+      // Fallback: use result length if CALL subquery is not supported
     }
 
     return {
@@ -125,9 +133,17 @@ export async function findDeprecated(
   }
 }
 
-function versionToOrdinal(version: string): number {
+function buildVersionFilter(): string {
+  return `WHERE (v.major > $sinceMajor
+         OR (v.major = $sinceMajor AND v.minor > $sinceMinor)
+         OR (v.major = $sinceMajor AND v.minor = $sinceMinor AND v.patch >= $sincePatch))`;
+}
+
+function parseVersion(version: string): { major: number; minor: number; patch: number } {
   const parts = version.replace(/\.Final.*$/, "").split(".");
-  const major = parseInt(parts[0] ?? "0", 10);
-  const minor = parseInt(parts[1] ?? "0", 10);
-  return major * 10 + minor;
+  return {
+    major: parseInt(parts[0] ?? "0", 10),
+    minor: parseInt(parts[1] ?? "0", 10),
+    patch: parseInt(parts[2] ?? "0", 10),
+  };
 }

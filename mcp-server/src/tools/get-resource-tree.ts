@@ -1,3 +1,6 @@
+// Returns the subtree of resources under a given address using variable-length
+// CHILD_OF traversal, with optional depth limit.
+
 import { getSession } from "../neo4j.js";
 
 interface ResourceTreeEntry {

@@ -1,3 +1,6 @@
+// Searches capabilities by name and maps them to declaring resources
+// and referencing attributes/parameters.
+
 import { getSession } from "../neo4j.js";
 import { escapeRegex, validateQueryLength } from "../utils.js";
 
