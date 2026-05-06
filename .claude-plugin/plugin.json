@@ -2,6 +2,10 @@
   "name": "mgt",
   "version": "0.8.2",
   "description": "Search and browse the WildFly management model across versions and feature packs",
+  "author": {
+    "name": "Harald Pehl",
+    "email": "harald.pehl@gmail.com"
+  },
   "mcpServers": {
     "wildfly-model-graph": {
       "command": "npx",

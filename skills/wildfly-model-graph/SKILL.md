@@ -2,24 +2,26 @@
 name: wildfly-model-graph
 description: >
   This skill should be used when the user asks about the WildFly, JBoss, or
-  JBoss EAP management model, management API, configuration schema, or model
-  graph, including resources, attributes, operations, capabilities, stability
-  levels, or deprecations. Covers queries like "what versions of WildFly are
-  available", "show me the datasources subsystem", "what changed between
-  WildFly 38 and 39", "find deprecated attributes", "what capabilities does
-  elytron provide", "start the model graph for WildFly 39", "how do I add a
-  datasource", "what attributes depend on each other", "what experimental
+  JBoss EAP management model, management API, or model graph, including
+  resources, attributes, operations, capabilities, stability levels, or
+  deprecations. Covers queries like "what versions of WildFly are available",
+  "what feature packs are there", "show me the datasources subsystem",
+  "what changed between WildFly 38 and 39", "what's new in WildFly 39",
+  "find deprecated attributes", "what capabilities does elytron provide",
+  "start the model graph for WildFly 39", "how do I add a datasource",
+  "what sub-attributes does connection-url have", "show the resource tree
+  for undertow", "what attributes depend on each other", "what experimental
   features exist", and "compare WildFly versions". Also applies when the user
   mentions WildFly subsystems such as undertow, elytron, datasources,
   messaging, infinispan, or logging.
-license: Apache-2.0
-compatibility: >
-  Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
-  for running Neo4j model graph containers, and network access to pull container
-  images from quay.io on first use.
 metadata:
   version: "0.8.2"
   author: model-graph-tools
+  license: Apache-2.0
+  compatibility: >
+    Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
+    for running Neo4j model graph containers, and network access to pull container
+    images from quay.io on first use.
 ---
 
 ## Domain Knowledge
@@ -110,13 +112,6 @@ Users often ask about these areas:
 
 ## How to use the tools
 
-**CRITICAL RULE (for agents with shell access):** Never read cached tool-result JSON files from
-disk (`cat ...tool-results/*.json`), and never pipe MCP tool output through `python3`, `jq`, or
-any Bash post-processing. Tool responses are already structured and parsed by the agent —
-post-processing adds latency and error risk. Summarize directly from the tool response. If the
-response is too large, use `run_cypher` with a targeted query instead of trying to parse a large
-`browse_resource` result.
-
 ### Translating user intent
 
 | User says...                                        | Tool to use            | Key parameters                              |
@@ -147,12 +142,20 @@ response is too large, use `run_cypher` with a targeted query instead of trying 
 | "what attributes depend on each other?" / "are mutually exclusive?" / "what parameters are required together?" | `find_relationships` | address=..., optional scope="attributes" or "parameters" |
 | "find deprecated parameters"                        | `find_deprecated`      | element_type="parameter"                     |
 | "what parameters have preview stability?"           | `find_by_stability`    | stability="preview", element_type="parameter"|
+| "what sub-attributes does X have?" / "show full attribute details" | `browse_resource` | address=... — the response includes sub-attribute composition (CONSISTS_OF) for complex LIST/OBJECT attributes |
 | "run a custom query against the model"              | `run_cypher`           | query="MATCH ...", identifier="39" — before writing a query, read `references/graph-schema.md` for available node labels, properties, and relationships, and consult `references/cypher-queries.md` for reusable patterns |
 
 When the user asks "what's new in WildFly X" or "what changed in WildFly X" without
 specifying a base version, infer the previous version: call `list_sources` to get
 available versions, then pick the highest version below X. For example, if X is 39
 and available versions include 34, 36, 38, 39, use 38 as identifier1.
+
+**Important (for agents with shell access):** Never read cached tool-result JSON files from
+disk (`cat ...tool-results/*.json`), and never pipe MCP tool output through `python3`, `jq`, or
+any Bash post-processing. Tool responses are already structured and parsed by the agent —
+post-processing adds latency and error risk. Summarize directly from the tool response. If the
+response is too large, use `run_cypher` with a targeted query instead of trying to parse a large
+`browse_resource` result.
 
 ### Starting and stopping model graphs
 

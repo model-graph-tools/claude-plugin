@@ -77,6 +77,18 @@ RETURN p.name AS name, p.type AS type, p.required AS required, p.description AS 
 ORDER BY p.required DESC, p.name
 ```
 
+## Deprecation queries
+
+Find all elements deprecated since a specific management model version with reasons:
+
+```cypher
+MATCH (n)-[:DEPRECATED_SINCE]->(v:Version)
+WHERE v.ordinal >= 300
+RETURN labels(n)[0] AS type, n.name AS name, v.ordinal AS since, n.`deprecated-reason` AS reason
+ORDER BY v.ordinal DESC, type, name
+LIMIT 50
+```
+
 Get required attributes for a specific resource:
 
 ```cypher

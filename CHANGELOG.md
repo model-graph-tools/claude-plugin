@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Keep `parseMgtError()` as deprecated fallback for older `mgt` versions without structured error codes
+- Add `author` field to plugin.json
+- Improve skill trigger phrases: add "what feature packs are there", "what's new in WildFly 39", "what sub-attributes does X have", "show the resource tree for undertow"; replace vague "configuration schema" trigger
+- Add translation table entry for complex attribute inspection (sub-attributes → `browse_resource`)
+- Relocate shell access rule from top of tool usage section to after the translation table for better content flow
+- Move `license` and `compatibility` from top-level skill frontmatter into `metadata` block
+- Add deprecation Cypher query example to `references/cypher-queries.md`
 
 ## [0.8.2] - 2026-05-05
 
