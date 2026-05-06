@@ -18,7 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve skill trigger phrases: add "what feature packs are there", "what's new in WildFly 39", "what sub-attributes does X have", "show the resource tree for undertow"; replace vague "configuration schema" trigger
 - Add translation table entry for complex attribute inspection (sub-attributes → `browse_resource`)
 - Relocate shell access rule from top of tool usage section to after the translation table for better content flow
-- Move `license` and `compatibility` from top-level skill frontmatter into `metadata` block
+- Promote `license` and `compatibility` from `metadata` to top-level skill frontmatter per Agent Skills spec; keep `version` and `author` under `metadata`
+- Move "Handling empty results" section from "Limitations" to "How to use the tools" for better content organization
+- Add "run a Cypher query against the model" and "mgt CLI" to skill trigger phrases
 - Add deprecation Cypher query example to `references/cypher-queries.md`
 - Add `engines` (node >=18), `bugs` (GitHub issues URL), and `model-context-protocol` keyword to `mcp-server/package.json`; replace agent-specific `claude-code` keyword; reorder fields to follow `sort-package-json` convention
 - Add `keywords`, `homepage`, `license`, and `repository` to `plugin.json`

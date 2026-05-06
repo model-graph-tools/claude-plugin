@@ -11,17 +11,18 @@ description: >
   "start the model graph for WildFly 39", "how do I add a datasource",
   "what sub-attributes does connection-url have", "show the resource tree
   for undertow", "what attributes depend on each other", "what experimental
-  features exist", and "compare WildFly versions". Also applies when the user
-  mentions WildFly subsystems such as undertow, elytron, datasources,
-  messaging, infinispan, or logging.
+  features exist", "compare WildFly versions", and "run a Cypher query against
+  the model". Also applies when the user mentions WildFly subsystems such as
+  undertow, elytron, datasources, messaging, infinispan, or logging, or
+  references the mgt CLI tool.
+license: Apache-2.0
+compatibility: >
+  Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
+  for running Neo4j model graph containers, and network access to pull container
+  images from quay.io on first use.
 metadata:
   version: "0.8.2"
   author: model-graph-tools
-  license: Apache-2.0
-  compatibility: >
-    Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
-    for running Neo4j model graph containers, and network access to pull container
-    images from quay.io on first use.
 ---
 
 ## Domain Knowledge
@@ -292,6 +293,15 @@ When the user asks about attribute dependencies ("what attributes must be set to
 
 Use `scope="attributes"` or `scope="parameters"` to narrow the results, or omit for both.
 
+### Handling empty results
+
+When a tool returns zero results:
+- Suggest broadening the search query or trying synonyms (e.g., "db" → "datasource",
+  "security" → "elytron").
+- Verify the correct model graph is active — the user may be querying the wrong version.
+- If searching by stability or deprecation, mention that the filter may be too restrictive
+  and suggest removing it to see all matches first.
+
 ## Limitations
 
 - The graph database is read-only. You cannot modify the management model.
@@ -305,12 +315,3 @@ Use `scope="attributes"` or `scope="parameters"` to narrow the results, or omit 
   narrow their search.
 - Cross-type comparisons (comparing a WildFly version with a feature pack) are not supported
   by `compare_versions`. Both entries should be of the same type.
-
-### Handling empty results
-
-When a tool returns zero results:
-- Suggest broadening the search query or trying synonyms (e.g., "db" → "datasource",
-  "security" → "elytron").
-- Verify the correct model graph is active — the user may be querying the wrong version.
-- If searching by stability or deprecation, mention that the filter may be too restrictive
-  and suggest removing it to see all matches first.
