@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Bundle the `mgt` binary automatically via platform-specific npm packages — eliminates the need for manual `mgt` installation on supported platforms (linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64)
+
+### Changed
+- Resolve `mgt` binary from the bundled npm platform package first, falling back to PATH for standalone installations
+- Improve "mgt not found" error message with guidance to reinstall the MCP server or install `mgt` manually
+
 ## [0.10.2] - 2026-05-08
 
 ### Added
