@@ -1,6 +1,6 @@
 {
   "name": "mgt",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "description": "Search and browse the WildFly management model across versions and feature packs",
   "keywords": [
     "wildfly",
@@ -20,7 +20,7 @@
   "mcpServers": {
     "wildfly-model-graph": {
       "command": "npx",
-      "args": ["--yes", "@model-graph-tools/mcp-server@0.10.3"]
+      "args": ["--yes", "@model-graph-tools/mcp-server@0.10.4"]
     }
   }
 }
