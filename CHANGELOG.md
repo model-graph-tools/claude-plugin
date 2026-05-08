@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Auto-update WildFly and feature pack metadata at MCP server startup via `mgt update` — ensures "latest" always resolves to the most recent version without manual intervention
+- `mgtUpdate()` function in `mgt.ts` for programmatic metadata updates
+
 ## [0.10.1] - 2026-05-06
 
 ### Added

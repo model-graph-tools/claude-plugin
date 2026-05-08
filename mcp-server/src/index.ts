@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { resolveIdentifier, resolveIdentifiers } from "./identifiers.js";
-import { mgtStop, mgtPs } from "./mgt.js";
+import { mgtUpdate, mgtStop, mgtPs } from "./mgt.js";
 import { closeAll, setContainerLookup } from "./neo4j.js";
 import { getStartedBySession } from "./session.js";
 import { listSources } from "./tools/list-sources.js";
@@ -415,6 +415,12 @@ async function main() {
     await shutdown();
     process.exit(0);
   });
+
+  try {
+    await mgtUpdate();
+  } catch {
+    console.error("mgt update failed — continuing with existing metadata");
+  }
 
   const transport = new StdioServerTransport();
   await server.connect(transport);

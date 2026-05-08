@@ -193,6 +193,10 @@ function parseMgtError(command: string, stderr: string): string | null {
 
 // --- High-level CLI commands ---
 
+export async function mgtUpdate(): Promise<void> {
+  await runMgt(["update"]);
+}
+
 export async function mgtVersions(): Promise<WildFlyVersion[]> {
   const output = await runMgt(["versions"]);
   return JSON.parse(output) as WildFlyVersion[];
