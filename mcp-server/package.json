@@ -41,6 +41,13 @@
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
+  "optionalDependencies": {
+    "@model-graph-tools/mgt-linux-x64": "0.3.3",
+    "@model-graph-tools/mgt-linux-arm64": "0.3.3",
+    "@model-graph-tools/mgt-darwin-x64": "0.3.3",
+    "@model-graph-tools/mgt-darwin-arm64": "0.3.3",
+    "@model-graph-tools/mgt-win32-x64": "0.3.3"
+  },
   "dependencies": {
     "neo4j-driver": "^6.0.1"
   },

@@ -75,7 +75,7 @@ describe("resolveIdentifier", () => {
     const error = Object.assign(new Error("ENOENT"), { code: "ENOENT" });
     mockExecFile.mockImplementation((() => Promise.reject(error)) as never);
 
-    await expect(resolveIdentifier("39")).rejects.toThrow("mgt CLI not found on PATH");
+    await expect(resolveIdentifier("39")).rejects.toThrow("mgt CLI not found");
   });
 });
 

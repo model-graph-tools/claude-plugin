@@ -111,7 +111,7 @@ describe("runMgt error handling", () => {
     mockError({ code: "ENOENT" });
 
     await expect(mgtVersions()).rejects.toThrow(
-      "mgt CLI not found on PATH"
+      "mgt CLI not found"
     );
   });
 

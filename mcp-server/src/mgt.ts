@@ -2,14 +2,45 @@
 // All commands are invoked with `--json` for machine-readable output.
 
 import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { createRequire } from "node:module";
 import { promisify } from "node:util";
 
 // --- Constants ---
 
 const execFileAsync = promisify(execFile);
-const MGT_COMMAND = "mgt";
 const MGT_START_TIMEOUT_MS = 300_000;
 const MGT_DEFAULT_TIMEOUT_MS = 30_000;
+
+const PLATFORM_PACKAGES: Record<string, string> = {
+  "linux-x64": "@model-graph-tools/mgt-linux-x64",
+  "linux-arm64": "@model-graph-tools/mgt-linux-arm64",
+  "darwin-x64": "@model-graph-tools/mgt-darwin-x64",
+  "darwin-arm64": "@model-graph-tools/mgt-darwin-arm64",
+  "win32-x64": "@model-graph-tools/mgt-win32-x64",
+};
+
+function resolveMgtBinary(): string {
+  const key = `${process.platform}-${process.arch}`;
+  const pkg = PLATFORM_PACKAGES[key];
+  if (pkg) {
+    try {
+      const require = createRequire(import.meta.url);
+      const pkgDir = join(require.resolve(`${pkg}/package.json`), "..");
+      const binary = process.platform === "win32" ? "mgt.exe" : "mgt";
+      const binPath = join(pkgDir, "bin", binary);
+      if (existsSync(binPath)) {
+        return binPath;
+      }
+    } catch {
+      // Package not installed — fall through to PATH
+    }
+  }
+  return "mgt";
+}
+
+const MGT_COMMAND = resolveMgtBinary();
 
 // --- Types ---
 
@@ -102,7 +133,9 @@ export async function runMgt(
       };
       if (nodeError.code === "ENOENT") {
         throw new Error(
-          "mgt CLI not found on PATH. Install it from https://github.com/model-graph-tools/tooling"
+          "mgt CLI not found. It should be installed automatically as part of the MCP server package. " +
+            "If it's missing, try reinstalling the MCP server or install mgt manually from " +
+            "https://github.com/model-graph-tools/tooling"
         );
       }
       if (nodeError.killed && nodeError.signal === "SIGTERM") {
