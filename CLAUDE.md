@@ -90,7 +90,7 @@ The MCP server communicates over stdio and is launched automatically by Claude C
 
 ## Key Architecture
 
-- **`mgt` CLI delegation** — Container lifecycle (start/stop/ps/versions/feature-packs) is handled by shelling out to `mgt --json`. The `mgt.ts` module wraps these calls. `mgt` must be installed and on PATH.
+- **`mgt` CLI delegation** — Container lifecycle (start/stop/ps/versions/feature-packs) is handled by shelling out to `mgt --json`. The `mgt.ts` module wraps these calls. The `mgt` binary is bundled via platform-specific npm optional dependencies (`@model-graph-tools/mgt-{platform}`) and resolved automatically at runtime, falling back to `mgt` on PATH.
 - **One Neo4j container per model graph** — Each WildFly version or feature pack runs its own Neo4j instance. Cross-graph queries (like `compare_versions`) connect to two containers simultaneously.
 - **Connection pooling** — `neo4j.ts` manages a `Map<string, Driver>` of Neo4j connections, reusing drivers across tool calls. Tracks the active model graph for session continuity.
 - **Zod schemas** — Tool input validation uses Zod v4.

@@ -25,9 +25,10 @@ WildFly exposes its entire configuration and runtime state through a management 
 
 ### Prerequisites
 
-- [`mgt`](https://github.com/model-graph-tools/tooling) CLI installed and on PATH
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/) for running Neo4j containers
 - [Node.js](https://nodejs.org/) 20+
+
+The [`mgt`](https://github.com/model-graph-tools/tooling) CLI is bundled automatically with the MCP server via platform-specific npm packages — no separate installation needed.
 
 ### Claude Code
 

@@ -7,8 +7,9 @@ This package is part of the [Model Graph Tools](https://github.com/model-graph-t
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 20+
-- [`mgt`](https://github.com/model-graph-tools/tooling) CLI installed and on PATH
 - [Docker](https://www.docker.com/) or [Podman](https://podman.io/) for running Neo4j containers
+
+The [`mgt`](https://github.com/model-graph-tools/tooling) CLI is bundled automatically via platform-specific npm packages (`@model-graph-tools/mgt-{platform}`) — no separate installation needed. If the bundled binary is unavailable, the server falls back to `mgt` on PATH.
 
 ## Usage
 

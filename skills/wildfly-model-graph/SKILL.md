@@ -12,9 +12,10 @@ description: >
   the user mentions WildFly subsystems or the mgt CLI tool.
 license: Apache-2.0
 compatibility: >
-  Requires the mgt CLI (github.com/model-graph-tools/tooling) on PATH, Docker
-  for running Neo4j model graph containers, and network access to pull container
-  images from quay.io on first use.
+  Requires Docker for running Neo4j model graph containers and network access to
+  pull container images from quay.io on first use. The mgt CLI
+  (github.com/model-graph-tools/tooling) is bundled automatically via the MCP
+  server package.
 metadata:
   version: "0.10.3"
   author: model-graph-tools
