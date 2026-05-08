@@ -16,7 +16,7 @@ compatibility: >
   for running Neo4j model graph containers, and network access to pull container
   images from quay.io on first use.
 metadata:
-  version: "0.10.2"
+  version: "0.10.3"
   author: model-graph-tools
 ---
 
