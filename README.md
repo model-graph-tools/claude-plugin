@@ -152,6 +152,31 @@ Install the skill:
 cp -r skills/wildfly-model-graph ~/.agents/skills/
 ```
 
+#### IBM Bob
+
+Add to `.bob/mcp.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "wildfly-model-graph": {
+      "command": "npx",
+      "args": ["--yes", "@model-graph-tools/mcp-server"]
+    }
+  }
+}
+```
+
+Install the skill:
+
+```bash
+# Project-level
+cp -r skills/wildfly-model-graph .agents/skills/
+
+# Or user-level
+cp -r skills/wildfly-model-graph ~/.agents/skills/
+```
+
 #### Other MCP-Compatible Agents
 
 For any agent that supports MCP over stdio, configure it to run:
