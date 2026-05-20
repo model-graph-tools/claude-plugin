@@ -2,6 +2,7 @@ name: Release
 
 permissions:
   contents: write
+  id-token: write
 
 on:
   push:
@@ -13,19 +14,17 @@ jobs:
     if: github.repository_owner == 'model-graph-tools'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
+          node-version: 25
+      - run: npm install -g npm@latest
       - run: npm ci
         working-directory: mcp-server
       - run: npm run build
         working-directory: mcp-server
       - run: npm publish --access public
         working-directory: mcp-server
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: taiki-e/create-gh-release-action@v1
         with:
           title: '$version'

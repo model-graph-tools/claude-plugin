@@ -42,11 +42,11 @@
     "prepublishOnly": "npm run build"
   },
   "optionalDependencies": {
-    "@model-graph-tools/mgt-linux-x64": "0.3.5",
-    "@model-graph-tools/mgt-linux-arm64": "0.3.5",
-    "@model-graph-tools/mgt-darwin-x64": "0.3.5",
-    "@model-graph-tools/mgt-darwin-arm64": "0.3.5",
-    "@model-graph-tools/mgt-win32-x64": "0.3.5"
+    "@model-graph-tools/mgt-linux-x64": "0.3.6",
+    "@model-graph-tools/mgt-linux-arm64": "0.3.6",
+    "@model-graph-tools/mgt-darwin-x64": "0.3.6",
+    "@model-graph-tools/mgt-darwin-arm64": "0.3.6",
+    "@model-graph-tools/mgt-win32-x64": "0.3.6"
   },
   "dependencies": {
     "neo4j-driver": "^6.0.1"
@@ -54,11 +54,11 @@
   "devDependencies": {
     "@cfworker/json-schema": "^4.1.1",
     "@modelcontextprotocol/server": "^2.0.0-alpha.2",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.9.1",
     "esbuild": "^0.28.0",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.3",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5",
+    "vitest": "^4.1.7",
     "zod": "^4.4.3"
   },
   "engines": {
