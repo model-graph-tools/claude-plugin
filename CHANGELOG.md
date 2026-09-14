@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-14
+
 ### Added
 - Add MCP tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`) to all 20 tools for better host integration and safety warnings
 - Add human-readable `title` to all 20 tools for improved display in MCP tool directories and host UIs
@@ -287,7 +289,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.6...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.6...v0.11.0
 [0.10.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.3...v0.10.4
