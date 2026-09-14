@@ -6,6 +6,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { z } from "zod";
 import { resolveIdentifier, resolveIdentifiers } from "./identifiers.js";
+import * as out from "./output-schemas.js";
 import { mgtUpdate, mgtStop, mgtPs } from "./mgt.js";
 import { closeAll, setContainerLookup } from "./neo4j.js";
 import { getStartedBySession } from "./session.js";
@@ -77,6 +78,20 @@ function handleTool<T>(fn: (params: T) => Promise<unknown>) {
   };
 }
 
+function handleStructuredTool<T>(fn: (params: T) => Promise<Record<string, unknown>>) {
+  return async (params: T) => {
+    try {
+      const result = await fn(params);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
+        structuredContent: result,
+      };
+    } catch (e) {
+      return errorResult(e);
+    }
+  };
+}
+
 // --- Lifecycle tools ---
 
 server.registerTool("list_sources", {
@@ -89,7 +104,8 @@ server.registerTool("list_sources", {
     idempotentHint: true,
     openWorldHint: false,
   },
-}, handleTool(async () => {
+  outputSchema: out.listSourcesOutput,
+}, handleStructuredTool(async () => {
   return listSources();
 }));
 
@@ -108,7 +124,8 @@ server.registerTool("start_source", {
       .string()
       .describe('WildFly version or feature pack, e.g. "39", "26.1", "ai:0.9.1"'),
   }),
-}, handleTool(async ({ identifier }) => {
+  outputSchema: out.startSourceOutput,
+}, handleStructuredTool(async ({ identifier }) => {
   const resolved = await resolveIdentifier(identifier);
   return startSource(resolved);
 }));
@@ -127,7 +144,8 @@ server.registerTool("stop_source", {
       .string()
       .describe('WildFly version or feature pack, e.g. "39", "ai:0.9.1"'),
   }),
-}, handleTool(async ({ identifier }) => {
+  outputSchema: out.stopSourceOutput,
+}, handleStructuredTool(async ({ identifier }) => {
   const resolved = await resolveIdentifier(identifier);
   return stopSource(resolved);
 }));
@@ -151,7 +169,8 @@ server.registerTool("search_resources", {
     identifier: identifierParam,
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, handleTool(async ({ query, identifier, limit }) => {
+  outputSchema: out.searchResourcesOutput,
+}, handleStructuredTool(async ({ query, identifier, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return searchResources(resolved, query, limit);
 }));
@@ -212,7 +231,8 @@ server.registerTool("search_operations", {
       .describe("If true, only return runtime-only operations"),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, handleTool(async ({ query, identifier, resource_filter, read_only, runtime_only, limit }) => {
+  outputSchema: out.searchOperationsOutput,
+}, handleStructuredTool(async ({ query, identifier, resource_filter, read_only, runtime_only, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return searchOperations(resolved, query, resource_filter, read_only, runtime_only, limit);
 }));
@@ -234,7 +254,8 @@ server.registerTool("search_attributes", {
     stability: stabilityEnum.optional(),
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, handleTool(async ({ query, identifier, deprecated, stability, limit }) => {
+  outputSchema: out.searchAttributesOutput,
+}, handleStructuredTool(async ({ query, identifier, deprecated, stability, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return searchAttributes(resolved, query, deprecated, stability, limit);
 }));
@@ -248,9 +269,10 @@ server.registerTool("find_capabilities", {
     query: z.string().describe("Search term matched against capability name"),
     identifier: identifierParam,
   }),
-}, handleTool(async ({ query, identifier }) => {
+  outputSchema: out.findCapabilitiesOutput,
+}, handleStructuredTool(async ({ query, identifier }) => {
   const resolved = await resolveIdentifier(identifier);
-  return findCapabilities(resolved, query);
+  return { results: await findCapabilities(resolved, query) };
 }));
 
 server.registerTool("find_deprecated", {
@@ -267,7 +289,8 @@ server.registerTool("find_deprecated", {
     element_type: elementTypeEnum.optional(),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
-}, handleTool(async ({ identifier, since_version, element_type, limit }) => {
+  outputSchema: out.findDeprecatedOutput,
+}, handleStructuredTool(async ({ identifier, since_version, element_type, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return findDeprecated(resolved, since_version, element_type, limit);
 }));
@@ -283,7 +306,8 @@ server.registerTool("find_by_stability", {
     element_type: elementTypeEnum.optional(),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
-}, handleTool(async ({ identifier, stability, element_type, limit }) => {
+  outputSchema: out.findByStabilityOutput,
+}, handleStructuredTool(async ({ identifier, stability, element_type, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return findByStability(resolved, stability, element_type, limit);
 }));
@@ -296,7 +320,8 @@ server.registerTool("get_statistics", {
   inputSchema: z.object({
     identifier: identifierParam,
   }),
-}, handleTool(async ({ identifier }) => {
+  outputSchema: out.getStatisticsOutput,
+}, handleStructuredTool(async ({ identifier }) => {
   const resolved = await resolveIdentifier(identifier);
   return getStatistics(resolved);
 }));
@@ -368,7 +393,8 @@ server.registerTool("find_sensitive_attributes", {
       .describe("Optional filter by attribute name or resource address"),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
-}, handleTool(async ({ identifier, query, limit }) => {
+  outputSchema: out.findSensitiveAttributesOutput,
+}, handleStructuredTool(async ({ identifier, query, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return findSensitiveAttributes(resolved, query, limit);
 }));
@@ -385,7 +411,8 @@ server.registerTool("get_allowed_values", {
     identifier: identifierParam,
     limit: z.number().optional().describe("Max results (default 25)"),
   }),
-}, handleTool(async ({ query, identifier, limit }) => {
+  outputSchema: out.getAllowedValuesOutput,
+}, handleStructuredTool(async ({ query, identifier, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return getAllowedValues(resolved, query, limit);
 }));
@@ -407,7 +434,8 @@ server.registerTool("find_restart_required", {
       .describe("Filter results to a resource address substring"),
     limit: z.number().optional().describe("Max results (default 50)"),
   }),
-}, handleTool(async ({ identifier, restart_type, resource_filter, limit }) => {
+  outputSchema: out.findRestartRequiredOutput,
+}, handleStructuredTool(async ({ identifier, restart_type, resource_filter, limit }) => {
   const resolved = await resolveIdentifier(identifier);
   return findRestartRequired(resolved, restart_type, resource_filter, limit);
 }));
@@ -428,9 +456,10 @@ server.registerTool("find_attribute_groups", {
       .optional()
       .describe("Filter by group name substring"),
   }),
-}, handleTool(async ({ identifier, resource, group_name }) => {
+  outputSchema: out.findAttributeGroupsOutput,
+}, handleStructuredTool(async ({ identifier, resource, group_name }) => {
   const resolved = await resolveIdentifier(identifier);
-  return findAttributeGroups(resolved, resource, group_name);
+  return { results: await findAttributeGroups(resolved, resource, group_name) };
 }));
 
 server.registerTool("run_cypher", {

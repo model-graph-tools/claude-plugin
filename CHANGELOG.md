@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add MCP tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`) to all 20 tools for better host integration and safety warnings
 - Add human-readable `title` to all 20 tools for improved display in MCP tool directories and host UIs
+- Add `outputSchema` and `structuredContent` to 14 tools for typed JSON output alongside text — enables programmatic consumption and client-side validation. Covers lifecycle tools (`list_sources`, `start_source`, `stop_source`), all search/find tools, and `get_statistics`. Tools with dynamic or prose output (`browse_resource`, `describe_resource`, `compare_versions`, `get_resource_tree`, `find_relationships`, `run_cypher`) remain text-only.
 
 ### Changed
 - Upgrade `@modelcontextprotocol/server` from 2.0.0-alpha.2 to 2.0.0 stable
 - Switch from `StdioServerTransport` to `serveStdio()` factory pattern for automatic support of both 2025-era and 2026-era MCP protocol clients
+- Wrap `find_capabilities` and `find_attribute_groups` array returns into `{results: [...]}` to conform to MCP structured output requirements
 
 ## [0.10.6] - 2026-05-20
 
