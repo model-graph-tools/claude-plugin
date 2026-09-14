@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fix CI release workflow by bumping Node from 25 to 26 (npm@latest requires Node >=26)
+- Align verify workflow to use Node 26 and actions/checkout@v6 / actions/setup-node@v6
+- Update MCP server README tool count from 16 to 20 and add missing tools to the tool table
+
 ## [0.11.0] - 2026-09-14
 
 ### Added
