@@ -2,7 +2,8 @@
 // Tool handlers delegate to per-tool modules in ./tools/.
 
 import { createRequire } from "node:module";
-import { McpServer, StdioServerTransport } from "@modelcontextprotocol/server";
+import { McpServer } from "@modelcontextprotocol/server";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { z } from "zod";
 import { resolveIdentifier, resolveIdentifiers } from "./identifiers.js";
 import { mgtUpdate, mgtStop, mgtPs } from "./mgt.js";
@@ -79,15 +80,29 @@ function handleTool<T>(fn: (params: T) => Promise<unknown>) {
 // --- Lifecycle tools ---
 
 server.registerTool("list_sources", {
+  title: "List Sources",
   description:
     "Lists all known WildFly versions and feature packs with their availability (running/not_found).",
+  annotations: {
+    readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
 }, handleTool(async () => {
   return listSources();
 }));
 
 server.registerTool("start_source", {
+  title: "Start Source",
   description:
     "Starts the model graph database for a WildFly version or feature pack. Downloads data automatically if needed — this may take up to a minute on first use. IMPORTANT: This starts the model graph database, NOT the WildFly application server. When describing this action to users, say 'starting the model graph for WildFly X', never 'starting WildFly X'.",
+  annotations: {
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   inputSchema: z.object({
     identifier: z
       .string()
@@ -99,7 +114,14 @@ server.registerTool("start_source", {
 }));
 
 server.registerTool("stop_source", {
+  title: "Stop Source",
   description: "Stops the model graph for a WildFly version or feature pack.",
+  annotations: {
+    readOnlyHint: false,
+    destructiveHint: true,
+    idempotentHint: true,
+    openWorldHint: false,
+  },
   inputSchema: z.object({
     identifier: z
       .string()
@@ -112,9 +134,18 @@ server.registerTool("stop_source", {
 
 // --- Query tools ---
 
+const readOnlyAnnotations = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
 server.registerTool("search_resources", {
+  title: "Search Resources",
   description:
     "Searches for management model resources by name, address, or description.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     query: z.string().describe("Search term matched against resource name, address, and description"),
     identifier: identifierParam,
@@ -126,8 +157,10 @@ server.registerTool("search_resources", {
 }));
 
 server.registerTool("browse_resource", {
+  title: "Browse Resource",
   description:
     "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata (allowed values, units, restart requirements, attribute groups), operation stability and characteristics (read-only, runtime-only, global), parameter relationships (requires/alternatives), and sub-attribute composition via CONSISTS_OF for complex attributes (LIST/OBJECT).",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     address: z
       .string()
@@ -140,8 +173,10 @@ server.registerTool("browse_resource", {
 }));
 
 server.registerTool("describe_resource", {
+  title: "Describe Resource",
   description:
     "Returns a concise, human-readable description of a resource — its purpose, required add-operation parameters, required and optional attributes, and a CLI example. Use this for 'how do I add/configure X?' questions instead of browse_resource.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     address: z
       .string()
@@ -154,8 +189,10 @@ server.registerTool("describe_resource", {
 }));
 
 server.registerTool("search_operations", {
+  title: "Search Operations",
   description:
     "Searches operations across all resources by name or description. Can filter by resource address, read-only vs. mutating, and runtime-only. Returns stability level, deprecation info, and operation characteristics.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     query: z
       .string()
@@ -181,8 +218,10 @@ server.registerTool("search_operations", {
 }));
 
 server.registerTool("search_attributes", {
+  title: "Search Attributes",
   description:
     "Searches attributes across all resources. Can filter to only deprecated attributes or by stability level. Returns access type and required flag.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     query: z
       .string()
@@ -201,8 +240,10 @@ server.registerTool("search_attributes", {
 }));
 
 server.registerTool("find_capabilities", {
+  title: "Find Capabilities",
   description:
     "Searches for capabilities by name and shows which resources declare or reference them (via attributes and parameters).",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     query: z.string().describe("Search term matched against capability name"),
     identifier: identifierParam,
@@ -213,8 +254,10 @@ server.registerTool("find_capabilities", {
 }));
 
 server.registerTool("find_deprecated", {
+  title: "Find Deprecated",
   description:
     "Finds all deprecated elements (resources, attributes, operations, and parameters), optionally filtered by version or type.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     identifier: identifierParam,
     since_version: z
@@ -230,8 +273,10 @@ server.registerTool("find_deprecated", {
 }));
 
 server.registerTool("find_by_stability", {
+  title: "Find by Stability",
   description:
     "Finds all elements (resources, attributes, operations, and parameters) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     identifier: identifierParam,
     stability: stabilityEnum,
@@ -244,8 +289,10 @@ server.registerTool("find_by_stability", {
 }));
 
 server.registerTool("get_statistics", {
+  title: "Get Statistics",
   description:
     "Overview of the management model: identity metadata (name, version, type), node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     identifier: identifierParam,
   }),
@@ -255,8 +302,10 @@ server.registerTool("get_statistics", {
 }));
 
 server.registerTool("compare_versions", {
+  title: "Compare Versions",
   description:
     "Compares two WildFly versions or feature packs to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute, operation, and parameter changes within resources that exist in both versions.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     identifier1: z.string().describe('Older WildFly version or feature pack, e.g. "38"'),
     identifier2: z.string().describe('Newer WildFly version or feature pack, e.g. "39"'),
@@ -267,8 +316,10 @@ server.registerTool("compare_versions", {
 }));
 
 server.registerTool("get_resource_tree", {
+  title: "Get Resource Tree",
   description:
     "Returns all resources in the subtree under a given address. Use to explore the resource hierarchy without recursive browse_resource calls.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     address: z
       .string()
@@ -285,8 +336,10 @@ server.registerTool("get_resource_tree", {
 }));
 
 server.registerTool("find_relationships", {
+  title: "Find Relationships",
   description:
     "Shows dependency and exclusivity relationships between attributes and between operation parameters for a resource. Exposes REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     address: z
       .string()
@@ -303,8 +356,10 @@ server.registerTool("find_relationships", {
 }));
 
 server.registerTool("find_sensitive_attributes", {
+  title: "Find Sensitive Attributes",
   description:
     "Find security-sensitive attributes marked with IS_SENSITIVE constraints. Returns attributes with their constraint type and resource. Use to audit passwords, keys, and other secrets in the management model.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     identifier: identifierParam,
     query: z
@@ -319,8 +374,10 @@ server.registerTool("find_sensitive_attributes", {
 }));
 
 server.registerTool("get_allowed_values", {
+  title: "Get Allowed Values",
   description:
     "Get allowed option values, numeric ranges, and string length constraints for attributes and parameters. Answers 'what values can I set for X?' questions.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     query: z
       .string()
@@ -334,8 +391,10 @@ server.registerTool("get_allowed_values", {
 }));
 
 server.registerTool("find_restart_required", {
+  title: "Find Restart Required",
   description:
     'Find attributes that require a server restart after modification. Filter by restart level (no-services, all-services, jvm) and/or resource address. Answers "what changes need a server restart?" questions.',
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     identifier: identifierParam,
     restart_type: z
@@ -354,8 +413,10 @@ server.registerTool("find_restart_required", {
 }));
 
 server.registerTool("find_attribute_groups", {
+  title: "Find Attribute Groups",
   description:
     "Discover attribute groups — logical groupings of related attributes within resources. Filter by resource address or group name.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     identifier: identifierParam,
     resource: z
@@ -373,8 +434,10 @@ server.registerTool("find_attribute_groups", {
 }));
 
 server.registerTool("run_cypher", {
+  title: "Run Cypher Query",
   description:
     "Escape hatch for advanced users: runs an arbitrary read-only Cypher query against the management model. Results capped at 100 rows with a 10s timeout.",
+  annotations: readOnlyAnnotations,
   inputSchema: z.object({
     query: z.string().describe("Cypher query to execute"),
     identifier: identifierParam,
@@ -422,8 +485,9 @@ async function main() {
     console.error("mgt update failed — continuing with existing metadata");
   }
 
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  serveStdio(() => server, {
+    onerror: (err) => console.error("Transport error:", err),
+  });
   console.error("WildFly Model Graph MCP server running on stdio");
 }
 

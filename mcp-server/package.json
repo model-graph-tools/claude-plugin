@@ -42,10 +42,10 @@
     "prepublishOnly": "npm run build"
   },
   "optionalDependencies": {
-    "@model-graph-tools/mgt-linux-x64": "0.3.6",
-    "@model-graph-tools/mgt-linux-arm64": "0.3.6",
-    "@model-graph-tools/mgt-darwin-x64": "0.3.6",
     "@model-graph-tools/mgt-darwin-arm64": "0.3.6",
+    "@model-graph-tools/mgt-darwin-x64": "0.3.6",
+    "@model-graph-tools/mgt-linux-arm64": "0.3.6",
+    "@model-graph-tools/mgt-linux-x64": "0.3.6",
     "@model-graph-tools/mgt-win32-x64": "0.3.6"
   },
   "dependencies": {
@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@cfworker/json-schema": "^4.1.1",
-    "@modelcontextprotocol/server": "^2.0.0-alpha.2",
+    "@modelcontextprotocol/server": "^2.0.0",
     "@types/node": "^25.9.1",
     "esbuild": "^0.28.0",
     "tsx": "^4.22.3",

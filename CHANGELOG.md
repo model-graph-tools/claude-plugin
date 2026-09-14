@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add MCP tool annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`) to all 20 tools for better host integration and safety warnings
+- Add human-readable `title` to all 20 tools for improved display in MCP tool directories and host UIs
+
+### Changed
+- Upgrade `@modelcontextprotocol/server` from 2.0.0-alpha.2 to 2.0.0 stable
+- Switch from `StdioServerTransport` to `serveStdio()` factory pattern for automatic support of both 2025-era and 2026-era MCP protocol clients
+
 ## [0.10.6] - 2026-05-20
 
 ### Fixed
