@@ -1,3 +1,5 @@
+[![M8ven Score](https://m8ven.ai/badge/mcp/model-graph-tools-mcp-server-1kxoiz?v=efc8c91102172ca63f8007d16b8bad7a)](https://m8ven.ai/mcp/model-graph-tools-mcp-server-1kxoiz)
+
 # Model Graph Tools
 
 Explore the [WildFly](https://wildfly.org) management model via natural language — from any AI agent that supports [MCP](https://modelcontextprotocol.io/) and [Agent Skills](https://agentskills.io/).
