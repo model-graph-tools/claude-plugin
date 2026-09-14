@@ -2,7 +2,7 @@
 
 An [MCP](https://modelcontextprotocol.io/) server for querying the [WildFly](https://wildfly.org) management model stored in Neo4j graph databases.
 
-This package is part of the [Model Graph Tools](https://github.com/model-graph-tools/claude-plugin) project. It provides 16 tools for searching, browsing, and comparing the WildFly management model across versions and feature packs. It works with any AI agent that supports MCP — see [Platform Configuration](#platform-configuration) below.
+This package is part of the [Model Graph Tools](https://github.com/model-graph-tools/claude-plugin) project. It provides 20 tools for searching, browsing, and comparing the WildFly management model across versions and feature packs. It works with any AI agent that supports MCP — see [Platform Configuration](#platform-configuration) below.
 
 ## Prerequisites
 
@@ -110,6 +110,10 @@ For any MCP-compatible agent, configure it to run `npx --yes @model-graph-tools/
 | `compare_versions` | Diffs two sources for added/removed/deprecated elements, including attribute and operation changes within shared resources |
 | `get_resource_tree` | Returns all resources in the subtree under a given address for hierarchy exploration |
 | `find_relationships` | Shows REQUIRES and ALTERNATIVE relationships between attributes and operation parameters |
+| `find_sensitive_attributes` | Finds security-sensitive attributes via IS_SENSITIVE constraints |
+| `get_allowed_values` | Gets allowed option values, numeric ranges, and string length constraints for attributes and parameters |
+| `find_restart_required` | Finds attributes that require a server restart after modification |
+| `find_attribute_groups` | Discovers logical groupings of related attributes within resources |
 | `run_cypher` | Runs arbitrary read-only Cypher queries (100 row limit, 10s timeout) |
 
 ## Related Projects
