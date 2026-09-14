@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-09-14
+
 ### Fixed
 - Fix CI release workflow by bumping Node from 25 to 26 (npm@latest requires Node >=26)
 - Align verify workflow to use Node 26 and actions/checkout@v6 / actions/setup-node@v6
@@ -294,7 +296,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.6...v0.11.0
 [0.10.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.4...v0.10.5
