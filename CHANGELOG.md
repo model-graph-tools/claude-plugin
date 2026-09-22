@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.2] - 2026-09-22
+
 ### Changed
 - Bump bundled `mgt` platform binaries from 0.3.6 to 0.3.8 — includes fix for `ps` sub command used by MCP server container discovery
 
@@ -302,7 +304,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.2...HEAD
+[0.11.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.6...v0.11.0
 [0.10.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.10.5...v0.10.6
