@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Bump bundled `mgt` platform binaries from 0.3.6 to 0.3.8 — includes fix for `ps` sub command used by MCP server container discovery
+
 ## [0.11.1] - 2026-09-14
 
 ### Fixed
