@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.6] - 2026-09-24
+
 ### Added
 - Add `mgtBump.sh` script to automate bundled `mgt` binary version upgrades with npm registry verification
 
@@ -325,7 +327,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.5...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.6...HEAD
+[0.11.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.2...v0.11.3
