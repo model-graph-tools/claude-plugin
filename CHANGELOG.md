@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add `mgtBump.sh` script to automate bundled `mgt` binary version upgrades with npm registry verification
+
+### Changed
+- Bump bundled `mgt` platform binaries from 0.5.0 to 0.5.2
+
 ## [0.11.5] - 2026-09-23
 
 ### Changed
