@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.7] - 2026-09-24
+
 ### Changed
 - Bump bundled `mgt` platform binaries from 0.5.2 to 0.5.3
 
@@ -330,7 +332,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.6...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.7...HEAD
+[0.11.7]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.3...v0.11.4

@@ -17,7 +17,7 @@ compatibility: >
   (github.com/model-graph-tools/tooling) is bundled automatically via the MCP
   server package.
 metadata:
-  version: "0.11.6"
+  version: "0.11.7"
   author: model-graph-tools
 ---
 
