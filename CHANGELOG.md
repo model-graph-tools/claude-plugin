@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Bump bundled `mgt` platform binaries from 0.5.3 to 0.5.4
+
 ## [0.11.7] - 2026-09-24
 
 ### Changed
