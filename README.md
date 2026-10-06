@@ -1,4 +1,4 @@
-[![M8ven Score](https://m8ven.ai/badge/mcp/model-graph-tools-mcp-server-1kxoiz?v=efc8c91102172ca63f8007d16b8bad7a)](https://m8ven.ai/mcp/model-graph-tools-mcp-server-1kxoiz)
+[![M8ven Score](https://m8ven.ai/badge/mcp/model-graph-tools-mcp-server-1kxoiz)](https://m8ven.ai/mcp/model-graph-tools-mcp-server-1kxoiz?s=readme)
 
 # Model Graph Tools
 
