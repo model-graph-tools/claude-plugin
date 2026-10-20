@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-20
+
 ### Changed
 - Bump bundled `mgt` platform binaries from 0.5.4 to 0.5.6
 - Update `neo4j-driver` from 6.0.1 to 6.2.0
@@ -348,7 +350,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.8...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.8...v0.12.0
 [0.11.8]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.7...v0.11.8
 [0.11.7]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/model-graph-tools/claude-plugin/compare/v0.11.5...v0.11.6
