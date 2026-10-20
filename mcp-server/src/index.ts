@@ -493,7 +493,9 @@ setContainerLookup(async (identifier: string) => {
     const containers = await mgtPs();
     const match = containers.find((c) => c.identifier === identifier);
     return match ? { bolt: match.bolt } : null;
-  } catch {
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    console.error(`Container lookup failed for "${identifier}": ${detail}`);
     return null;
   }
 });

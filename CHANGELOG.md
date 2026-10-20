@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Log container lookup errors instead of silently swallowing them, improving diagnostics when auto-discovery of externally started containers fails
+
 ## [0.11.8] - 2026-09-24
 
 ### Changed
