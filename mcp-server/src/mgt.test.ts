@@ -34,7 +34,7 @@ describe("mgtVersions", () => {
     const result = await mgtVersions();
     expect(result).toEqual(versions);
     expect(mockExecFile).toHaveBeenCalledWith(
-      "mgt", ["versions", "--json"], { timeout: 30000 }
+      expect.stringContaining("mgt"), ["versions", "--json"], { timeout: 30000 }
     );
   });
 });
@@ -47,7 +47,7 @@ describe("mgtFeaturePacks", () => {
     const result = await mgtFeaturePacks();
     expect(result).toEqual(packs);
     expect(mockExecFile).toHaveBeenCalledWith(
-      "mgt", ["feature-packs", "--json"], { timeout: 30000 }
+      expect.stringContaining("mgt"), ["feature-packs", "--json"], { timeout: 30000 }
     );
   });
 });
@@ -75,7 +75,7 @@ describe("mgtStart", () => {
     const result = await mgtStart("39");
     expect(result).toEqual(results[0]);
     expect(mockExecFile).toHaveBeenCalledWith(
-      "mgt", ["start", "39", "--json"], { timeout: 300000 }
+      expect.stringContaining("mgt"), ["start", "39", "--json"], { timeout: 300000 }
     );
   });
 

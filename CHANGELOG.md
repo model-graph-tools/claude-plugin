@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Bump bundled `mgt` platform binaries from 0.5.4 to 0.5.6
+- Update `neo4j-driver` from 6.0.1 to 6.2.0
+- Update `@modelcontextprotocol/server` from 2.0.0 to 2.3.1
+- Update `typescript` from 6.0.3 to 7.0.2
+- Update `vitest` from 4.1.7 to 5.0.5
+- Update `zod` from 4.4.3 to 4.6.7
+
 ### Fixed
 - Log container lookup errors instead of silently swallowing them, improving diagnostics when auto-discovery of externally started containers fails
 
