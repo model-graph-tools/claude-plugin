@@ -7,8 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add Dependabot configuration for weekly npm dependency updates in `mcp-server/`
+
 ### Changed
 - Bump bundled `mgt` platform binaries from 0.5.6 to 0.5.7
+- Update `neo4j-driver` from 6.2.0 to 6.3.2
+- Update `@modelcontextprotocol/server` to latest version
+- Update `@cfworker/json-schema` to latest version
+- Update `vitest` from 5.0.5 to 5.1.0
+- Update `@types/node` from 26.6.5 to 26.6.6
 
 ## [0.12.0] - 2026-10-20
 
