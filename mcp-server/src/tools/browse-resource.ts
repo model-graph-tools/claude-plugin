@@ -55,8 +55,8 @@ const OPERATIONS_QUERY = `
   ORDER BY o.name`;
 
 const CAPABILITIES_QUERY = `
-  MATCH (r:Resource {address: $address})-[:DECLARES_CAPABILITY]->(c:Capability)
-  RETURN c.name AS capability`;
+  MATCH (r:Resource {address: $address})-[d:DECLARES_CAPABILITY]->(c:Capability)
+  RETURN c.name AS capability, d.stability AS stability`;
 
 const PARAM_RELATIONSHIPS_QUERY = `
   MATCH (r:Resource {address: $address})-[:PROVIDES]->(o:Operation)-[:ACCEPTS]->(p:Parameter)
@@ -150,7 +150,7 @@ interface BrowseResult {
   children: { address: string; name: string }[];
   attributes: AttributeInfo[];
   operations: OperationInfo[];
-  capabilities: string[];
+  capabilities: { name: string; stability: string | null }[];
 }
 
 // --- Main ---
@@ -210,7 +210,10 @@ export async function browseResource(
       children: children.map((c) => ({ address: c.address, name: c.name })),
       attributes: attrResult.records.map((r) => mapAttribute(r, consistsOfMap)),
       operations: opResult.records.map((r) => mapOperation(r, paramRelMap)),
-      capabilities: capResult.records.map((r) => r.get("capability") as string),
+      capabilities: capResult.records.map((r) => ({
+        name: r.get("capability") as string,
+        stability: r.get("stability") as string | null,
+      })),
       ...pickDefined({
         description: rec.get("description"),
         stability: rec.get("stability"),

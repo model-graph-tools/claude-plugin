@@ -15,9 +15,14 @@ interface ParameterReference {
   resource: string;
 }
 
+interface DeclaringResource {
+  address: string;
+  stability: string | null;
+}
+
 interface CapabilityResult {
   capability: string;
-  declaredBy: string[];
+  declaredBy: DeclaringResource[];
   referencedBy: CapabilityReference[];
   referencedByParameters: ParameterReference[];
 }
@@ -34,13 +39,13 @@ export async function findCapabilities(
     const result = await session.run(
       `MATCH (c:Capability)
        WHERE c.name =~ $regex
-       OPTIONAL MATCH (r:Resource)-[:DECLARES_CAPABILITY]->(c)
+       OPTIONAL MATCH (r:Resource)-[d:DECLARES_CAPABILITY]->(c)
        OPTIONAL MATCH (a:Attribute)-[:REFERENCES_CAPABILITY]->(c)
        OPTIONAL MATCH (ra:Resource)-[:HAS_ATTRIBUTE]->(a)
        OPTIONAL MATCH (p:Parameter)-[:REFERENCES_CAPABILITY]->(c)
        OPTIONAL MATCH (rp:Resource)-[:PROVIDES]->(op:Operation)-[:ACCEPTS]->(p)
        RETURN c.name AS capability,
-              collect(DISTINCT r.address) AS declaredBy,
+              collect(DISTINCT {address: r.address, stability: d.stability}) AS declaredBy,
               collect(DISTINCT {attribute: a.name, resource: ra.address}) AS referencedBy,
               collect(DISTINCT {parameter: p.name, operation: op.name, resource: rp.address}) AS referencedByParameters
        ORDER BY c.name`,
@@ -49,9 +54,8 @@ export async function findCapabilities(
 
     return result.records.map((r) => ({
       capability: r.get("capability") as string,
-      declaredBy: (r.get("declaredBy") as Array<string | null>).filter(
-        (d): d is string => d != null
-      ),
+      declaredBy: (r.get("declaredBy") as Array<{address: string | null, stability: string | null}>)
+        .filter((d): d is DeclaringResource => d?.address != null),
       referencedBy: (r.get("referencedBy") as Array<CapabilityReference | null>)
         .filter((ref): ref is CapabilityReference => ref?.attribute != null),
       referencedByParameters: (r.get("referencedByParameters") as Array<ParameterReference | null>)
