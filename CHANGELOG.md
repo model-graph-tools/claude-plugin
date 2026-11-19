@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Include stability level on declared capabilities in `browse_resource` and `find_capabilities` results
+
+### Changed
+- Bump bundled `mgt` platform binaries from 0.5.7 to 0.5.8
+
 ## [0.12.1] - 2026-11-16
 
 ### Added
