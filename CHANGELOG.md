@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.4] - 2026-11-26
+
 ### Added
 - Send model graph selection rules as MCP server instructions, so agents start the latest WildFly model graph when none is running, even without the skill loaded ([#7](https://github.com/model-graph-tools/claude-plugin/issues/7))
 - Include a `hint` in `list_sources` results naming the `start_source` call to make when no model graph is running
@@ -389,7 +391,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Skill prompt with domain knowledge for WildFly management model
 - Marketplace manifest for plugin discovery
 
-[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.12.3...HEAD
+[Unreleased]: https://github.com/model-graph-tools/claude-plugin/compare/v0.12.4...HEAD
+[0.12.4]: https://github.com/model-graph-tools/claude-plugin/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/model-graph-tools/claude-plugin/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/model-graph-tools/claude-plugin/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/model-graph-tools/claude-plugin/compare/v0.12.0...v0.12.1
