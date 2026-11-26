@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Send model graph selection rules as MCP server instructions, so agents start the latest WildFly model graph when none is running, even without the skill loaded ([#7](https://github.com/model-graph-tools/claude-plugin/issues/7))
+- Include a `hint` in `list_sources` results naming the `start_source` call to make when no model graph is running
+
+### Changed
+- Name the exact `start_source` call in the error returned by query tools when the model graph isn't running
+- Migrate `mcp-server` development tooling to Vite+ (`vp check`, `vp test`, `vp fmt`)
+
+### Fixed
+- Fix `search_resources` throwing instead of reporting zero results when the count query returns no rows
+
 ## [0.12.3] - 2026-11-19
 
 ### Changed
