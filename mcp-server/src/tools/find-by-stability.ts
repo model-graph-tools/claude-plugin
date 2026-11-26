@@ -23,14 +23,12 @@ export async function findByStability(
   identifier: string,
   stability: string,
   elementType?: string,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<FindByStabilityResult> {
   const session = await getSession(identifier);
   try {
     const queries: string[] = [];
-    const types = elementType
-      ? [elementType]
-      : ["resource", "attribute", "operation", "parameter"];
+    const types = elementType ? [elementType] : ["resource", "attribute", "operation", "parameter"];
 
     if (types.includes("resource")) {
       queries.push(
@@ -39,7 +37,7 @@ export async function findByStability(
          RETURN 'resource' AS elementType,
                 r.address AS name,
                 null AS resource,
-                r.stability AS stability`
+                r.stability AS stability`,
       );
     }
 
@@ -50,7 +48,7 @@ export async function findByStability(
          RETURN 'attribute' AS elementType,
                 a.name AS name,
                 r.address AS resource,
-                a.stability AS stability`
+                a.stability AS stability`,
       );
     }
 
@@ -61,7 +59,7 @@ export async function findByStability(
          RETURN 'operation' AS elementType,
                 o.name AS name,
                 r.address AS resource,
-                o.stability AS stability`
+                o.stability AS stability`,
       );
     }
 
@@ -72,7 +70,7 @@ export async function findByStability(
          RETURN 'parameter' AS elementType,
                 p.name AS name,
                 r.address AS resource,
-                p.stability AS stability`
+                p.stability AS stability`,
       );
     }
 

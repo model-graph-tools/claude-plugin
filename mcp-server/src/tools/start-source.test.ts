@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vite-plus/test";
 
 vi.mock("../mgt.js", () => ({
   mgtStart: vi.fn(),
@@ -71,16 +71,18 @@ describe("startSource", () => {
       error: "Failed to start Neo4J: container name conflict",
       error_code: "CONTAINER_START_FAILED",
     });
-    mockMgtPs.mockResolvedValue([{
-      identifier: "39.0",
-      source_type: "wildfly",
-      name: "WildFly 39.0",
-      container_name: "mgt-39",
-      bolt: 7687,
-      http: 7474,
-      status: "running",
-      id: "abc123",
-    }]);
+    mockMgtPs.mockResolvedValue([
+      {
+        identifier: "39.0",
+        source_type: "wildfly",
+        name: "WildFly 39.0",
+        container_name: "mgt-39",
+        bolt: 7687,
+        http: 7474,
+        status: "running",
+        id: "abc123",
+      },
+    ]);
 
     const result = await startSource("39.0");
 
@@ -97,16 +99,18 @@ describe("startSource", () => {
       success: false,
       error: "container conflict",
     });
-    mockMgtPs.mockResolvedValue([{
-      identifier: "39.0",
-      source_type: "wildfly",
-      name: "WildFly 39.0",
-      container_name: "mgt-39",
-      bolt: 7687,
-      http: 7474,
-      status: "running",
-      id: "abc123",
-    }]);
+    mockMgtPs.mockResolvedValue([
+      {
+        identifier: "39.0",
+        source_type: "wildfly",
+        name: "WildFly 39.0",
+        container_name: "mgt-39",
+        bolt: 7687,
+        http: 7474,
+        status: "running",
+        id: "abc123",
+      },
+    ]);
 
     await startSource("39.0");
 
@@ -121,9 +125,7 @@ describe("startSource", () => {
     });
     mockMgtPs.mockResolvedValue([]);
 
-    await expect(startSource("99.0")).rejects.toThrow(
-      "Failed to pull image"
-    );
+    await expect(startSource("99.0")).rejects.toThrow("Failed to pull image");
   });
 
   it("rolls back on waitForReady failure", async () => {
@@ -145,8 +147,6 @@ describe("startSource", () => {
       success: true,
     });
 
-    await expect(startSource("39.0")).rejects.toThrow(
-      "did not return port information"
-    );
+    await expect(startSource("39.0")).rejects.toThrow("did not return port information");
   });
 });

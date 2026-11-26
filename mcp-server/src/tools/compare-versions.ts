@@ -43,7 +43,7 @@ interface ChangedElements {
 
 export async function compareVersions(
   identifier1: string,
-  identifier2: string
+  identifier2: string,
 ): Promise<CompareResult> {
   for (const id of [identifier1, identifier2]) {
     if (!hasConnection(id)) {
@@ -52,11 +52,16 @@ export async function compareVersions(
   }
 
   const [
-    addresses1, addresses2,
-    deprecated1, deprecated2,
-    attrs1, attrs2,
-    ops1, ops2,
-    params1, params2,
+    addresses1,
+    addresses2,
+    deprecated1,
+    deprecated2,
+    attrs1,
+    attrs2,
+    ops1,
+    ops2,
+    params1,
+    params2,
   ] = await Promise.all([
     getResourceAddresses(identifier1),
     getResourceAddresses(identifier2),
@@ -77,9 +82,7 @@ export async function compareVersions(
   const removed = addresses1.filter((a) => !set2.has(a)).sort();
 
   const depKeys1 = new Set(deprecated1.map((d) => `${d.elementType}:${d.name}`));
-  const newlyDeprecated = deprecated2.filter(
-    (d) => !depKeys1.has(`${d.elementType}:${d.name}`)
-  );
+  const newlyDeprecated = deprecated2.filter((d) => !depKeys1.has(`${d.elementType}:${d.name}`));
 
   const commonAddresses = addresses2.filter((a) => set1.has(a));
 
@@ -104,7 +107,7 @@ export async function compareVersions(
 function computeChanges(
   commonAddresses: string[],
   map1: Map<string, Set<string>>,
-  map2: Map<string, Set<string>>
+  map2: Map<string, Set<string>>,
 ): ChangedElements[] {
   const results: ChangedElements[] = [];
   for (const addr of commonAddresses) {
@@ -125,7 +128,7 @@ async function getResourceAddresses(identifier: string): Promise<string[]> {
   const session = await getSession(identifier);
   try {
     const result = await session.run(
-      "MATCH (r:Resource) RETURN r.address AS address ORDER BY address"
+      "MATCH (r:Resource) RETURN r.address AS address ORDER BY address",
     );
     return result.records.map((r) => r.get("address") as string);
   } finally {
@@ -135,7 +138,7 @@ async function getResourceAddresses(identifier: string): Promise<string[]> {
 
 async function getElementsByResource(
   identifier: string,
-  elementType: "attribute" | "operation"
+  elementType: "attribute" | "operation",
 ): Promise<Map<string, Set<string>>> {
   const session = await getSession(identifier);
   try {
@@ -149,10 +152,7 @@ async function getElementsByResource(
     const result = await session.run(query);
     const map = new Map<string, Set<string>>();
     for (const r of result.records) {
-      map.set(
-        r.get("resource") as string,
-        new Set(r.get("names") as string[])
-      );
+      map.set(r.get("resource") as string, new Set(r.get("names") as string[]));
     }
     return map;
   } finally {
@@ -176,7 +176,7 @@ async function getDeprecatedKeys(identifier: string): Promise<DeprecatedInfo[]> 
        UNION ALL
        MATCH (r:Resource)-[d:DEPRECATED_SINCE]->(v:Version)
        RETURN 'resource' AS elementType, r.address AS name, null AS resource,
-              (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince, d.reason AS reason`
+              (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince, d.reason AS reason`,
     );
     return result.records.map((r) => {
       const elem: DeprecatedInfo = {
@@ -196,13 +196,13 @@ async function getDeprecatedKeys(identifier: string): Promise<DeprecatedInfo[]> 
 }
 
 async function getParametersByOperation(
-  identifier: string
+  identifier: string,
 ): Promise<Map<string, Map<string, Set<string>>>> {
   const session = await getSession(identifier);
   try {
     const result = await session.run(
       `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)-[:ACCEPTS]->(p:Parameter)
-       RETURN r.address AS resource, o.name AS operation, collect(p.name) AS names`
+       RETURN r.address AS resource, o.name AS operation, collect(p.name) AS names`,
     );
     const map = new Map<string, Map<string, Set<string>>>();
     for (const r of result.records) {
@@ -225,7 +225,7 @@ function computeParameterChanges(
   ops1: Map<string, Set<string>>,
   ops2: Map<string, Set<string>>,
   params1: Map<string, Map<string, Set<string>>>,
-  params2: Map<string, Map<string, Set<string>>>
+  params2: Map<string, Map<string, Set<string>>>,
 ): ChangedParameters[] {
   const results: ChangedParameters[] = [];
   for (const addr of commonAddresses) {
@@ -247,6 +247,6 @@ function computeParameterChanges(
   return results.sort((a, b) =>
     a.resource === b.resource
       ? a.operation.localeCompare(b.operation)
-      : a.resource.localeCompare(b.resource)
+      : a.resource.localeCompare(b.resource),
   );
 }

@@ -155,10 +155,7 @@ interface BrowseResult {
 
 // --- Main ---
 
-export async function browseResource(
-  identifier: string,
-  address: string
-): Promise<BrowseResult> {
+export async function browseResource(identifier: string, address: string): Promise<BrowseResult> {
   const sessions = await getSessions(identifier, 6);
   try {
     const [resourceResult, attrResult, opResult, capResult, paramRelResult, consistsOfResult] =
@@ -173,16 +170,14 @@ export async function browseResource(
 
     if (resourceResult.records.length === 0) {
       throw new Error(
-        `Resource not found: ${address}. Use search_resources to find valid addresses.`
+        `Resource not found: ${address}. Use search_resources to find valid addresses.`,
       );
     }
 
     const consistsOfMap = new Map<string, SubAttributeInfo[]>();
     for (const r of consistsOfResult.records) {
       const parent = r.get("parent") as string;
-      const subs = (r.get("subAttributes") as SubAttributeInfo[]).filter(
-        (s) => s.name != null
-      );
+      const subs = (r.get("subAttributes") as SubAttributeInfo[]).filter((s) => s.name != null);
       if (subs.length > 0) {
         consistsOfMap.set(parent, subs);
       }
@@ -191,17 +186,18 @@ export async function browseResource(
     const paramRelMap = new Map<string, { requires: string[]; alternatives: string[] }>();
     for (const r of paramRelResult.records) {
       const requires = (r.get("requires") as Array<string | null>).filter(
-        (n): n is string => n != null
+        (n): n is string => n != null,
       );
       const alternatives = (r.get("alternatives") as Array<string | null>).filter(
-        (n): n is string => n != null
+        (n): n is string => n != null,
       );
       paramRelMap.set(`${r.get("operation")}:${r.get("parameter")}`, { requires, alternatives });
     }
 
     const rec = resourceResult.records[0];
-    const children = (rec.get("children") as Array<{ address: string; name: string }>)
-      .filter((c) => c.address != null);
+    const children = (rec.get("children") as Array<{ address: string; name: string }>).filter(
+      (c) => c.address != null,
+    );
 
     return {
       address: rec.get("address") as string,
@@ -229,7 +225,7 @@ export async function browseResource(
 
 function mapAttribute(
   r: { get(key: string): unknown },
-  consistsOfMap: Map<string, SubAttributeInfo[]>
+  consistsOfMap: Map<string, SubAttributeInfo[]>,
 ): AttributeInfo {
   const name = r.get("name") as string;
   return {
@@ -262,7 +258,7 @@ function mapAttribute(
 
 function mapOperation(
   r: { get(key: string): unknown },
-  paramRelMap: Map<string, { requires: string[]; alternatives: string[] }>
+  paramRelMap: Map<string, { requires: string[]; alternatives: string[] }>,
 ): OperationInfo {
   const opName = r.get("operation") as string;
   return {
@@ -286,7 +282,7 @@ function mapOperation(
 function mapParameter(
   opName: string,
   p: Record<string, unknown>,
-  paramRelMap: Map<string, { requires: string[]; alternatives: string[] }>
+  paramRelMap: Map<string, { requires: string[]; alternatives: string[] }>,
 ): ParameterInfo {
   const rels = paramRelMap.get(`${opName}:${p.name}`);
   return {

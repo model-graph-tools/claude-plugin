@@ -42,7 +42,7 @@ export async function searchOperations(
   resourceFilter?: string,
   readOnly?: boolean,
   runtimeOnly?: boolean,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<SearchOperationsResult> {
   if (query) validateQueryLength(query);
   const session = await getSession(identifier);
@@ -80,7 +80,7 @@ export async function searchOperations(
       `MATCH (r:Resource)-[:PROVIDES]->(o:Operation)
        ${whereClause}
        RETURN count(o) AS total`,
-      params
+      params,
     );
     const totalCount = toNumber(countResult.records[0]?.get("total"));
 
@@ -104,27 +104,30 @@ export async function searchOperations(
               d.reason AS deprecationReason
        ORDER BY o.name, r.address
        LIMIT $limit`,
-      params
+      params,
     );
 
     return {
-      results: result.records.map((r) => ({
-        resource: r.get("resource") as string,
-        operation: r.get("operation") as string,
-        description: r.get("description") as string,
-        parameters: (r.get("parameters") as Array<ParameterInfo | null>).filter(
-          (p): p is ParameterInfo => p != null
-        ),
-        ...pickDefined({
-          stability: r.get("stability"),
-          global: r.get("global"),
-          readOnly: r.get("readOnly"),
-          runtimeOnly: r.get("runtimeOnly"),
-          returnValue: r.get("returnValue"),
-          deprecatedSince: r.get("deprecatedSince"),
-          deprecationReason: r.get("deprecationReason"),
-        }),
-      } as OperationResult)),
+      results: result.records.map(
+        (r) =>
+          ({
+            resource: r.get("resource") as string,
+            operation: r.get("operation") as string,
+            description: r.get("description") as string,
+            parameters: (r.get("parameters") as Array<ParameterInfo | null>).filter(
+              (p): p is ParameterInfo => p != null,
+            ),
+            ...pickDefined({
+              stability: r.get("stability"),
+              global: r.get("global"),
+              readOnly: r.get("readOnly"),
+              runtimeOnly: r.get("runtimeOnly"),
+              returnValue: r.get("returnValue"),
+              deprecatedSince: r.get("deprecatedSince"),
+              deprecationReason: r.get("deprecationReason"),
+            }),
+          }) as OperationResult,
+      ),
       totalCount,
     };
   } finally {

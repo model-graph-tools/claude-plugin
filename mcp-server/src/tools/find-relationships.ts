@@ -27,7 +27,7 @@ interface FindRelationshipsResult {
 export async function findRelationships(
   identifier: string,
   address: string,
-  scope: "attributes" | "parameters" | "all" = "all"
+  scope: "attributes" | "parameters" | "all" = "all",
 ): Promise<FindRelationshipsResult> {
   const includeAttributes = scope === "all" || scope === "attributes";
   const includeParameters = scope === "all" || scope === "parameters";
@@ -50,8 +50,8 @@ export async function findRelationships(
            WHERE size(requires) > 0 OR size(alternatives) > 0
            RETURN attribute, requires, alternatives
            ORDER BY attribute`,
-          { address }
-        )
+          { address },
+        ),
       );
     }
 
@@ -68,8 +68,8 @@ export async function findRelationships(
            WHERE size(requires) > 0 OR size(alternatives) > 0
            RETURN operation, parameter, requires, alternatives
            ORDER BY operation, parameter`,
-          { address }
-        )
+          { address },
+        ),
       );
     }
 
@@ -78,7 +78,9 @@ export async function findRelationships(
 
     const attributeRelationships: AttributeRelationship[] = [];
     if (includeAttributes) {
-      const attrResult = results[resultIndex++] as { records: Array<{ get(key: string): unknown }> };
+      const attrResult = results[resultIndex++] as {
+        records: Array<{ get(key: string): unknown }>;
+      };
       for (const r of attrResult.records) {
         attributeRelationships.push({
           attribute: r.get("attribute") as string,

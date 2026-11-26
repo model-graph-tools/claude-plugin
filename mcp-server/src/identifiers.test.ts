@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vite-plus/test";
 import { resolveIdentifier, resolveIdentifiers } from "./identifiers.js";
 
 vi.mock("node:child_process", () => ({
@@ -32,7 +32,11 @@ describe("resolveIdentifier", () => {
 
     const result = await resolveIdentifier("39");
     expect(result).toBe("39.0");
-    expect(mockExecFile).toHaveBeenCalledWith(expect.stringContaining("mgt"), ["resolve", "39", "--json"], { timeout: 30000 });
+    expect(mockExecFile).toHaveBeenCalledWith(
+      expect.stringContaining("mgt"),
+      ["resolve", "39", "--json"],
+      { timeout: 30000 },
+    );
   });
 
   it("resolves already-canonical WildFly version", async () => {
@@ -50,14 +54,18 @@ describe("resolveIdentifier", () => {
   });
 
   it("resolves feature pack shortcut to latest version", async () => {
-    mockResolve([{ identifier: "ai:0.9.1", source_type: "feature-pack", name: "AI Feature Pack 0.9.1" }]);
+    mockResolve([
+      { identifier: "ai:0.9.1", source_type: "feature-pack", name: "AI Feature Pack 0.9.1" },
+    ]);
 
     const result = await resolveIdentifier("ai");
     expect(result).toBe("ai:0.9.1");
   });
 
   it("resolves exact feature pack version", async () => {
-    mockResolve([{ identifier: "ai:0.9.0", source_type: "feature-pack", name: "AI Feature Pack 0.9.0" }]);
+    mockResolve([
+      { identifier: "ai:0.9.0", source_type: "feature-pack", name: "AI Feature Pack 0.9.0" },
+    ]);
 
     const result = await resolveIdentifier("ai:0.9.0");
     expect(result).toBe("ai:0.9.0");
@@ -67,7 +75,7 @@ describe("resolveIdentifier", () => {
     mockError("Unknown identifier: unknown");
 
     await expect(resolveIdentifier("unknown")).rejects.toThrow(
-      "mgt resolve failed: Unknown identifier: unknown"
+      "mgt resolve failed: Unknown identifier: unknown",
     );
   });
 
@@ -89,7 +97,11 @@ describe("resolveIdentifiers", () => {
     const [id1, id2] = await resolveIdentifiers("38", "39");
     expect(id1).toBe("38.0");
     expect(id2).toBe("39.0");
-    expect(mockExecFile).toHaveBeenCalledWith(expect.stringContaining("mgt"), ["resolve", "38,39", "--json"], { timeout: 30000 });
+    expect(mockExecFile).toHaveBeenCalledWith(
+      expect.stringContaining("mgt"),
+      ["resolve", "38,39", "--json"],
+      { timeout: 30000 },
+    );
   });
 
   it("resolves mixed WildFly and feature pack identifiers", async () => {

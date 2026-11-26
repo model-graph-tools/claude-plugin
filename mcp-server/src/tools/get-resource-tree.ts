@@ -19,25 +19,24 @@ interface ResourceTreeResult {
 export async function getResourceTree(
   identifier: string,
   address: string,
-  depth?: number
+  depth?: number,
 ): Promise<ResourceTreeResult> {
   const session = await getSession(identifier);
   try {
-    const depthClause = depth != null && depth >= 0
-      ? `CHILD_OF*0..${Math.floor(depth)}`
-      : "CHILD_OF*0..";
+    const depthClause =
+      depth != null && depth >= 0 ? `CHILD_OF*0..${Math.floor(depth)}` : "CHILD_OF*0..";
 
     const result = await session.run(
       `MATCH (root:Resource {address: $address})
        MATCH (r:Resource)-[:${depthClause}]->(root)
        RETURN r.address AS address, r.name AS name, r.singleton AS singleton
        ORDER BY r.address`,
-      { address }
+      { address },
     );
 
     if (result.records.length === 0) {
       throw new Error(
-        `Resource not found: ${address}. Use search_resources to find valid addresses.`
+        `Resource not found: ${address}. Use search_resources to find valid addresses.`,
       );
     }
 

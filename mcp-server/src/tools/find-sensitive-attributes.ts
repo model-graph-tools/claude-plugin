@@ -23,7 +23,7 @@ interface FindSensitiveResult {
 export async function findSensitiveAttributes(
   identifier: string,
   query?: string,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<FindSensitiveResult> {
   if (query) validateQueryLength(query);
   const session = await getSession(identifier);
@@ -43,7 +43,7 @@ export async function findSensitiveAttributes(
       `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)-[:IS_SENSITIVE]->(c:Constraint)
        ${whereClause}
        RETURN count(a) AS total`,
-      params
+      params,
     );
     const totalCount = toNumber(countResult.records[0]?.get("total"));
 
@@ -57,7 +57,7 @@ export async function findSensitiveAttributes(
               c.type AS constraintType
        ORDER BY r.address, a.name
        LIMIT $limit`,
-      params
+      params,
     );
 
     return {

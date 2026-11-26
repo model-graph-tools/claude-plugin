@@ -116,7 +116,7 @@ function tryParseJsonError(stdout: string): MgtJsonError | null {
 
 export async function runMgt(
   args: string[],
-  timeoutMs: number = MGT_DEFAULT_TIMEOUT_MS
+  timeoutMs: number = MGT_DEFAULT_TIMEOUT_MS,
 ): Promise<string> {
   try {
     const { stdout } = await execFileAsync(MGT_COMMAND, [...args, "--json"], {
@@ -135,7 +135,7 @@ export async function runMgt(
         throw new Error(
           "mgt CLI not found. It should be installed automatically as part of the MCP server package. " +
             "If it's missing, try reinstalling the MCP server or install mgt manually from " +
-            "https://github.com/model-graph-tools/tooling"
+            "https://github.com/model-graph-tools/tooling",
         );
       }
       if (nodeError.killed && nodeError.signal === "SIGTERM") {
@@ -145,7 +145,7 @@ export async function runMgt(
             "This can happen on first use when container images need to be downloaded. " +
             "To resolve: (1) Verify Docker is running ('docker info'). " +
             "(2) Check your network connection — the first run downloads ~500MB. " +
-            "(3) Try again — the download may have been slow but should resume."
+            "(3) Try again — the download may have been slow but should resume.",
         );
       }
 
@@ -186,8 +186,9 @@ function parseMgtError(command: string, stderr: string): string | null {
     lower.includes("unknown version") ||
     lower.includes("unknown feature pack")
   ) {
-    const match = stderr.match(/invalid version or feature pack '([^']+)'/i)
-      ?? stderr.match(/unknown (?:version|feature pack) '?([^'"\n]+)/i);
+    const match =
+      stderr.match(/invalid version or feature pack '([^']+)'/i) ??
+      stderr.match(/unknown (?:version|feature pack) '?([^'"\n]+)/i);
     const id = match?.[1] ?? "the requested identifier";
     return (
       `"${id}" is not a known WildFly version or feature pack. ` +

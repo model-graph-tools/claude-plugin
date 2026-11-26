@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vite-plus/test";
 
 const { mockSession } = vi.hoisted(() => {
   const mockSession = {
@@ -29,10 +29,13 @@ function mockRecords(keys: string[], rows: unknown[][]) {
 
 describe("runCypher", () => {
   it("returns query results", async () => {
-    mockRecords(["name", "count"], [
-      ["datasources", 5],
-      ["logging", 3],
-    ]);
+    mockRecords(
+      ["name", "count"],
+      [
+        ["datasources", 5],
+        ["logging", 3],
+      ],
+    );
 
     const result = await runCypher("39.0", "MATCH (n) RETURN n.name AS name, count(*) AS count");
     expect(result.columns).toEqual(["name", "count"]);
@@ -66,10 +69,12 @@ describe("runCypher", () => {
 
   it("converts Neo4j Integer objects to numbers", async () => {
     mockSession.run.mockResolvedValue({
-      records: [{
-        keys: ["count"],
-        get: () => ({ toNumber: () => 42 }),
-      }],
+      records: [
+        {
+          keys: ["count"],
+          get: () => ({ toNumber: () => 42 }),
+        },
+      ],
     });
 
     const result = await runCypher("39.0", "RETURN count(*) AS count");
@@ -78,10 +83,12 @@ describe("runCypher", () => {
 
   it("converts Neo4j node objects to plain objects", async () => {
     mockSession.run.mockResolvedValue({
-      records: [{
-        keys: ["node"],
-        get: () => ({ properties: { name: "test", count: { toNumber: () => 7 } } }),
-      }],
+      records: [
+        {
+          keys: ["node"],
+          get: () => ({ properties: { name: "test", count: { toNumber: () => 7 } } }),
+        },
+      ],
     });
 
     const result = await runCypher("39.0", "MATCH (n) RETURN n AS node");
@@ -116,18 +123,16 @@ describe("mutation detection", () => {
 
   for (const query of mutatingQueries) {
     it(`rejects: ${query}`, async () => {
-      await expect(runCypher("39.0", query)).rejects.toThrow(
-        "Write operations are not allowed"
-      );
+      await expect(runCypher("39.0", query)).rejects.toThrow("Write operations are not allowed");
     });
   }
 
   it("rejects case-insensitive mutations", async () => {
     await expect(runCypher("39.0", "create (n:Test)")).rejects.toThrow(
-      "Write operations are not allowed"
+      "Write operations are not allowed",
     );
     await expect(runCypher("39.0", "MeRgE (n:Test)")).rejects.toThrow(
-      "Write operations are not allowed"
+      "Write operations are not allowed",
     );
   });
 
@@ -152,7 +157,7 @@ describe("query length validation", () => {
   it("rejects queries exceeding 10,000 characters", async () => {
     const longQuery = "MATCH " + "a".repeat(10_001);
     await expect(runCypher("39.0", longQuery)).rejects.toThrow(
-      "Query too long (max 10000 characters)"
+      "Query too long (max 10000 characters)",
     );
   });
 

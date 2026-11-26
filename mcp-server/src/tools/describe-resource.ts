@@ -24,35 +24,31 @@ interface AttributeRow {
 
 // --- Main ---
 
-export async function describeResource(
-  identifier: string,
-  address: string
-): Promise<string> {
+export async function describeResource(identifier: string, address: string): Promise<string> {
   const sessions = await getSessions(identifier, 3);
   try {
-    const [resourceResult, requiredAttrsResult, optionalAttrsResult] =
-      await Promise.all([
-        sessions[0].run(
-          `MATCH (r:Resource {address: $address})
+    const [resourceResult, requiredAttrsResult, optionalAttrsResult] = await Promise.all([
+      sessions[0].run(
+        `MATCH (r:Resource {address: $address})
            OPTIONAL MATCH (r)-[:PROVIDES]->(o:Operation {name: "add"})-[:ACCEPTS]->(p:Parameter)
            RETURN r.name AS resourceName, r.description AS resourceDescription,
                   p.name AS paramName, p.type AS paramType,
                   p.required AS paramRequired, p.description AS paramDescription
            ORDER BY p.required DESC, p.name`,
-          { address }
-        ),
-        sessions[1].run(
-          `MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
+        { address },
+      ),
+      sessions[1].run(
+        `MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
            WHERE a.required = true
            RETURN a.name AS name, a.type AS type,
                   a.description AS description, a.\`default-value\` AS defaultValue,
                   a.allowed AS allowed, a.unit AS unit,
                   a.\`restart-required\` AS restartRequired
            ORDER BY a.name`,
-          { address }
-        ),
-        sessions[2].run(
-          `MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
+        { address },
+      ),
+      sessions[2].run(
+        `MATCH (r:Resource {address: $address})-[:HAS_ATTRIBUTE]->(a:Attribute)
            WHERE (a.required IS NULL OR a.required = false)
              AND NOT EXISTS { (a)-[:DEPRECATED_SINCE]->() }
            RETURN a.name AS name, a.type AS type,
@@ -60,13 +56,13 @@ export async function describeResource(
                   a.allowed AS allowed, a.unit AS unit,
                   a.\`restart-required\` AS restartRequired
            ORDER BY a.name`,
-          { address }
-        ),
-      ]);
+        { address },
+      ),
+    ]);
 
     if (resourceResult.records.length === 0) {
       throw new Error(
-        `Resource not found: ${address}. Use search_resources to find valid addresses.`
+        `Resource not found: ${address}. Use search_resources to find valid addresses.`,
       );
     }
 
@@ -109,7 +105,7 @@ export async function describeResource(
       address,
       addParams,
       requiredAttrs,
-      optionalAttrs
+      optionalAttrs,
     );
   } finally {
     await Promise.all(sessions.map((s) => s.close()));
@@ -124,7 +120,7 @@ function formatMarkdown(
   address: string,
   addParams: ParameterRow[],
   requiredAttrs: AttributeRow[],
-  optionalAttrs: AttributeRow[]
+  optionalAttrs: AttributeRow[],
 ): string {
   const lines: string[] = [];
 

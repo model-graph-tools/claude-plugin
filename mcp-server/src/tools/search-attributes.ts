@@ -32,7 +32,7 @@ export async function searchAttributes(
   query: string,
   deprecated?: boolean,
   stability?: string,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<SearchAttributesResult> {
   validateQueryLength(query);
   const session = await getSession(identifier);
@@ -54,10 +54,7 @@ export async function searchAttributes(
        ${whereClause}
        ${deprecatedJoin}`;
 
-    const countResult = await session.run(
-      `${baseQuery}\nRETURN count(a) AS total`,
-      params
-    );
+    const countResult = await session.run(`${baseQuery}\nRETURN count(a) AS total`, params);
     const totalCount = toNumber(countResult.records[0]?.get("total"));
 
     const result = await session.run(
@@ -72,7 +69,7 @@ export async function searchAttributes(
               d.reason AS deprecationReason
        ORDER BY a.name, r.address
        LIMIT $limit`,
-      params
+      params,
     );
 
     return {

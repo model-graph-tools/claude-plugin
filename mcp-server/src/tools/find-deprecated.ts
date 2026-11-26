@@ -28,14 +28,12 @@ export async function findDeprecated(
   identifier: string,
   sinceVersion?: string,
   elementType?: string,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<FindDeprecatedResult> {
   const session = await getSession(identifier);
   try {
     const queries: string[] = [];
-    const types = elementType
-      ? [elementType]
-      : ["resource", "attribute", "operation", "parameter"];
+    const types = elementType ? [elementType] : ["resource", "attribute", "operation", "parameter"];
 
     const versionFilter = sinceVersion ? buildVersionFilter() : "";
 
@@ -48,7 +46,7 @@ export async function findDeprecated(
                 r.address AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
                 v.major AS _major, v.minor AS _minor, v.patch AS _patch,
-                d.reason AS reason`
+                d.reason AS reason`,
       );
     }
 
@@ -61,7 +59,7 @@ export async function findDeprecated(
                 r.address AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
                 v.major AS _major, v.minor AS _minor, v.patch AS _patch,
-                d.reason AS reason`
+                d.reason AS reason`,
       );
     }
 
@@ -74,7 +72,7 @@ export async function findDeprecated(
                 r.address AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
                 v.major AS _major, v.minor AS _minor, v.patch AS _patch,
-                d.reason AS reason`
+                d.reason AS reason`,
       );
     }
 
@@ -87,7 +85,7 @@ export async function findDeprecated(
                 null AS resource,
                 (v.major + '.' + v.minor + '.' + v.patch) AS deprecatedSince,
                 v.major AS _major, v.minor AS _minor, v.patch AS _patch,
-                d.reason AS reason`
+                d.reason AS reason`,
       );
     }
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vite-plus/test";
 
 const { mockDriver } = vi.hoisted(() => {
   const mockSession = { close: vi.fn() };
@@ -61,7 +61,7 @@ describe("hasConnection", () => {
 describe("getSession", () => {
   it("throws when no connection exists", async () => {
     await expect(getSession("nonexistent")).rejects.toThrow(
-      'No connection for model graph "nonexistent"'
+      'No connection for model graph "nonexistent"',
     );
   });
 
@@ -108,9 +108,7 @@ describe("getSession", () => {
     refreshConnection("44.0", 7687);
     mockDriver.verifyConnectivity.mockRejectedValue(new Error("connection refused"));
 
-    await expect(getSession("44.0")).rejects.toThrow(
-      "connection refused"
-    );
+    await expect(getSession("44.0")).rejects.toThrow("connection refused");
   });
 
   it("auto-connects when container lookup finds running container", async () => {
@@ -128,9 +126,7 @@ describe("getSession", () => {
     const lookup = vi.fn().mockResolvedValue(null);
     setContainerLookup(lookup);
 
-    await expect(getSession("51.0")).rejects.toThrow(
-      'No connection for model graph "51.0"'
-    );
+    await expect(getSession("51.0")).rejects.toThrow('No connection for model graph "51.0"');
     expect(lookup).toHaveBeenCalledWith("51.0");
   });
 
@@ -144,9 +140,7 @@ describe("getSession", () => {
   });
 
   it("throws when no lookup is set and no connection exists", async () => {
-    await expect(getSession("53.0")).rejects.toThrow(
-      'No connection for model graph "53.0"'
-    );
+    await expect(getSession("53.0")).rejects.toThrow('No connection for model graph "53.0"');
   });
 });
 
@@ -179,7 +173,7 @@ describe("waitForReady", () => {
     mockDriver.verifyConnectivity.mockRejectedValue(new Error("connection refused"));
 
     await expect(waitForReady("62.0", 1)).rejects.toThrow(
-      'Model graph "62.0" started but Neo4j is not ready after 1 attempts'
+      'Model graph "62.0" started but Neo4j is not ready after 1 attempts',
     );
 
     vi.useFakeTimers();
@@ -187,7 +181,7 @@ describe("waitForReady", () => {
 
   it("throws when no connection exists", async () => {
     await expect(waitForReady("nonexistent")).rejects.toThrow(
-      'No connection for "nonexistent" to verify'
+      'No connection for "nonexistent" to verify',
     );
   });
 });

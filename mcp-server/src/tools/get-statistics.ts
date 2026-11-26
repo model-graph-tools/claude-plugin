@@ -84,9 +84,7 @@ const REL_TYPE_MAP: Record<string, keyof StatisticsResult["relationships"]> = {
 
 // --- Main ---
 
-export async function getStatistics(
-  identifier: string
-): Promise<StatisticsResult> {
+export async function getStatistics(identifier: string): Promise<StatisticsResult> {
   const sessions = await getSessions(identifier, 4);
   try {
     const [nodeResult, deprecatedResult, relResult, identityResult] = await Promise.all([
@@ -94,25 +92,25 @@ export async function getStatistics(
         `MATCH (n)
          WHERE n:Resource OR n:Attribute OR n:Operation OR n:Parameter OR n:Capability
          WITH labels(n)[0] AS label, n.stability AS stability
-         RETURN label, stability, count(*) AS cnt`
+         RETURN label, stability, count(*) AS cnt`,
       ),
       sessions[1].run(
         `MATCH (r:Resource)-[:DEPRECATED_SINCE]->() RETURN 'resource' AS type, count(r) AS cnt
          UNION ALL
          MATCH (a:Attribute)-[:DEPRECATED_SINCE]->() RETURN 'attribute' AS type, count(a) AS cnt
          UNION ALL
-         MATCH (o:Operation)-[:DEPRECATED_SINCE]->() RETURN 'operation' AS type, count(o) AS cnt`
+         MATCH (o:Operation)-[:DEPRECATED_SINCE]->() RETURN 'operation' AS type, count(o) AS cnt`,
       ),
       sessions[2].run(
         `MATCH ()-[r]->()
-         RETURN type(r) AS relType, count(r) AS cnt`
+         RETURN type(r) AS relType, count(r) AS cnt`,
       ),
       sessions[3].run(
         `OPTIONAL MATCH (i:Identity)
          RETURN i.name AS name, i.identifier AS identifier, i.type AS type,
                 i.version AS version, i.description AS description,
                 i.\`group-id\` AS groupId, i.\`artifact-id\` AS artifactId,
-                i.url AS url, i.\`scm-url\` AS scmUrl, i.licenses AS licenses`
+                i.url AS url, i.\`scm-url\` AS scmUrl, i.licenses AS licenses`,
       ),
     ]);
 

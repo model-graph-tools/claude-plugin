@@ -22,7 +22,7 @@ interface SearchResourcesResult {
 export async function searchResources(
   identifier: string,
   query: string,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<SearchResourcesResult> {
   validateQueryLength(query);
   const session = await getSession(identifier);
@@ -33,7 +33,7 @@ export async function searchResources(
       `MATCH (r:Resource)
        WHERE r.name =~ $regex OR r.address =~ $regex OR r.description =~ $regex
        RETURN count(r) AS total`,
-      { regex }
+      { regex },
     );
     const totalCount = (countResult.records[0]?.get("total") as { toNumber(): number }).toNumber();
 
@@ -48,7 +48,7 @@ export async function searchResources(
               count(child) AS childCount
        ORDER BY r.address
        LIMIT $limit`,
-      { regex, limit: neo4j.int(limit) }
+      { regex, limit: neo4j.int(limit) },
     );
 
     return {

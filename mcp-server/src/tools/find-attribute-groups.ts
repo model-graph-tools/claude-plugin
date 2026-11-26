@@ -12,14 +12,12 @@ interface AttributeGroupEntry {
 export async function findAttributeGroups(
   identifier: string,
   resource?: string,
-  groupName?: string
+  groupName?: string,
 ): Promise<AttributeGroupEntry[]> {
   const session = await getSession(identifier);
   try {
     const params: Record<string, unknown> = {};
-    const conditions: string[] = [
-      "a.`attribute-group` IS NOT NULL",
-    ];
+    const conditions: string[] = ["a.`attribute-group` IS NOT NULL"];
 
     if (resource) {
       params.address = resource;
@@ -39,7 +37,7 @@ export async function findAttributeGroups(
               a.\`attribute-group\` AS group,
               collect(a.name) AS attributes
        ORDER BY r.address, group`,
-      params
+      params,
     );
 
     return result.records.map((r) => ({

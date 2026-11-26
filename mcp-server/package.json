@@ -3,12 +3,12 @@
   "version": "0.12.3",
   "description": "MCP server for querying the WildFly management model graph",
   "keywords": [
-    "wildfly",
     "jboss",
     "management-model",
     "mcp",
     "model-context-protocol",
-    "neo4j"
+    "neo4j",
+    "wildfly"
   ],
   "homepage": "https://model-graph-tools.github.io/",
   "bugs": {
@@ -24,8 +24,6 @@
     "url": "https://github.com/model-graph-tools/claude-plugin.git",
     "directory": "mcp-server"
   },
-  "type": "module",
-  "main": "dist/index.js",
   "bin": {
     "model-graph-mcp-server": "dist/index.js"
   },
@@ -33,20 +31,15 @@
     "dist",
     "README.md"
   ],
+  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "build": "node build.mjs",
     "build:types": "tsc --emitDeclarationOnly",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
-    "test": "vitest run",
+    "dev": "vpx src/index.ts",
+    "test": "vp test run",
     "prepublishOnly": "npm run build"
-  },
-  "optionalDependencies": {
-    "@model-graph-tools/mgt-darwin-arm64": "0.5.10",
-    "@model-graph-tools/mgt-darwin-x64": "0.5.10",
-    "@model-graph-tools/mgt-linux-arm64": "0.5.10",
-    "@model-graph-tools/mgt-linux-x64": "0.5.10",
-    "@model-graph-tools/mgt-win32-x64": "0.5.10"
   },
   "dependencies": {
     "neo4j-driver": "^6.2.0"
@@ -56,10 +49,28 @@
     "@modelcontextprotocol/server": "^2.3.1",
     "@types/node": "^26.6.5",
     "esbuild": "^0.28.0",
-    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.5",
+    "vite-plus": "1.8.0",
+    "vitest": "5.1.1",
     "zod": "^4.6.7"
+  },
+  "optionalDependencies": {
+    "@model-graph-tools/mgt-darwin-arm64": "0.5.10",
+    "@model-graph-tools/mgt-darwin-x64": "0.5.10",
+    "@model-graph-tools/mgt-linux-arm64": "0.5.10",
+    "@model-graph-tools/mgt-linux-x64": "0.5.10",
+    "@model-graph-tools/mgt-win32-x64": "0.5.10"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@8.3.8001",
+    "vitest": "5.1.1"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.23.0",
+      "onFail": "download"
+    }
   },
   "engines": {
     "node": ">=18"

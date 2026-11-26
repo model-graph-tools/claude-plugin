@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vite-plus/test";
 import { escapeRegex, toNumber, validateQueryLength } from "./utils.js";
 
 describe("escapeRegex", () => {
@@ -20,9 +20,7 @@ describe("escapeRegex", () => {
   });
 
   it("escapes all special characters in a single string", () => {
-    expect(escapeRegex(".*+?^${}()|[]\\")).toBe(
-      "\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\"
-    );
+    expect(escapeRegex(".*+?^${}()|[]\\")).toBe("\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\");
   });
 });
 
@@ -60,7 +58,7 @@ describe("validateQueryLength", () => {
 
   it("rejects queries exceeding the limit", () => {
     expect(() => validateQueryLength("a".repeat(201))).toThrow(
-      "Search query too long (max 200 characters)"
+      "Search query too long (max 200 characters)",
     );
   });
 

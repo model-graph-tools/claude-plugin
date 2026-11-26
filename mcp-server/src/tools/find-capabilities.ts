@@ -29,7 +29,7 @@ interface CapabilityResult {
 
 export async function findCapabilities(
   identifier: string,
-  query: string
+  query: string,
 ): Promise<CapabilityResult[]> {
   validateQueryLength(query);
   const session = await getSession(identifier);
@@ -49,17 +49,20 @@ export async function findCapabilities(
               collect(DISTINCT {attribute: a.name, resource: ra.address}) AS referencedBy,
               collect(DISTINCT {parameter: p.name, operation: op.name, resource: rp.address}) AS referencedByParameters
        ORDER BY c.name`,
-      { regex }
+      { regex },
     );
 
     return result.records.map((r) => ({
       capability: r.get("capability") as string,
-      declaredBy: (r.get("declaredBy") as Array<{address: string | null, stability: string | null}>)
-        .filter((d): d is DeclaringResource => d?.address != null),
-      referencedBy: (r.get("referencedBy") as Array<CapabilityReference | null>)
-        .filter((ref): ref is CapabilityReference => ref?.attribute != null),
-      referencedByParameters: (r.get("referencedByParameters") as Array<ParameterReference | null>)
-        .filter((ref): ref is ParameterReference => ref?.parameter != null),
+      declaredBy: (
+        r.get("declaredBy") as Array<{ address: string | null; stability: string | null }>
+      ).filter((d): d is DeclaringResource => d?.address != null),
+      referencedBy: (r.get("referencedBy") as Array<CapabilityReference | null>).filter(
+        (ref): ref is CapabilityReference => ref?.attribute != null,
+      ),
+      referencedByParameters: (
+        r.get("referencedByParameters") as Array<ParameterReference | null>
+      ).filter((ref): ref is ParameterReference => ref?.parameter != null),
     }));
   } finally {
     await session.close();

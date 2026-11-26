@@ -29,9 +29,7 @@ export async function listSources(): Promise<ListSourcesResult> {
     mgtPs(),
   ]);
 
-  const runningByIdentifier = new Map(
-    running.map((c) => [c.identifier, c])
-  );
+  const runningByIdentifier = new Map(running.map((c) => [c.identifier, c]));
 
   const active = getActiveSource();
   const sources: SourceInfo[] = [];

@@ -71,7 +71,7 @@ export async function getSession(identifier: string): Promise<Session> {
     }
     if (!entry) {
       throw new Error(
-        `No connection for model graph "${identifier}". Use start_source to start it first.`
+        `No connection for model graph "${identifier}". Use start_source to start it first.`,
       );
     }
   }
@@ -83,7 +83,10 @@ export async function getSession(identifier: string): Promise<Session> {
       await entry.driver.verifyConnectivity();
       lastVerified.set(identifier, now);
     } catch (verifyError) {
-      console.error(`Connection verification failed for ${identifier}, attempting reconnect:`, verifyError);
+      console.error(
+        `Connection verification failed for ${identifier}, attempting reconnect:`,
+        verifyError,
+      );
       entry.driver.close().catch((err) => {
         console.error(`Failed to close stale driver for ${identifier}:`, err);
       });
@@ -95,10 +98,11 @@ export async function getSession(identifier: string): Promise<Session> {
       } catch (reconnectError) {
         connections.delete(identifier);
         lastVerified.delete(identifier);
-        const detail = reconnectError instanceof Error ? reconnectError.message : String(reconnectError);
+        const detail =
+          reconnectError instanceof Error ? reconnectError.message : String(reconnectError);
         throw new Error(
           `Cannot connect to model graph "${identifier}" at bolt://localhost:${entry.boltPort}: ${detail}. ` +
-            `The container may not be running or Neo4j may not be ready. Use start_source to reconnect.`
+            `The container may not be running or Neo4j may not be ready. Use start_source to reconnect.`,
         );
       }
     }
@@ -127,7 +131,7 @@ export async function getSessions(identifier: string, count: number): Promise<Se
 
   const entry = connections.get(identifier)!;
   const rest = Array.from({ length: count - 1 }, () =>
-    entry.driver.session({ defaultAccessMode: neo4j.session.READ })
+    entry.driver.session({ defaultAccessMode: neo4j.session.READ }),
   );
   return [first, ...rest];
 }
@@ -136,7 +140,7 @@ export async function getSessions(identifier: string, count: number): Promise<Se
 
 export async function waitForReady(
   identifier: string,
-  maxAttempts: number = READINESS_DELAYS.length
+  maxAttempts: number = READINESS_DELAYS.length,
 ): Promise<void> {
   const entry = connections.get(identifier);
   if (!entry) {
@@ -160,7 +164,7 @@ export async function waitForReady(
   const detail = lastError instanceof Error ? lastError.message : String(lastError);
   throw new Error(
     `Model graph "${identifier}" started but Neo4j is not ready after ${maxAttempts} attempts: ${detail}. ` +
-      `The database may still be loading. Try again in a few seconds.`
+      `The database may still be loading. Try again in a few seconds.`,
   );
 }
 
@@ -179,9 +183,7 @@ export async function closeConnection(identifier: string): Promise<void> {
 }
 
 export async function closeAll(): Promise<void> {
-  const closePromises = Array.from(connections.values()).map((e) =>
-    e.driver.close()
-  );
+  const closePromises = Array.from(connections.values()).map((e) => e.driver.close());
   await Promise.all(closePromises);
   connections.clear();
   lastVerified.clear();

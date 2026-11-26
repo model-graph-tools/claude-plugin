@@ -13,9 +13,7 @@ interface StartSourceResult {
   message: string;
 }
 
-export async function startSource(
-  identifier: string
-): Promise<StartSourceResult> {
+export async function startSource(identifier: string): Promise<StartSourceResult> {
   const result = await mgtStart(identifier);
   if (!result.success) {
     // Container might already be running (name conflict) — check before failing
@@ -23,14 +21,10 @@ export async function startSource(
     if (running) {
       return running;
     }
-    throw new Error(
-      result.error ?? `Failed to start model graph "${identifier}"`
-    );
+    throw new Error(result.error ?? `Failed to start model graph "${identifier}"`);
   }
   if (!result.bolt || !result.http) {
-    throw new Error(
-      `mgt start succeeded but did not return port information for "${identifier}"`
-    );
+    throw new Error(`mgt start succeeded but did not return port information for "${identifier}"`);
   }
   const canonicalId = result.identifier ?? identifier;
   try {
@@ -52,9 +46,7 @@ export async function startSource(
   };
 }
 
-async function findRunning(
-  identifier: string
-): Promise<StartSourceResult | null> {
+async function findRunning(identifier: string): Promise<StartSourceResult | null> {
   try {
     const containers = await mgtPs();
     const container = containers.find((c) => c.identifier === identifier);

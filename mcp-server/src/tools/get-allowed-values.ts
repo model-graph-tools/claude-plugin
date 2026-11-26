@@ -30,7 +30,7 @@ interface GetAllowedValuesResult {
 export async function getAllowedValues(
   identifier: string,
   query: string,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<GetAllowedValuesResult> {
   validateQueryLength(query);
   const session = await getSession(identifier);
@@ -53,7 +53,7 @@ export async function getAllowedValues(
        OPTIONAL MATCH (r2:Resource)-[:PROVIDES]->(o:Operation)-[:ACCEPTS]->(p:Parameter)
        WHERE (p.name =~ $regex OR p.description =~ $regex) AND ${hasParamConstraint}
        RETURN attrCount + count(p) AS total`,
-      { regex }
+      { regex },
     );
     const totalCount = toNumber(countResult.records[0]?.get("total"));
 
@@ -77,7 +77,7 @@ export async function getAllowedValues(
               p.unit AS unit
        ORDER BY name, resource
        LIMIT $limit`,
-      params
+      params,
     );
 
     return {

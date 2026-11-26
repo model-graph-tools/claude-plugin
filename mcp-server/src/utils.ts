@@ -28,9 +28,7 @@ export function toNumberOrUndefined(val: unknown): number | undefined {
 
 export function validateQueryLength(query: string): void {
   if (query.length > MAX_QUERY_LENGTH) {
-    throw new Error(
-      `Search query too long (max ${MAX_QUERY_LENGTH} characters)`
-    );
+    throw new Error(`Search query too long (max ${MAX_QUERY_LENGTH} characters)`);
   }
 }
 
@@ -42,7 +40,7 @@ export function pickDefined(fields: Record<string, unknown>): Record<string, unk
       if (v == null) return false;
       if (Array.isArray(v) && v.length === 0) return false;
       return true;
-    })
+    }),
   );
 }
 
@@ -54,7 +52,7 @@ export function toPlainValue(val: unknown): unknown {
   if (typeof val === "object" && "properties" in val) {
     const node = val as { properties: Record<string, unknown> };
     return Object.fromEntries(
-      Object.entries(node.properties).map(([k, v]) => [k, toPlainValue(v)])
+      Object.entries(node.properties).map(([k, v]) => [k, toPlainValue(v)]),
     );
   }
   if (Array.isArray(val)) {

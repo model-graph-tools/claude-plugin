@@ -41,9 +41,7 @@ const server = new McpServer({
 
 // --- Shared schemas ---
 
-const identifierParam = z
-  .string()
-  .describe('WildFly version or feature pack, e.g. "39"');
+const identifierParam = z.string().describe('WildFly version or feature pack, e.g. "39"');
 
 const stabilityEnum = z
   .enum(["experimental", "preview", "community", "default"])
@@ -67,10 +65,7 @@ function handleTool<T>(fn: (params: T) => Promise<unknown>) {
   return async (params: T) => {
     try {
       const result = await fn(params);
-      const text =
-        typeof result === "string"
-          ? result
-          : JSON.stringify(result, null, 2);
+      const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
       return { content: [{ type: "text" as const, text }] };
     } catch (e) {
       return errorResult(e);
@@ -94,61 +89,71 @@ function handleStructuredTool<T>(fn: (params: T) => Promise<Record<string, unkno
 
 // --- Lifecycle tools ---
 
-server.registerTool("list_sources", {
-  title: "List Sources",
-  description:
-    "Lists all known WildFly versions and feature packs with their availability (running/not_found).",
-  annotations: {
-    readOnlyHint: true,
-    destructiveHint: false,
-    idempotentHint: true,
-    openWorldHint: false,
+server.registerTool(
+  "list_sources",
+  {
+    title: "List Sources",
+    description:
+      "Lists all known WildFly versions and feature packs with their availability (running/not_found).",
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    outputSchema: out.listSourcesOutput,
   },
-  outputSchema: out.listSourcesOutput,
-}, handleStructuredTool(async () => {
-  return listSources();
-}));
-
-server.registerTool("start_source", {
-  title: "Start Source",
-  description:
-    "Starts the model graph database for a WildFly version or feature pack. Downloads data automatically if needed — this may take up to a minute on first use. IMPORTANT: This starts the model graph database, NOT the WildFly application server. When describing this action to users, say 'starting the model graph for WildFly X', never 'starting WildFly X'.",
-  annotations: {
-    readOnlyHint: false,
-    destructiveHint: false,
-    idempotentHint: true,
-    openWorldHint: false,
-  },
-  inputSchema: z.object({
-    identifier: z
-      .string()
-      .describe('WildFly version or feature pack, e.g. "39", "26.1", "ai:0.9.1"'),
+  handleStructuredTool(async () => {
+    return listSources();
   }),
-  outputSchema: out.startSourceOutput,
-}, handleStructuredTool(async ({ identifier }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return startSource(resolved);
-}));
+);
 
-server.registerTool("stop_source", {
-  title: "Stop Source",
-  description: "Stops the model graph for a WildFly version or feature pack.",
-  annotations: {
-    readOnlyHint: false,
-    destructiveHint: true,
-    idempotentHint: true,
-    openWorldHint: false,
+server.registerTool(
+  "start_source",
+  {
+    title: "Start Source",
+    description:
+      "Starts the model graph database for a WildFly version or feature pack. Downloads data automatically if needed — this may take up to a minute on first use. IMPORTANT: This starts the model graph database, NOT the WildFly application server. When describing this action to users, say 'starting the model graph for WildFly X', never 'starting WildFly X'.",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    inputSchema: z.object({
+      identifier: z
+        .string()
+        .describe('WildFly version or feature pack, e.g. "39", "26.1", "ai:0.9.1"'),
+    }),
+    outputSchema: out.startSourceOutput,
   },
-  inputSchema: z.object({
-    identifier: z
-      .string()
-      .describe('WildFly version or feature pack, e.g. "39", "ai:0.9.1"'),
+  handleStructuredTool(async ({ identifier }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return startSource(resolved);
   }),
-  outputSchema: out.stopSourceOutput,
-}, handleStructuredTool(async ({ identifier }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return stopSource(resolved);
-}));
+);
+
+server.registerTool(
+  "stop_source",
+  {
+    title: "Stop Source",
+    description: "Stops the model graph for a WildFly version or feature pack.",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    inputSchema: z.object({
+      identifier: z.string().describe('WildFly version or feature pack, e.g. "39", "ai:0.9.1"'),
+    }),
+    outputSchema: out.stopSourceOutput,
+  },
+  handleStructuredTool(async ({ identifier }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return stopSource(resolved);
+  }),
+);
 
 // --- Query tools ---
 
@@ -159,322 +164,372 @@ const readOnlyAnnotations = {
   openWorldHint: false,
 } as const;
 
-server.registerTool("search_resources", {
-  title: "Search Resources",
-  description:
-    "Searches for management model resources by name, address, or description.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    query: z.string().describe("Search term matched against resource name, address, and description"),
-    identifier: identifierParam,
-    limit: z.number().optional().describe("Max results (default 25)"),
+server.registerTool(
+  "search_resources",
+  {
+    title: "Search Resources",
+    description: "Searches for management model resources by name, address, or description.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      query: z
+        .string()
+        .describe("Search term matched against resource name, address, and description"),
+      identifier: identifierParam,
+      limit: z.number().optional().describe("Max results (default 25)"),
+    }),
+    outputSchema: out.searchResourcesOutput,
+  },
+  handleStructuredTool(async ({ query, identifier, limit }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return searchResources(resolved, query, limit);
   }),
-  outputSchema: out.searchResourcesOutput,
-}, handleStructuredTool(async ({ query, identifier, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return searchResources(resolved, query, limit);
-}));
+);
 
-server.registerTool("browse_resource", {
-  title: "Browse Resource",
-  description:
-    "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata (allowed values, units, restart requirements, attribute groups), operation stability and characteristics (read-only, runtime-only, global), parameter relationships (requires/alternatives), and sub-attribute composition via CONSISTS_OF for complex attributes (LIST/OBJECT).",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    address: z
-      .string()
-      .describe('Resource address, e.g. "/subsystem=datasources"'),
-    identifier: identifierParam,
+server.registerTool(
+  "browse_resource",
+  {
+    title: "Browse Resource",
+    description:
+      "Returns a resource with its children, attributes, operations, and capabilities. The primary drill-down tool. Includes description, stability, parent, full attribute metadata (allowed values, units, restart requirements, attribute groups), operation stability and characteristics (read-only, runtime-only, global), parameter relationships (requires/alternatives), and sub-attribute composition via CONSISTS_OF for complex attributes (LIST/OBJECT).",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      address: z.string().describe('Resource address, e.g. "/subsystem=datasources"'),
+      identifier: identifierParam,
+    }),
+  },
+  handleTool(async ({ address, identifier }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return browseResource(resolved, address);
   }),
-}, handleTool(async ({ address, identifier }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return browseResource(resolved, address);
-}));
+);
 
-server.registerTool("describe_resource", {
-  title: "Describe Resource",
-  description:
-    "Returns a concise, human-readable description of a resource — its purpose, required add-operation parameters, required and optional attributes, and a CLI example. Use this for 'how do I add/configure X?' questions instead of browse_resource.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    address: z
-      .string()
-      .describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
-    identifier: identifierParam,
+server.registerTool(
+  "describe_resource",
+  {
+    title: "Describe Resource",
+    description:
+      "Returns a concise, human-readable description of a resource — its purpose, required add-operation parameters, required and optional attributes, and a CLI example. Use this for 'how do I add/configure X?' questions instead of browse_resource.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      address: z.string().describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
+      identifier: identifierParam,
+    }),
+  },
+  handleTool(async ({ address, identifier }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return describeResource(resolved, address);
   }),
-}, handleTool(async ({ address, identifier }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return describeResource(resolved, address);
-}));
+);
 
-server.registerTool("search_operations", {
-  title: "Search Operations",
-  description:
-    "Searches operations across all resources by name or description. Can filter by resource address, read-only vs. mutating, and runtime-only. Returns stability level, deprecation info, and operation characteristics.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    query: z
-      .string()
-      .describe("Search term matched against operation name and description"),
-    identifier: identifierParam,
-    resource_filter: z
-      .string()
-      .optional()
-      .describe("Filter to operations in resources matching this address substring"),
-    read_only: z
-      .boolean()
-      .optional()
-      .describe("If true, only return read-only operations; if false, only mutating operations"),
-    runtime_only: z
-      .boolean()
-      .optional()
-      .describe("If true, only return runtime-only operations"),
-    limit: z.number().optional().describe("Max results (default 25)"),
-  }),
-  outputSchema: out.searchOperationsOutput,
-}, handleStructuredTool(async ({ query, identifier, resource_filter, read_only, runtime_only, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return searchOperations(resolved, query, resource_filter, read_only, runtime_only, limit);
-}));
+server.registerTool(
+  "search_operations",
+  {
+    title: "Search Operations",
+    description:
+      "Searches operations across all resources by name or description. Can filter by resource address, read-only vs. mutating, and runtime-only. Returns stability level, deprecation info, and operation characteristics.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      query: z.string().describe("Search term matched against operation name and description"),
+      identifier: identifierParam,
+      resource_filter: z
+        .string()
+        .optional()
+        .describe("Filter to operations in resources matching this address substring"),
+      read_only: z
+        .boolean()
+        .optional()
+        .describe("If true, only return read-only operations; if false, only mutating operations"),
+      runtime_only: z.boolean().optional().describe("If true, only return runtime-only operations"),
+      limit: z.number().optional().describe("Max results (default 25)"),
+    }),
+    outputSchema: out.searchOperationsOutput,
+  },
+  handleStructuredTool(
+    async ({ query, identifier, resource_filter, read_only, runtime_only, limit }) => {
+      const resolved = await resolveIdentifier(identifier);
+      return searchOperations(resolved, query, resource_filter, read_only, runtime_only, limit);
+    },
+  ),
+);
 
-server.registerTool("search_attributes", {
-  title: "Search Attributes",
-  description:
-    "Searches attributes across all resources. Can filter to only deprecated attributes or by stability level. Returns access type and required flag.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    query: z
-      .string()
-      .describe("Search term matched against attribute name and description"),
-    identifier: identifierParam,
-    deprecated: z
-      .boolean()
-      .optional()
-      .describe("If true, only return deprecated attributes"),
-    stability: stabilityEnum.optional(),
-    limit: z.number().optional().describe("Max results (default 25)"),
+server.registerTool(
+  "search_attributes",
+  {
+    title: "Search Attributes",
+    description:
+      "Searches attributes across all resources. Can filter to only deprecated attributes or by stability level. Returns access type and required flag.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      query: z.string().describe("Search term matched against attribute name and description"),
+      identifier: identifierParam,
+      deprecated: z.boolean().optional().describe("If true, only return deprecated attributes"),
+      stability: stabilityEnum.optional(),
+      limit: z.number().optional().describe("Max results (default 25)"),
+    }),
+    outputSchema: out.searchAttributesOutput,
+  },
+  handleStructuredTool(async ({ query, identifier, deprecated, stability, limit }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return searchAttributes(resolved, query, deprecated, stability, limit);
   }),
-  outputSchema: out.searchAttributesOutput,
-}, handleStructuredTool(async ({ query, identifier, deprecated, stability, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return searchAttributes(resolved, query, deprecated, stability, limit);
-}));
+);
 
-server.registerTool("find_capabilities", {
-  title: "Find Capabilities",
-  description:
-    "Searches for capabilities by name and shows which resources declare or reference them (via attributes and parameters).",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    query: z.string().describe("Search term matched against capability name"),
-    identifier: identifierParam,
+server.registerTool(
+  "find_capabilities",
+  {
+    title: "Find Capabilities",
+    description:
+      "Searches for capabilities by name and shows which resources declare or reference them (via attributes and parameters).",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      query: z.string().describe("Search term matched against capability name"),
+      identifier: identifierParam,
+    }),
+    outputSchema: out.findCapabilitiesOutput,
+  },
+  handleStructuredTool(async ({ query, identifier }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return { results: await findCapabilities(resolved, query) };
   }),
-  outputSchema: out.findCapabilitiesOutput,
-}, handleStructuredTool(async ({ query, identifier }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return { results: await findCapabilities(resolved, query) };
-}));
+);
 
-server.registerTool("find_deprecated", {
-  title: "Find Deprecated",
-  description:
-    "Finds all deprecated elements (resources, attributes, operations, and parameters), optionally filtered by version or type.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    identifier: identifierParam,
-    since_version: z
-      .string()
-      .optional()
-      .describe('Only show items deprecated since this management model version, e.g. "25.0.0". Note: this is the management model version, not the WildFly server version.'),
-    element_type: elementTypeEnum.optional(),
-    limit: z.number().optional().describe("Max results (default 50)"),
+server.registerTool(
+  "find_deprecated",
+  {
+    title: "Find Deprecated",
+    description:
+      "Finds all deprecated elements (resources, attributes, operations, and parameters), optionally filtered by version or type.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      identifier: identifierParam,
+      since_version: z
+        .string()
+        .optional()
+        .describe(
+          'Only show items deprecated since this management model version, e.g. "25.0.0". Note: this is the management model version, not the WildFly server version.',
+        ),
+      element_type: elementTypeEnum.optional(),
+      limit: z.number().optional().describe("Max results (default 50)"),
+    }),
+    outputSchema: out.findDeprecatedOutput,
+  },
+  handleStructuredTool(async ({ identifier, since_version, element_type, limit }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return findDeprecated(resolved, since_version, element_type, limit);
   }),
-  outputSchema: out.findDeprecatedOutput,
-}, handleStructuredTool(async ({ identifier, since_version, element_type, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return findDeprecated(resolved, since_version, element_type, limit);
-}));
+);
 
-server.registerTool("find_by_stability", {
-  title: "Find by Stability",
-  description:
-    "Finds all elements (resources, attributes, operations, and parameters) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    identifier: identifierParam,
-    stability: stabilityEnum,
-    element_type: elementTypeEnum.optional(),
-    limit: z.number().optional().describe("Max results (default 50)"),
+server.registerTool(
+  "find_by_stability",
+  {
+    title: "Find by Stability",
+    description:
+      "Finds all elements (resources, attributes, operations, and parameters) with a given stability level, optionally filtered by type. Mainly useful for non-default levels (experimental, preview, community).",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      identifier: identifierParam,
+      stability: stabilityEnum,
+      element_type: elementTypeEnum.optional(),
+      limit: z.number().optional().describe("Max results (default 50)"),
+    }),
+    outputSchema: out.findByStabilityOutput,
+  },
+  handleStructuredTool(async ({ identifier, stability, element_type, limit }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return findByStability(resolved, stability, element_type, limit);
   }),
-  outputSchema: out.findByStabilityOutput,
-}, handleStructuredTool(async ({ identifier, stability, element_type, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return findByStability(resolved, stability, element_type, limit);
-}));
+);
 
-server.registerTool("get_statistics", {
-  title: "Get Statistics",
-  description:
-    "Overview of the management model: identity metadata (name, version, type), node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    identifier: identifierParam,
+server.registerTool(
+  "get_statistics",
+  {
+    title: "Get Statistics",
+    description:
+      "Overview of the management model: identity metadata (name, version, type), node counts, stability breakdown per element type, deprecation counts, and relationship counts.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      identifier: identifierParam,
+    }),
+    outputSchema: out.getStatisticsOutput,
+  },
+  handleStructuredTool(async ({ identifier }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return getStatistics(resolved);
   }),
-  outputSchema: out.getStatisticsOutput,
-}, handleStructuredTool(async ({ identifier }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return getStatistics(resolved);
-}));
+);
 
-server.registerTool("compare_versions", {
-  title: "Compare Versions",
-  description:
-    "Compares two WildFly versions or feature packs to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute, operation, and parameter changes within resources that exist in both versions.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    identifier1: z.string().describe('Older WildFly version or feature pack, e.g. "38"'),
-    identifier2: z.string().describe('Newer WildFly version or feature pack, e.g. "39"'),
+server.registerTool(
+  "compare_versions",
+  {
+    title: "Compare Versions",
+    description:
+      "Compares two WildFly versions or feature packs to find added, removed, and newly deprecated resources/attributes/operations. Also detects attribute, operation, and parameter changes within resources that exist in both versions.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      identifier1: z.string().describe('Older WildFly version or feature pack, e.g. "38"'),
+      identifier2: z.string().describe('Newer WildFly version or feature pack, e.g. "39"'),
+    }),
+  },
+  handleTool(async ({ identifier1, identifier2 }) => {
+    const [resolved1, resolved2] = await resolveIdentifiers(identifier1, identifier2);
+    return compareVersions(resolved1, resolved2);
   }),
-}, handleTool(async ({ identifier1, identifier2 }) => {
-  const [resolved1, resolved2] = await resolveIdentifiers(identifier1, identifier2);
-  return compareVersions(resolved1, resolved2);
-}));
+);
 
-server.registerTool("get_resource_tree", {
-  title: "Get Resource Tree",
-  description:
-    "Returns all resources in the subtree under a given address. Use to explore the resource hierarchy without recursive browse_resource calls.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    address: z
-      .string()
-      .describe('Root address, e.g. "/subsystem=datasources". Use "/" for the full tree'),
-    identifier: identifierParam,
-    depth: z
-      .number()
-      .optional()
-      .describe("Max depth to traverse (default: unlimited)"),
+server.registerTool(
+  "get_resource_tree",
+  {
+    title: "Get Resource Tree",
+    description:
+      "Returns all resources in the subtree under a given address. Use to explore the resource hierarchy without recursive browse_resource calls.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      address: z
+        .string()
+        .describe('Root address, e.g. "/subsystem=datasources". Use "/" for the full tree'),
+      identifier: identifierParam,
+      depth: z.number().optional().describe("Max depth to traverse (default: unlimited)"),
+    }),
+  },
+  handleTool(async ({ address, identifier, depth }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return getResourceTree(resolved, address, depth);
   }),
-}, handleTool(async ({ address, identifier, depth }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return getResourceTree(resolved, address, depth);
-}));
+);
 
-server.registerTool("find_relationships", {
-  title: "Find Relationships",
-  description:
-    "Shows dependency and exclusivity relationships between attributes and between operation parameters for a resource. Exposes REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    address: z
-      .string()
-      .describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
-    identifier: identifierParam,
-    scope: z
-      .enum(["attributes", "parameters", "all"])
-      .optional()
-      .describe('Which relationships to return: "attributes", "parameters", or "all" (default: "all")'),
+server.registerTool(
+  "find_relationships",
+  {
+    title: "Find Relationships",
+    description:
+      "Shows dependency and exclusivity relationships between attributes and between operation parameters for a resource. Exposes REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      address: z.string().describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),
+      identifier: identifierParam,
+      scope: z
+        .enum(["attributes", "parameters", "all"])
+        .optional()
+        .describe(
+          'Which relationships to return: "attributes", "parameters", or "all" (default: "all")',
+        ),
+    }),
+  },
+  handleTool(async ({ address, identifier, scope }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return findRelationships(resolved, address, scope);
   }),
-}, handleTool(async ({ address, identifier, scope }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return findRelationships(resolved, address, scope);
-}));
+);
 
-server.registerTool("find_sensitive_attributes", {
-  title: "Find Sensitive Attributes",
-  description:
-    "Find security-sensitive attributes marked with IS_SENSITIVE constraints. Returns attributes with their constraint type and resource. Use to audit passwords, keys, and other secrets in the management model.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    identifier: identifierParam,
-    query: z
-      .string()
-      .optional()
-      .describe("Optional filter by attribute name or resource address"),
-    limit: z.number().optional().describe("Max results (default 50)"),
+server.registerTool(
+  "find_sensitive_attributes",
+  {
+    title: "Find Sensitive Attributes",
+    description:
+      "Find security-sensitive attributes marked with IS_SENSITIVE constraints. Returns attributes with their constraint type and resource. Use to audit passwords, keys, and other secrets in the management model.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      identifier: identifierParam,
+      query: z
+        .string()
+        .optional()
+        .describe("Optional filter by attribute name or resource address"),
+      limit: z.number().optional().describe("Max results (default 50)"),
+    }),
+    outputSchema: out.findSensitiveAttributesOutput,
+  },
+  handleStructuredTool(async ({ identifier, query, limit }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return findSensitiveAttributes(resolved, query, limit);
   }),
-  outputSchema: out.findSensitiveAttributesOutput,
-}, handleStructuredTool(async ({ identifier, query, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return findSensitiveAttributes(resolved, query, limit);
-}));
+);
 
-server.registerTool("get_allowed_values", {
-  title: "Get Allowed Values",
-  description:
-    "Get allowed option values, numeric ranges, and string length constraints for attributes and parameters. Answers 'what values can I set for X?' questions.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    query: z
-      .string()
-      .describe("Search term matched against attribute or parameter name and description"),
-    identifier: identifierParam,
-    limit: z.number().optional().describe("Max results (default 25)"),
+server.registerTool(
+  "get_allowed_values",
+  {
+    title: "Get Allowed Values",
+    description:
+      "Get allowed option values, numeric ranges, and string length constraints for attributes and parameters. Answers 'what values can I set for X?' questions.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      query: z
+        .string()
+        .describe("Search term matched against attribute or parameter name and description"),
+      identifier: identifierParam,
+      limit: z.number().optional().describe("Max results (default 25)"),
+    }),
+    outputSchema: out.getAllowedValuesOutput,
+  },
+  handleStructuredTool(async ({ query, identifier, limit }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return getAllowedValues(resolved, query, limit);
   }),
-  outputSchema: out.getAllowedValuesOutput,
-}, handleStructuredTool(async ({ query, identifier, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return getAllowedValues(resolved, query, limit);
-}));
+);
 
-server.registerTool("find_restart_required", {
-  title: "Find Restart Required",
-  description:
-    'Find attributes that require a server restart after modification. Filter by restart level (no-services, all-services, jvm) and/or resource address. Answers "what changes need a server restart?" questions.',
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    identifier: identifierParam,
-    restart_type: z
-      .enum(["no-services", "all-services", "jvm"])
-      .optional()
-      .describe('Filter by restart level: "no-services", "all-services", or "jvm"'),
-    resource_filter: z
-      .string()
-      .optional()
-      .describe("Filter results to a resource address substring"),
-    limit: z.number().optional().describe("Max results (default 50)"),
+server.registerTool(
+  "find_restart_required",
+  {
+    title: "Find Restart Required",
+    description:
+      'Find attributes that require a server restart after modification. Filter by restart level (no-services, all-services, jvm) and/or resource address. Answers "what changes need a server restart?" questions.',
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      identifier: identifierParam,
+      restart_type: z
+        .enum(["no-services", "all-services", "jvm"])
+        .optional()
+        .describe('Filter by restart level: "no-services", "all-services", or "jvm"'),
+      resource_filter: z
+        .string()
+        .optional()
+        .describe("Filter results to a resource address substring"),
+      limit: z.number().optional().describe("Max results (default 50)"),
+    }),
+    outputSchema: out.findRestartRequiredOutput,
+  },
+  handleStructuredTool(async ({ identifier, restart_type, resource_filter, limit }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return findRestartRequired(resolved, restart_type, resource_filter, limit);
   }),
-  outputSchema: out.findRestartRequiredOutput,
-}, handleStructuredTool(async ({ identifier, restart_type, resource_filter, limit }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return findRestartRequired(resolved, restart_type, resource_filter, limit);
-}));
+);
 
-server.registerTool("find_attribute_groups", {
-  title: "Find Attribute Groups",
-  description:
-    "Discover attribute groups — logical groupings of related attributes within resources. Filter by resource address or group name.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    identifier: identifierParam,
-    resource: z
-      .string()
-      .optional()
-      .describe("Specific resource address to query"),
-    group_name: z
-      .string()
-      .optional()
-      .describe("Filter by group name substring"),
+server.registerTool(
+  "find_attribute_groups",
+  {
+    title: "Find Attribute Groups",
+    description:
+      "Discover attribute groups — logical groupings of related attributes within resources. Filter by resource address or group name.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      identifier: identifierParam,
+      resource: z.string().optional().describe("Specific resource address to query"),
+      group_name: z.string().optional().describe("Filter by group name substring"),
+    }),
+    outputSchema: out.findAttributeGroupsOutput,
+  },
+  handleStructuredTool(async ({ identifier, resource, group_name }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return { results: await findAttributeGroups(resolved, resource, group_name) };
   }),
-  outputSchema: out.findAttributeGroupsOutput,
-}, handleStructuredTool(async ({ identifier, resource, group_name }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return { results: await findAttributeGroups(resolved, resource, group_name) };
-}));
+);
 
-server.registerTool("run_cypher", {
-  title: "Run Cypher Query",
-  description:
-    "Escape hatch for advanced users: runs an arbitrary read-only Cypher query against the management model. Results capped at 100 rows with a 10s timeout.",
-  annotations: readOnlyAnnotations,
-  inputSchema: z.object({
-    query: z.string().describe("Cypher query to execute"),
-    identifier: identifierParam,
+server.registerTool(
+  "run_cypher",
+  {
+    title: "Run Cypher Query",
+    description:
+      "Escape hatch for advanced users: runs an arbitrary read-only Cypher query against the management model. Results capped at 100 rows with a 10s timeout.",
+    annotations: readOnlyAnnotations,
+    inputSchema: z.object({
+      query: z.string().describe("Cypher query to execute"),
+      identifier: identifierParam,
+    }),
+  },
+  handleTool(async ({ query, identifier }) => {
+    const resolved = await resolveIdentifier(identifier);
+    return runCypher(resolved, query);
   }),
-}, handleTool(async ({ query, identifier }) => {
-  const resolved = await resolveIdentifier(identifier);
-  return runCypher(resolved, query);
-}));
+);
 
 // --- Server startup ---
 
@@ -483,7 +538,7 @@ async function shutdown(): Promise<void> {
   const stopPromises = Array.from(getStartedBySession()).map((id) =>
     mgtStop(id).catch((err) => {
       console.error(`Failed to stop ${id} during shutdown:`, err);
-    })
+    }),
   );
   await Promise.all(stopPromises);
 }

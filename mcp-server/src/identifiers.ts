@@ -14,10 +14,7 @@ export async function resolveIdentifier(input: string): Promise<string> {
   return results[0].identifier;
 }
 
-export async function resolveIdentifiers(
-  id1: string,
-  id2: string
-): Promise<[string, string]> {
+export async function resolveIdentifiers(id1: string, id2: string): Promise<[string, string]> {
   const results = await mgtResolve(`${id1},${id2}`);
   return [results[0].identifier, results[1].identifier];
 }

@@ -17,17 +17,12 @@ interface RunCypherResult {
   truncated: boolean;
 }
 
-export async function runCypher(
-  identifier: string,
-  query: string
-): Promise<RunCypherResult> {
+export async function runCypher(identifier: string, query: string): Promise<RunCypherResult> {
   if (query.length > MAX_QUERY_LENGTH) {
     throw new Error(`Query too long (max ${MAX_QUERY_LENGTH} characters)`);
   }
   if (isMutatingQuery(query)) {
-    throw new Error(
-      "Write operations are not allowed. The model databases are read-only."
-    );
+    throw new Error("Write operations are not allowed. The model databases are read-only.");
   }
 
   const session = await getSession(identifier);

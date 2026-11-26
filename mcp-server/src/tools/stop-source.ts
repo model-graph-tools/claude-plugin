@@ -9,14 +9,10 @@ interface StopSourceResult {
   status: "stopped";
 }
 
-export async function stopSource(
-  identifier: string
-): Promise<StopSourceResult> {
+export async function stopSource(identifier: string): Promise<StopSourceResult> {
   const result = await mgtStop(identifier);
   if (!result.success) {
-    throw new Error(
-      result.error ?? `Failed to stop model graph "${identifier}"`
-    );
+    throw new Error(result.error ?? `Failed to stop model graph "${identifier}"`);
   }
   const canonicalId = result.identifier ?? identifier;
   await closeConnection(canonicalId);

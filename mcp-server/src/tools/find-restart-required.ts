@@ -24,7 +24,7 @@ export async function findRestartRequired(
   identifier: string,
   restartType?: string,
   resourceFilter?: string,
-  limit: number = DEFAULT_LIMIT
+  limit: number = DEFAULT_LIMIT,
 ): Promise<FindRestartRequiredResult> {
   const session = await getSession(identifier);
   try {
@@ -32,9 +32,7 @@ export async function findRestartRequired(
       limit: neo4j.int(limit),
     };
 
-    const conditions: string[] = [
-      "a.`restart-required` IS NOT NULL",
-    ];
+    const conditions: string[] = ["a.`restart-required` IS NOT NULL"];
 
     if (restartType) {
       params.restartType = restartType;
@@ -51,7 +49,7 @@ export async function findRestartRequired(
       `MATCH (r:Resource)-[:HAS_ATTRIBUTE]->(a:Attribute)
        ${whereClause}
        RETURN count(a) AS total`,
-      params
+      params,
     );
     const totalCount = toNumber(countResult.records[0]?.get("total"));
 
@@ -65,7 +63,7 @@ export async function findRestartRequired(
               a.\`default-value\` AS defaultValue
        ORDER BY a.\`restart-required\`, r.address, a.name
        LIMIT $limit`,
-      params
+      params,
     );
 
     return {

@@ -93,36 +93,36 @@ For any MCP-compatible agent, configure it to run `npx --yes @model-graph-tools/
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `list_sources` | Lists available WildFly versions and feature packs with container status |
-| `start_source` | Starts a Neo4j container for a source (auto-pulls image) |
-| `stop_source` | Stops a running Neo4j container |
-| `search_resources` | Searches resources by name or address pattern |
-| `browse_resource` | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
-| `describe_resource` | Returns a concise, human-readable description of a resource — purpose, required add-operation parameters, required and optional attributes, and a CLI example |
-| `search_operations` | Searches operations across all resources |
-| `search_attributes` | Searches attributes, with optional deprecated-only and stability level filters |
-| `find_capabilities` | Searches capabilities and their declaring/referencing resources |
-| `find_deprecated` | Finds deprecated elements, filterable by version and type |
-| `find_by_stability` | Finds elements by stability level (experimental, preview, community, default) |
-| `get_statistics` | Overview of a source's model: counts, stability breakdown, relationships |
-| `compare_versions` | Diffs two sources for added/removed/deprecated elements, including attribute and operation changes within shared resources |
-| `get_resource_tree` | Returns all resources in the subtree under a given address for hierarchy exploration |
-| `find_relationships` | Shows REQUIRES and ALTERNATIVE relationships between attributes and operation parameters |
-| `find_sensitive_attributes` | Finds security-sensitive attributes via IS_SENSITIVE constraints |
-| `get_allowed_values` | Gets allowed option values, numeric ranges, and string length constraints for attributes and parameters |
-| `find_restart_required` | Finds attributes that require a server restart after modification |
-| `find_attribute_groups` | Discovers logical groupings of related attributes within resources |
-| `run_cypher` | Runs arbitrary read-only Cypher queries (100 row limit, 10s timeout) |
+| Tool                        | Description                                                                                                                                                                                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `list_sources`              | Lists available WildFly versions and feature packs with container status                                                                                                                                                                                                    |
+| `start_source`              | Starts a Neo4j container for a source (auto-pulls image)                                                                                                                                                                                                                    |
+| `stop_source`               | Stops a running Neo4j container                                                                                                                                                                                                                                             |
+| `search_resources`          | Searches resources by name or address pattern                                                                                                                                                                                                                               |
+| `browse_resource`           | Returns a resource with full metadata: description, stability, parent, children, attributes (with access-type, stability, required, nillable, expressions-allowed, storage), operations (with stability), parameter relationships (requires/alternatives), and capabilities |
+| `describe_resource`         | Returns a concise, human-readable description of a resource — purpose, required add-operation parameters, required and optional attributes, and a CLI example                                                                                                               |
+| `search_operations`         | Searches operations across all resources                                                                                                                                                                                                                                    |
+| `search_attributes`         | Searches attributes, with optional deprecated-only and stability level filters                                                                                                                                                                                              |
+| `find_capabilities`         | Searches capabilities and their declaring/referencing resources                                                                                                                                                                                                             |
+| `find_deprecated`           | Finds deprecated elements, filterable by version and type                                                                                                                                                                                                                   |
+| `find_by_stability`         | Finds elements by stability level (experimental, preview, community, default)                                                                                                                                                                                               |
+| `get_statistics`            | Overview of a source's model: counts, stability breakdown, relationships                                                                                                                                                                                                    |
+| `compare_versions`          | Diffs two sources for added/removed/deprecated elements, including attribute and operation changes within shared resources                                                                                                                                                  |
+| `get_resource_tree`         | Returns all resources in the subtree under a given address for hierarchy exploration                                                                                                                                                                                        |
+| `find_relationships`        | Shows REQUIRES and ALTERNATIVE relationships between attributes and operation parameters                                                                                                                                                                                    |
+| `find_sensitive_attributes` | Finds security-sensitive attributes via IS_SENSITIVE constraints                                                                                                                                                                                                            |
+| `get_allowed_values`        | Gets allowed option values, numeric ranges, and string length constraints for attributes and parameters                                                                                                                                                                     |
+| `find_restart_required`     | Finds attributes that require a server restart after modification                                                                                                                                                                                                           |
+| `find_attribute_groups`     | Discovers logical groupings of related attributes within resources                                                                                                                                                                                                          |
+| `run_cypher`                | Runs arbitrary read-only Cypher queries (100 row limit, 10s timeout)                                                                                                                                                                                                        |
 
 ## Related Projects
 
-| Project | Description |
-|---------|-------------|
-| [claude-plugin](https://github.com/model-graph-tools/claude-plugin) | Claude Code plugin (skill, command, and this MCP server) |
-| [tooling](https://github.com/model-graph-tools/tooling) | `mgt` CLI for container lifecycle and WildFly analysis |
-| [analyzer](https://github.com/model-graph-tools/analyzer) | Java tool that reads the WildFly management model and populates Neo4j |
+| Project                                                             | Description                                                           |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [claude-plugin](https://github.com/model-graph-tools/claude-plugin) | Claude Code plugin (skill, command, and this MCP server)              |
+| [tooling](https://github.com/model-graph-tools/tooling)             | `mgt` CLI for container lifecycle and WildFly analysis                |
+| [analyzer](https://github.com/model-graph-tools/analyzer)           | Java tool that reads the WildFly management model and populates Neo4j |
 
 ## License
 
