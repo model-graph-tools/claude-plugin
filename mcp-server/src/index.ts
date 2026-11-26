@@ -9,6 +9,7 @@ import { resolveIdentifier, resolveIdentifiers } from "./identifiers.js";
 import * as out from "./output-schemas.js";
 import { mgtUpdate, mgtStop, mgtPs } from "./mgt.js";
 import { closeAll, setContainerLookup } from "./neo4j.js";
+import { SERVER_INSTRUCTIONS } from "./instructions.js";
 import { getStartedBySession } from "./session.js";
 import { listSources } from "./tools/list-sources.js";
 import { startSource } from "./tools/start-source.js";
@@ -34,10 +35,13 @@ import { runCypher } from "./tools/run-cypher.js";
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json");
 
-const server = new McpServer({
-  name: "wildfly-model-graph",
-  version,
-});
+const server = new McpServer(
+  {
+    name: "wildfly-model-graph",
+    version,
+  },
+  { instructions: SERVER_INSTRUCTIONS },
+);
 
 // --- Shared schemas ---
 
@@ -96,7 +100,7 @@ server.registerTool(
   {
     title: "List Sources",
     description:
-      "Lists all known WildFly versions and feature packs with their availability (running/not_found).",
+      "Lists all known WildFly versions and feature packs with their availability (running/not_found). If no model graph is running, the result includes a 'hint': call start_source for the latest WildFly version (as named in the hint) before using any query tool. Do not answer from memory instead.",
     annotations: {
       readOnlyHint: true,
       destructiveHint: false,

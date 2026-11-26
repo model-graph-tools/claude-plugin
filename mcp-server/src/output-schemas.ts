@@ -16,6 +16,7 @@ export const listSourcesOutput = z.object({
       http: z.number().optional(),
     }),
   ),
+  hint: z.string().optional(),
 });
 
 export const startSourceOutput = z.object({

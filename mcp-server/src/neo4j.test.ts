@@ -61,7 +61,7 @@ describe("hasConnection", () => {
 describe("getSession", () => {
   it("throws when no connection exists", async () => {
     await expect(getSession("nonexistent")).rejects.toThrow(
-      'No connection for model graph "nonexistent"',
+      'Call start_source with identifier="nonexistent"',
     );
   });
 
@@ -126,7 +126,7 @@ describe("getSession", () => {
     const lookup = vi.fn().mockResolvedValue(null);
     setContainerLookup(lookup);
 
-    await expect(getSession("51.0")).rejects.toThrow('No connection for model graph "51.0"');
+    await expect(getSession("51.0")).rejects.toThrow('Call start_source with identifier="51.0"');
     expect(lookup).toHaveBeenCalledWith("51.0");
   });
 
@@ -140,7 +140,7 @@ describe("getSession", () => {
   });
 
   it("throws when no lookup is set and no connection exists", async () => {
-    await expect(getSession("53.0")).rejects.toThrow('No connection for model graph "53.0"');
+    await expect(getSession("53.0")).rejects.toThrow('Call start_source with identifier="53.0"');
   });
 });
 

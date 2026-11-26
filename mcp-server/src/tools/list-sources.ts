@@ -1,7 +1,7 @@
 // Lists all known WildFly versions and feature packs, merging static metadata
 // from `mgt versions`/`mgt feature-packs` with live container status from `mgt ps`.
 
-import { mgtVersions, mgtFeaturePacks, mgtPs } from "../mgt.js";
+import { mgtVersions, mgtFeaturePacks, mgtPs, type WildFlyVersion } from "../mgt.js";
 import { getActiveSource, ensureConnection } from "../neo4j.js";
 
 // --- Types ---
@@ -20,6 +20,21 @@ interface SourceInfo {
 interface ListSourcesResult {
   activeSource: string | null;
   sources: SourceInfo[];
+  hint?: string;
+}
+
+/** Returns the short version of the newest WildFly release, or undefined if none is known. */
+export function latestWildFlyVersion(versions: readonly WildFlyVersion[]): string | undefined {
+  if (versions.length === 0) return undefined;
+  return versions.reduce((latest, v) => (v.identifier > latest.identifier ? v : latest))
+    .short_version;
+}
+
+function noneRunningHint(latest: string): string {
+  return (
+    `No model graph is running. Call start_source with identifier="${latest}" (latest WildFly) ` +
+    `before querying. The first start may take up to a minute.`
+  );
 }
 
 export async function listSources(): Promise<ListSourcesResult> {
@@ -73,5 +88,7 @@ export async function listSources(): Promise<ListSourcesResult> {
     });
   }
 
-  return { activeSource: active, sources };
+  const latest = latestWildFlyVersion(versions);
+  const hint = running.length === 0 && latest ? noneRunningHint(latest) : undefined;
+  return hint ? { activeSource: active, sources, hint } : { activeSource: active, sources };
 }

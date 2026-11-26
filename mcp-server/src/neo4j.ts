@@ -71,7 +71,7 @@ export async function getSession(identifier: string): Promise<Session> {
     }
     if (!entry) {
       throw new Error(
-        `No connection for model graph "${identifier}". Use start_source to start it first.`,
+        `Model graph "${identifier}" is not running. Call start_source with identifier="${identifier}" first, then retry.`,
       );
     }
   }
