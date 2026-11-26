@@ -1,6 +1,8 @@
 // Server-level instructions sent to every MCP client during initialization.
 // Keeps the critical source-selection rules independent of the agent skill.
 
+import { RELATIONSHIP_SEMANTICS } from "./relationships.js";
+
 export const SERVER_INSTRUCTIONS = `Explore the WildFly management model (resources, attributes, operations, capabilities, deprecations) stored in per-version Neo4j model graphs. Always ground answers in these tools instead of answering from memory.
 
 Choosing a model graph (the "identifier" parameter):
@@ -12,4 +14,7 @@ Choosing a model graph (the "identifier" parameter):
   4. If no model graph is running, call start_source for the latest WildFly version (list_sources returns a "hint" with the exact identifier), then query it. Do not give up and answer from memory.
 - The first start_source call may take up to a minute while the image is downloaded.
 
-start_source starts the model graph database, not a WildFly server. Describe it as "starting the model graph for WildFly X".`;
+start_source starts the model graph database, not a WildFly server. Describe it as "starting the model graph for WildFly X".
+
+Attribute and parameter relationships (when writing CLI scripts or operations):
+${RELATIONSHIP_SEMANTICS}`;

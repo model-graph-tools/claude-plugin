@@ -2,6 +2,7 @@
 // Rejects mutating keywords and caps results at 100 rows with a 10s timeout.
 
 import { getSession } from "../neo4j.js";
+import { mentionsRelationships, RELATIONSHIP_SEMANTICS } from "../relationships.js";
 import { toPlainValue } from "../utils.js";
 
 // --- Constants ---
@@ -15,6 +16,7 @@ interface RunCypherResult {
   rows: Record<string, unknown>[];
   rowCount: number;
   truncated: boolean;
+  hint?: string;
 }
 
 export async function runCypher(identifier: string, query: string): Promise<RunCypherResult> {
@@ -32,18 +34,22 @@ export async function runCypher(identifier: string, query: string): Promise<RunC
     const truncated = result.records.length > MAX_ROWS;
     const records = result.records.slice(0, MAX_ROWS);
 
+    const rows = records.map((r) => {
+      const row: Record<string, unknown> = {};
+      for (const key of r.keys) {
+        const k = String(key);
+        row[k] = toPlainValue(r.get(k));
+      }
+      return row;
+    });
+    const showHint = mentionsRelationships(query) || mentionsRelationships(JSON.stringify(rows));
+
     return {
       columns: columns as string[],
-      rows: records.map((r) => {
-        const row: Record<string, unknown> = {};
-        for (const key of r.keys) {
-          const k = String(key);
-          row[k] = toPlainValue(r.get(k));
-        }
-        return row;
-      }),
+      rows,
       rowCount: result.records.length,
       truncated,
+      ...(showHint && { hint: RELATIONSHIP_SEMANTICS }),
     };
   } finally {
     await session.close();

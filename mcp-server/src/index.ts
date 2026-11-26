@@ -408,7 +408,7 @@ server.registerTool(
   {
     title: "Find Relationships",
     description:
-      "Shows dependency and exclusivity relationships between attributes and between operation parameters for a resource. Exposes REQUIRES (must be set together) and ALTERNATIVE (mutually exclusive) relationships.",
+      "Shows dependency and exclusivity relationships between attributes and between operation parameters for a resource. Exposes REQUIRES (must be defined together) and ALTERNATIVE (mutually exclusive) relationships. Alternatives are exclusive by definition, not by value: to switch from one alternative to another, undefine-attribute the old one; writing false still defines it and fails with WFLYCTL0105.",
     annotations: readOnlyAnnotations,
     inputSchema: z.object({
       address: z.string().describe('Resource address, e.g. "/subsystem=datasources/data-source=*"'),

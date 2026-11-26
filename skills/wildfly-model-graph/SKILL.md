@@ -323,6 +323,23 @@ When the user asks about attribute dependencies ("what attributes must be set to
 - **REQUIRES**: Attributes/parameters that must be set together
 - **ALTERNATIVE**: Attributes/parameters that are mutually exclusive
 
+How WildFly enforces them (critical when generating CLI scripts or operations):
+- **ALTERNATIVE** is checked by whether an attribute is *defined*, not by its value. Writing
+  `false` (or any value) still defines it, so enabling the other alternative fails with
+  `WFLYCTL0105: X is invalid in combination with Y`. To switch, `undefine-attribute` the old
+  alternative(s) first, e.g. in the same batch:
+  ```
+  batch
+  /subsystem=transactions:undefine-attribute(name=use-journal-store)
+  /subsystem=transactions:write-attribute(name=jdbc-store-datasource, value=java:jboss/datasources/TxLogDS)
+  /subsystem=transactions:write-attribute(name=use-jdbc-store, value=true)
+  run-batch
+  ```
+- **REQUIRES**: the required attribute/parameter must be defined first, or in the same
+  batch/operation.
+
+The same rule applies when you discover relationships via `run_cypher`.
+
 Use `scope="attributes"` or `scope="parameters"` to narrow the results, or omit for both.
 
 ### Querying sensitive attributes

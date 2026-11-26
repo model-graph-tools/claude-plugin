@@ -2,6 +2,7 @@
 // between operation parameters for a given resource.
 
 import { getSessions } from "../neo4j.js";
+import { RELATIONSHIP_SEMANTICS } from "../relationships.js";
 
 // --- Types ---
 
@@ -22,6 +23,7 @@ interface FindRelationshipsResult {
   address: string;
   attributeRelationships: AttributeRelationship[];
   parameterRelationships: ParameterRelationship[];
+  hint?: string;
 }
 
 export async function findRelationships(
@@ -103,10 +105,12 @@ export async function findRelationships(
       }
     }
 
+    const hasRelationships = attributeRelationships.length > 0 || parameterRelationships.length > 0;
     return {
       address,
       attributeRelationships,
       parameterRelationships,
+      ...(hasRelationships && { hint: RELATIONSHIP_SEMANTICS }),
     };
   } finally {
     await Promise.all(sessions.map((s) => s.close()));

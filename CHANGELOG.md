@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Explain how WildFly enforces `ALTERNATIVE` and `REQUIRES` relationships (alternatives are exclusive by definition, so switching requires `undefine-attribute`, not writing `false`) in the MCP server instructions, the skill, and the `find_relationships` tool description ([#8](https://github.com/model-graph-tools/claude-plugin/issues/8))
+- Include a relationship-semantics `hint` in `find_relationships` and `run_cypher` results that contain `ALTERNATIVE` or `REQUIRES` relations
+
 ## [0.12.4] - 2026-11-26
 
 ### Added

@@ -13,6 +13,7 @@ vi.mock("../neo4j.js", () => ({
 }));
 
 import { runCypher } from "./run-cypher.js";
+import { RELATIONSHIP_SEMANTICS } from "../relationships.js";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -151,6 +152,35 @@ describe("mutation detection", () => {
       await expect(runCypher("39.0", query)).resolves.toBeDefined();
     });
   }
+});
+
+describe("relationship semantics hint", () => {
+  it("adds the hint when the query references ALTERNATIVE or REQUIRES", async () => {
+    mockRecords(["a", "rel", "b"], [["use-jdbc-store", "ALTERNATIVE", "use-journal-store"]]);
+
+    const result = await runCypher(
+      "42.0",
+      "MATCH (a:Attribute)-[rel:REQUIRES|ALTERNATIVE]->(b) RETURN a.name AS a, type(rel) AS rel, b.name AS b",
+    );
+
+    expect(result.hint).toBe(RELATIONSHIP_SEMANTICS);
+  });
+
+  it("adds the hint when the rows contain an ALTERNATIVE relation type", async () => {
+    mockRecords(["rel"], [["ALTERNATIVE"]]);
+
+    const result = await runCypher("42.0", "MATCH ()-[r]->() RETURN type(r) AS rel");
+
+    expect(result.hint).toBe(RELATIONSHIP_SEMANTICS);
+  });
+
+  it("omits the hint for unrelated queries", async () => {
+    mockRecords(["x"], [["y"]]);
+
+    const result = await runCypher("42.0", "MATCH (n:Resource) RETURN n.name AS x");
+
+    expect(result.hint).toBeUndefined();
+  });
 });
 
 describe("query length validation", () => {
