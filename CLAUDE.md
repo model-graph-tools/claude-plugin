@@ -50,13 +50,13 @@ claude plugin install mgt@model-graph-tools
 
 ```bash
 # Build the MCP server
-cd mcp-server && npm run build
+cd mcp-server && pnpm install && pnpm build
 
-# Run in development mode (tsx, no compile step)
-cd mcp-server && npm run dev
+# Run in development mode (no compile step)
+cd mcp-server && pnpm dev
 
 # Start the compiled server
-cd mcp-server && npm start
+cd mcp-server && pnpm start
 ```
 
 The MCP server communicates over stdio and is launched automatically by Claude Code when the plugin is installed.

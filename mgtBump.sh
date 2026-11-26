@@ -20,7 +20,7 @@
 #
 # Bumps the bundled mgt binary version in
 #   - mcp-server/package.json (optionalDependencies)
-#   - mcp-server/package-lock.json (via npm install)
+#   - mcp-server/pnpm-lock.yaml (via pnpm install)
 #
 # -------------------------------------------------------
 
@@ -72,7 +72,7 @@ for (const key of Object.keys(pkg.optionalDependencies || {})) {
 fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
 "
 
-# Regenerate package-lock.json
-(cd mcp-server && npm install)
+# Regenerate pnpm-lock.yaml
+(cd mcp-server && pnpm install)
 
 echo "mgt bumped to ${VERSION}"

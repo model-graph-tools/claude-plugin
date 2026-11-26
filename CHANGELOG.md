@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Name the exact `start_source` call in the error returned by query tools when the model graph isn't running
 - Migrate `mcp-server` development tooling to Vite+ (`vp check`, `vp test`, `vp fmt`)
+- Switch `mcp-server` package manager from npm to pnpm; CI, release, and bump scripts now use `pnpm`, and the Verify workflow also runs `vp check` and tests
+- Update bundled `@modelcontextprotocol/server` SDK from 2.3.1 to 2.4.0
 
 ### Fixed
 - Fix `search_resources` throwing instead of reporting zero results when the count query returns no rows

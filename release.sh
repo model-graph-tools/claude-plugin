@@ -135,8 +135,8 @@ msg ""
 msg "Bumping version to ${CYAN}${RELEASE_VERSION}${NOFORMAT}..."
 ./versionBump.sh "${RELEASE_VERSION}"
 
-msg "Syncing ${CYAN}package-lock.json${NOFORMAT}..."
-(cd mcp-server && npm install --package-lock-only --ignore-scripts)
+msg "Syncing ${CYAN}pnpm-lock.yaml${NOFORMAT}..."
+(cd mcp-server && pnpm install --lockfile-only --ignore-scripts)
 
 msg "Updating ${CYAN}CHANGELOG.md${NOFORMAT}..."
 sed -i '' "s/## \[Unreleased\]/## [Unreleased]\n\n## [${RELEASE_VERSION}] - ${TODAY}/" CHANGELOG.md
@@ -146,7 +146,7 @@ sed -i '' "/^\[Unreleased\]/a\\
 [${RELEASE_VERSION}]: https://github.com/model-graph-tools/claude-plugin/compare/v${PREV_TAG}...${TAG}" CHANGELOG.md
 
 msg "Committing and tagging..."
-git add .claude-plugin/plugin.json mcp-server/package.json mcp-server/package-lock.json skills/wildfly-model-graph/SKILL.md CHANGELOG.md
+git add .claude-plugin/plugin.json mcp-server/package.json mcp-server/pnpm-lock.yaml skills/wildfly-model-graph/SKILL.md CHANGELOG.md
 git commit -m "$(cat <<EOF
 chore: release v${RELEASE_VERSION}
 EOF

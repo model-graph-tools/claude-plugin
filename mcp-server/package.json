@@ -39,19 +39,19 @@
     "start": "node dist/index.js",
     "dev": "vpx src/index.ts",
     "test": "vp test run",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "neo4j-driver": "^6.2.0"
+    "neo4j-driver": "^6.3.2"
   },
   "devDependencies": {
-    "@cfworker/json-schema": "^4.1.1",
-    "@modelcontextprotocol/server": "^2.3.1",
-    "@types/node": "^26.6.5",
-    "esbuild": "^0.28.0",
+    "@cfworker/json-schema": "^4.1.6",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "@types/node": "^26.6.10",
+    "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
-    "vite-plus": "1.8.0",
-    "vitest": "5.1.1",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:",
     "zod": "^4.6.7"
   },
   "optionalDependencies": {

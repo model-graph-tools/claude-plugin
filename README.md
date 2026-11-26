@@ -48,8 +48,8 @@ The MCP server is fetched automatically from [npm](https://www.npmjs.com/package
 ```bash
 git clone https://github.com/model-graph-tools/claude-plugin.git
 cd claude-plugin/mcp-server
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 Then load the plugin locally:
@@ -277,7 +277,7 @@ Contributions are welcome! Here's how to get started:
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feat/my-feature`
-3. Build the MCP server: `cd mcp-server && npm install && npm run build`
+3. Build the MCP server: `cd mcp-server && pnpm install && pnpm build`
 4. Test locally: `claude --plugin-dir /path/to/your/fork`
 5. Commit your changes using [conventional commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, etc.
 6. Push and open a pull request
@@ -287,8 +287,8 @@ Contributions are welcome! Here's how to get started:
 ```bash
 git clone https://github.com/model-graph-tools/claude-plugin.git
 cd claude-plugin/mcp-server
-npm install
-npm run dev    # runs with tsx, no compile step needed
+pnpm install
+pnpm dev       # runs the TypeScript sources directly, no compile step needed
 ```
 
 ### Project Structure
