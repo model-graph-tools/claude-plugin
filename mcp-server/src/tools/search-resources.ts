@@ -35,7 +35,7 @@ export async function searchResources(
        RETURN count(r) AS total`,
       { regex },
     );
-    const totalCount = (countResult.records[0]?.get("total") as { toNumber(): number }).toNumber();
+    const totalCount = toNumber(countResult.records[0]?.get("total"));
 
     const result = await session.run(
       `MATCH (r:Resource)

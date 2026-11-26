@@ -2,7 +2,7 @@
 // resource info, attributes, operations, capabilities, parameter relationships, and sub-attributes.
 
 import { getSessions } from "../neo4j.js";
-import { pickDefined, toNumber, toNumberOrUndefined } from "../utils.js";
+import { pickDefined, toNumberOrUndefined } from "../utils.js";
 
 // --- Cypher queries ---
 
@@ -284,9 +284,10 @@ function mapParameter(
   p: Record<string, unknown>,
   paramRelMap: Map<string, { requires: string[]; alternatives: string[] }>,
 ): ParameterInfo {
-  const rels = paramRelMap.get(`${opName}:${p.name}`);
+  const name = p.name as string;
+  const rels = paramRelMap.get(`${opName}:${name}`);
   return {
-    name: p.name as string,
+    name,
     type: p.type as string,
     required: p.required as boolean,
     description: p.description as string,

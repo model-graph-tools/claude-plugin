@@ -73,13 +73,15 @@ function handleTool<T>(fn: (params: T) => Promise<unknown>) {
   };
 }
 
-function handleStructuredTool<T>(fn: (params: T) => Promise<Record<string, unknown>>) {
+// Result types are plain interfaces, which TypeScript does not treat as having an
+// index signature, so they are widened to the SDK's structuredContent type here.
+function handleStructuredTool<T, R extends object>(fn: (params: T) => Promise<R>) {
   return async (params: T) => {
     try {
       const result = await fn(params);
       return {
         content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-        structuredContent: result,
+        structuredContent: result as Record<string, unknown>,
       };
     } catch (e) {
       return errorResult(e);

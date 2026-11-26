@@ -5,9 +5,9 @@ import { searchOperations } from "./src/tools/search-operations.js";
 import { findCapabilities } from "./src/tools/find-capabilities.js";
 import { findDeprecated } from "./src/tools/find-deprecated.js";
 import { runCypher } from "./src/tools/run-cypher.js";
-import { registerConnection, closeAll } from "./src/neo4j.js";
+import { ensureConnection, closeAll } from "./src/neo4j.js";
 
-registerConnection("39.0", 6390);
+ensureConnection("39.0", 6390);
 
 async function test() {
   console.log("=== list_sources ===");
@@ -29,7 +29,7 @@ async function test() {
   );
 
   console.log("\n=== search_operations: test-connection ===");
-  const ops = await searchOperations("39.0", "test-connection", 3);
+  const ops = await searchOperations("39.0", "test-connection", undefined, undefined, undefined, 3);
   console.log(`Found ${ops.totalCount} operations`);
   for (const op of ops.results) console.log(`  ${op.operation} on ${op.resource}`);
 
